@@ -53,15 +53,15 @@ export default function Home() {
             <Link href="#gestion" className="hover:text-blue-600 transition-colors">Gestión RentControl</Link>
             <Link href="#proveedores" className="hover:text-blue-600 transition-colors">Para Técnicos</Link>
           </div>
-          <div className="flex gap-4 items-center">
+          <div className="flex gap-2 sm:gap-4 items-center">
             <a href="https://clientes.portalinternet.net/accounts/login/?next=/panel/" target="_blank" rel="noopener noreferrer">
-              <Button variant="outline" className="hidden sm:flex border-blue-200 text-blue-700 hover:bg-blue-50">
+              <Button variant="outline" size="sm" className="border-blue-200 text-blue-700 hover:bg-blue-50 px-2 sm:px-4 text-xs sm:text-sm h-9 sm:h-10">
                 Portal WISP
               </Button>
             </a>
-            <Link href="/login" className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors h-10 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white shadow-md shadow-slate-900/20">
-              <Building2 className="mr-2 h-4 w-4" />
-              Acceso a la Nube
+            <Link href="/login" className="inline-flex items-center justify-center rounded-md text-xs sm:text-sm font-medium transition-colors h-9 sm:h-10 px-3 sm:px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white shadow-md shadow-slate-900/20">
+              <Building2 className="hidden sm:inline-block mr-2 h-4 w-4" />
+              RentControl
             </Link>
           </div>
         </div>
