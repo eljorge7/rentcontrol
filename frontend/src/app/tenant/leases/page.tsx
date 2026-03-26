@@ -71,7 +71,7 @@ export default function TenantLeasePage() {
   const handleDownloadPDF = async () => {
     setDownloading(true);
     try {
-      const res = await fetch(`http://localhost:3001/pdfs/lease/${lease.id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/pdfs/lease/${lease.id}`, {
         headers: getAuthHeaders()
       });
       if (!res.ok) throw new Error("File not found");

@@ -19,7 +19,7 @@ export default function PublicTicketPage() {
   useEffect(() => {
     const fetchIncident = async () => {
       try {
-        const res = await fetch(`http://localhost:3001/incidents/public/${id}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/incidents/public/${id}`);
         if (!res.ok) throw new Error("Ticket no encontrado");
         const data = await res.json();
         setIncident(data);
@@ -36,7 +36,7 @@ export default function PublicTicketPage() {
     e.preventDefault();
     setResolving(true);
     try {
-      const res = await fetch(`http://localhost:3001/incidents/public/${id}/resolve`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/incidents/public/${id}/resolve`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

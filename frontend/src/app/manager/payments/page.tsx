@@ -97,7 +97,7 @@ export default function PaymentsListPage() {
                   
                   const receiptPath = receiptMatch ? receiptMatch[1].trim() : null;
                   const finalReceiptPath = receiptPath?.replace(/^\/api/, '') || receiptPath;
-                  const fullReceiptUrl = finalReceiptPath ? `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${finalReceiptPath}` : null;
+                  const fullReceiptUrl = finalReceiptPath ? `${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}`}${finalReceiptPath}` : null;
 
                   const reference = refMatch ? refMatch[1].trim() : null;
                   const nota = notaMatch ? notaMatch[1].trim() : null;

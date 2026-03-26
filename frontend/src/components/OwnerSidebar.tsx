@@ -19,7 +19,7 @@ export function OwnerSidebar() {
 
   useEffect(() => {
     if (user?.role === 'OWNER') {
-      fetch("http://localhost:3001/properties", { headers: getAuthHeaders() })
+      fetch(`${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}/properties`, { headers: getAuthHeaders() })
         .then(res => res.json())
         .then(data => {
           if (Array.isArray(data)) setProperties(data);

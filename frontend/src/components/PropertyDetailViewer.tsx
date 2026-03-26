@@ -84,7 +84,7 @@ export function PropertyDetailViewer({ id, roleBasePath }: PropertyDetailViewerP
 
   const fetchPropertyDetails = async () => {
     try {
-      const res = await fetch(`http://localhost:3001/properties/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/properties/${id}`, {
         headers: getAuthHeaders()
       });
       if (res.ok) {

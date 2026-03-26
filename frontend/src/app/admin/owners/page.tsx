@@ -72,9 +72,9 @@ export default function AdminOwnersPage() {
     setIsLoading(true);
     try {
       const [ownersRes, managersRes, plansRes] = await Promise.all([
-        fetch("http://localhost:3001/users/owners", { headers: getAuthHeaders() }),
-        fetch("http://localhost:3001/users/managers", { headers: getAuthHeaders() }),
-        fetch("http://localhost:3001/management-plans", { headers: getAuthHeaders() })
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}/users/owners`, { headers: getAuthHeaders() }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}/users/managers`, { headers: getAuthHeaders() }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}/management-plans`, { headers: getAuthHeaders() })
       ]);
       
       if (ownersRes.ok) setOwners(await ownersRes.json());
@@ -104,7 +104,7 @@ export default function AdminOwnersPage() {
           managerId: formData.managerId || null,
           managementPlanId: formData.managementPlanId || null
         };
-        const res = await fetch(`http://localhost:3001/users/${formData.id}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/users/${formData.id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json", ...getAuthHeaders() },
           body: JSON.stringify(payload)
@@ -144,7 +144,7 @@ export default function AdminOwnersPage() {
         if (files.propertyDeed) formPayload.append("propertyDeed", files.propertyDeed);
         if (files.bankStatement) formPayload.append("bankStatement", files.bankStatement);
 
-        const res = await fetch("http://localhost:3001/users/owner", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}/users/owner`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${getToken()}`
@@ -181,7 +181,7 @@ export default function AdminOwnersPage() {
   const handleDeleteOwner = async (id: string, name: string) => {
     if (!confirm(`¿Estás seguro de que deseas eliminar permanentemente a ${name}? Toda su información será borrada.`)) return;
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}`;
       const res = await fetch(`${apiUrl}/users/${id}`, {
         method: "DELETE",
         headers: getAuthHeaders()

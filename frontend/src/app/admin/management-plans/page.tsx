@@ -40,7 +40,7 @@ export default function AdminManagementPlansPage() {
 
   const fetchPlans = async () => {
     try {
-      const res = await fetch("http://localhost:3001/management-plans", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}/management-plans`, {
         headers: getAuthHeaders()
       });
       if (res.ok) {
@@ -67,7 +67,7 @@ export default function AdminManagementPlansPage() {
       };
 
       const isEditing = !!formData.id;
-      const url = isEditing ? `http://localhost:3001/management-plans/${formData.id}` : "http://localhost:3001/management-plans";
+      const url = isEditing ? `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/management-plans/${formData.id}` : `${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}/management-plans`;
       const method = isEditing ? "PATCH" : "POST";
 
       const res = await fetch(url, {
@@ -98,7 +98,7 @@ export default function AdminManagementPlansPage() {
   const handleDelete = async (id: string) => {
     if (!confirm("¿Seguro que deseas eliminar este plan?")) return;
     try {
-      const res = await fetch(`http://localhost:3001/management-plans/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/management-plans/${id}`, {
         method: "DELETE",
         headers: getAuthHeaders()
       });

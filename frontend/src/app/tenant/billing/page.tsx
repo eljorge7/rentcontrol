@@ -72,7 +72,7 @@ export default function TenantBillingPage() {
     
     setDownloading(true);
     try {
-      const res = await fetch(`http://localhost:3001/pdfs/account-statement/${leaseId}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/pdfs/account-statement/${leaseId}`, {
         headers: getAuthHeaders()
       });
       if (!res.ok) throw new Error("File not found");

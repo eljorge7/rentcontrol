@@ -28,7 +28,7 @@ export default function TenantIncidentsPage() {
 
   const fetchIncidents = async () => {
     try {
-      const res = await fetch("http://localhost:3001/incidents", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}/incidents`, {
         headers: getAuthHeaders(),
       });
       const data = await res.json();
@@ -55,7 +55,7 @@ export default function TenantIncidentsPage() {
     
     setIsSubmitting(true);
     try {
-      const res = await fetch("http://localhost:3001/incidents", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}/incidents`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

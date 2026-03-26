@@ -45,7 +45,7 @@ export default function OwnerIncidentsPage() {
 
   const fetchIncidents = async () => {
     try {
-      const res = await fetch("http://localhost:3001/incidents", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}/incidents`, {
         headers: getAuthHeaders(),
       });
       if (res.ok) {
@@ -61,7 +61,7 @@ export default function OwnerIncidentsPage() {
 
   const handleUpdateStatus = async (id: string, newStatus: string) => {
     try {
-      const res = await fetch(`http://localhost:3001/incidents/${id}/status`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/incidents/${id}/status`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -84,7 +84,7 @@ export default function OwnerIncidentsPage() {
     e.preventDefault();
     if (!selectedIncident || !selectedSupplier) return;
     try {
-      const res = await fetch(`http://localhost:3001/incidents/${selectedIncident}/status`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/incidents/${selectedIncident}/status`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

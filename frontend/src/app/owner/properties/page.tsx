@@ -28,7 +28,7 @@ export default function OwnerPropertiesPage() {
 
   const fetchProperties = async () => {
     try {
-      const res = await fetch("http://localhost:3001/properties", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}/properties`, {
         headers: getAuthHeaders()
       });
       if (res.ok) {
@@ -53,7 +53,7 @@ export default function OwnerPropertiesPage() {
         ownerId: user?.id
       };
 
-      const res = await fetch("http://localhost:3001/properties", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}/properties`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

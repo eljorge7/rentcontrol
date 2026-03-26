@@ -42,7 +42,7 @@ export default function OwnerBillingPage() {
   const fetchData = async () => {
     if (!user?.id) return;
     try {
-      const res = await fetch(`http://localhost:3001/dashboard/owner/${user.id}/billing`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/dashboard/owner/${user.id}/billing`, {
         headers: getAuthHeaders(),
       });
       const json = await res.json();
@@ -64,7 +64,7 @@ export default function OwnerBillingPage() {
     }
 
     try {
-      const res = await fetch("http://localhost:3001/expenses", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}/expenses`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

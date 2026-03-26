@@ -31,9 +31,9 @@ export default function ManagerWalletPage() {
     const fetchWalletData = async () => {
       try {
         const [sumRes, comRes, payRes] = await Promise.all([
-          fetch("http://localhost:3001/commissions/summary", { headers: getAuthHeaders() }),
-          fetch("http://localhost:3001/commissions/my-commissions", { headers: getAuthHeaders() }),
-          fetch("http://localhost:3001/commissions/my-payrolls", { headers: getAuthHeaders() })
+          fetch(`${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}/commissions/summary`, { headers: getAuthHeaders() }),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}/commissions/my-commissions`, { headers: getAuthHeaders() }),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}/commissions/my-payrolls`, { headers: getAuthHeaders() })
         ]);
 
         if (sumRes.ok) setSummary(await sumRes.json());

@@ -73,7 +73,7 @@ export default function OwnerDashboard() {
   const fetchData = async (ownerId: string) => {
     try {
       const [dashRes, metricsRes] = await Promise.all([
-        fetch(`http://localhost:3001/dashboard/owner/${ownerId}`, { headers: getAuthHeaders() }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/dashboard/owner/${ownerId}`, { headers: getAuthHeaders() }),
         api.get('/metrics/owner')
       ]);
       const data = await dashRes.json();
