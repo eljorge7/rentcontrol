@@ -39,6 +39,8 @@ const setupCommands = `
     git clone https://github.com/eljorge7/rentcontrol.git .
   fi
 
+  ls -la
+
   echo "--- Building and starting Docker containers ---"
   # Pull the latest changes directly and start containers
   docker compose pull || true
