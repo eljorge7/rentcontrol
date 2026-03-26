@@ -37,8 +37,6 @@ export default function AdminPropertiesPage() {
       loading={loading}
       basePath="/admin/properties"
       onRefresh={fetchData}
-      newPropertyOwnersFilter={(o) => o.planType === 'FULL_MANAGEMENT'}
-      editPropertyOwnersFilter={(o, p) => o.planType === 'FULL_MANAGEMENT' || o.id === p.ownerId}
     />
   );
 }

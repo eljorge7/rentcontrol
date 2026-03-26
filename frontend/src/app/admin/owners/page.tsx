@@ -177,6 +177,27 @@ export default function AdminOwnersPage() {
     });
     setFiles({ ine: null, rfcDocument: null, addressProof: null, propertyDeed: null, bankStatement: null });
   };
+
+  const handleDeleteOwner = async (id: string, name: string) => {
+    if (!confirm(`¿Estás seguro de que deseas eliminar permanentemente a ${name}? Toda su información será borrada.`)) return;
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+      const res = await fetch(`${apiUrl}/users/${id}`, {
+        method: "DELETE",
+        headers: getAuthHeaders()
+      });
+      if (res.ok) {
+        fetchData();
+      } else {
+        const error = await res.json();
+        alert(error.message || "Error al eliminar propietario");
+      }
+    } catch (error) {
+      console.error("Error deleting owner:", error);
+      alert("Error de conexión al servidor");
+    }
+  };
+
   const filteredOwners = owners.filter(o => 
     o.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
     o.email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -294,7 +315,7 @@ export default function AdminOwnersPage() {
                   Editar Básico
                 </Button>
                 {user?.role === "ADMIN" && (
-                  <Button variant="ghost" size="sm" className="h-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50">
+                  <Button variant="ghost" size="sm" className="h-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50" onClick={() => handleDeleteOwner(owner.id, owner.name)}>
                     <Trash2 className="h-4 w-4 mr-2" />
                     Eliminar
                   </Button>
