@@ -39,7 +39,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        - NEXT_PUBLIC_API_URL=https://api.radiotecpro.com
+        - NEXT_PUBLIC_API_URL=/api
     container_name: rentcontrol-frontend
     restart: always
     depends_on:
