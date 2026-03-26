@@ -7,7 +7,7 @@ import { Wifi, Zap, Shield, PhoneCall, ChevronRight, Check, Building2, Star, Tar
 import axios from "axios";
 
 // Using native fetch or axios to the public endpoints.
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = "https://api.radiotecpro.com";
 
 export default function Home() {
   const [wispPlans, setWispPlans] = useState<any[]>([]);
@@ -55,11 +55,11 @@ export default function Home() {
           </div>
           <div className="flex gap-2 sm:gap-4 items-center">
             <a href="https://clientes.portalinternet.net/accounts/login/?next=/panel/" target="_blank" rel="noopener noreferrer">
-              <Button variant="outline" size="sm" className="border-blue-200 text-blue-700 hover:bg-blue-50 px-2 sm:px-4 text-xs sm:text-sm h-9 sm:h-10">
+              <Button variant="outline" size="sm" className="rounded-full border-blue-200 text-blue-700 hover:bg-blue-50 px-3 sm:px-5 text-xs sm:text-sm h-9 sm:h-10">
                 Portal WISP
               </Button>
             </a>
-            <Link href="/login" className="inline-flex items-center justify-center rounded-md text-xs sm:text-sm font-medium transition-colors h-9 sm:h-10 px-3 sm:px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white shadow-md shadow-slate-900/20">
+            <Link href="/login" className="inline-flex items-center justify-center rounded-xl text-xs sm:text-sm font-medium transition-colors h-9 sm:h-10 px-4 sm:px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white shadow-md shadow-slate-900/20">
               <Building2 className="hidden sm:inline-block mr-2 h-4 w-4" />
               RentControl
             </Link>
