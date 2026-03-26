@@ -31,4 +31,4 @@ RUN npm run build
 EXPOSE 3001
 
 # Run migrations and start the backend
-CMD ["sh", "-c", "npx prisma migrate deploy && npm run start:prod"]
+CMD ["sh", "-c", "npx prisma db push --accept-data-loss && npm run start:prod"]
