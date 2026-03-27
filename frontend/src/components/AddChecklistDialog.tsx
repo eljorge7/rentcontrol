@@ -57,7 +57,7 @@ export function AddChecklistDialog({ leaseId, onChecklistAdded }: AddChecklistDi
         formData.append("files", files[i]);
       }
       
-      const response = await api.post("/uploads", formData, {
+      const response = await api.post("/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
       
