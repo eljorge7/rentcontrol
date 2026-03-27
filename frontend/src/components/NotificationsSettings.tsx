@@ -66,7 +66,7 @@ export function NotificationsSettings() {
     try {
       setSaving(true);
       await api.post('/settings/bulk', formData);
-      alert('Configuraciones SMTP Guardadas Exitosamente.');
+      alert('Resend API Key Guardada Exitosamente.');
     } catch (error) {
       alert('Error guardando configuraciones.');
     } finally {
@@ -128,52 +128,28 @@ export function NotificationsSettings() {
         <CardHeader>
           <div className="flex items-center gap-2">
             <Mail className="h-5 w-5 text-indigo-500" />
-            <CardTitle>Credenciales de Envío Email (SMTP)</CardTitle>
+            <CardTitle>Conexión Resend (API de Correos)</CardTitle>
           </div>
           <CardDescription>
-            Configura las llaves de tu proveedor de correos (Gmail, Outlook, Hostinger) para enviar recibos en PDF.
+            Configura tu llave de acceso de Resend.com para inyectar correos globalmente mediante HTTP (Esquivando bloqueos portuarios de VPS).
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="SMTP_HOST">Servidor SMTP</Label>
-              <Input 
-                id="SMTP_HOST" name="SMTP_HOST" placeholder="Ej: smtp.gmail.com" 
-                value={formData.SMTP_HOST} onChange={handleChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="SMTP_PORT">Puerto</Label>
-              <Input 
-                id="SMTP_PORT" name="SMTP_PORT" placeholder="Ej: 587 o 465" 
-                value={formData.SMTP_PORT} onChange={handleChange}
-              />
-            </div>
-          </div>
-          
           <div className="space-y-2">
-            <Label htmlFor="SMTP_USER">Correo Electrónico Emisor</Label>
+            <Label htmlFor="SMTP_PASS">Resend API Key</Label>
             <Input 
-              id="SMTP_USER" name="SMTP_USER" placeholder="Ej: admin@radiotecpro.com" 
-              value={formData.SMTP_USER} onChange={handleChange}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="SMTP_PASS">Contraseña o App Password</Label>
-            <Input 
-              id="SMTP_PASS" name="SMTP_PASS" type="password" placeholder="Tu contraseña secreta" 
+              id="SMTP_PASS" name="SMTP_PASS" type="password" placeholder="re_..." 
               value={formData.SMTP_PASS} onChange={handleChange}
             />
             <p className="text-xs text-slate-500">
-              Si usas Gmail, asegúrate de generar una 'App Password' en la configuración de seguridad de Google.
+              Es la llave secreta generada en tu panel de Resend (comienza usualmente con "re_"). Funciona inmediatamente una vez verificas tu dominio radiotecpro.com.
             </p>
           </div>
         </CardContent>
         <CardFooter className="bg-slate-50 border-t px-6 py-4 flex justify-end">
           <Button onClick={handleSave} disabled={saving} className="bg-indigo-600 hover:bg-indigo-700 text-white">
             {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-            Guardar SMTP
+            Guardar API Key
           </Button>
         </CardFooter>
       </Card>
