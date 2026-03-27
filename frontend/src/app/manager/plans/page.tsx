@@ -40,8 +40,8 @@ export default function ManagerPlansPage() {
   const fetchData = async () => {
     try {
       const [plansRes, profilesRes] = await Promise.all([
-        fetch(`${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}/management-plans`, { headers: getAuthHeaders() }),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}/network-profiles`, { headers: getAuthHeaders() }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/management-plans`, { headers: getAuthHeaders() }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/network-profiles`, { headers: getAuthHeaders() }),
       ]);
       
       if (plansRes.ok) {

@@ -64,7 +64,7 @@ export default function OwnerBillingPage() {
     }
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}/expenses`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/expenses`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -29,7 +29,7 @@ export function ProfileSettings() {
       // Tenants do not have extended Users configuration like requiresInvoice on the User model
       return;
     }
-    fetch(`${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}/users/my-profile`, { headers: getAuthHeaders() })
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/users/my-profile`, { headers: getAuthHeaders() })
       .then(async res => {
         if (!res.ok) throw new Error(await res.text());
         return res.json();
@@ -62,7 +62,7 @@ export function ProfileSettings() {
     }
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}/auth/profile`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/auth/profile`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

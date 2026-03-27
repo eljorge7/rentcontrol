@@ -52,7 +52,7 @@ export default function ManagerInboxPage() {
     }).catch(console.error);
 
     // Setup Socket
-    const newSocket = io(process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}`);
+    const newSocket = io(process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}`);
     setSocket(newSocket);
 
     newSocket.on("connect", () => {

@@ -31,7 +31,7 @@ export default function OwnerIncidentsPage() {
 
   const fetchIncidents = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}/incidents`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/incidents`, {
         headers: getAuthHeaders(),
       });
       if (res.ok) {

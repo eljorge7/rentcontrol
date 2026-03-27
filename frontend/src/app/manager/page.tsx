@@ -40,7 +40,7 @@ export default function ManagerDashboard() {
       try {
         const [metricsRes, ownersRes] = await Promise.all([
           api.get('/metrics/manager'),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}/users/owners`, { headers: getAuthHeaders() }),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/users/owners`, { headers: getAuthHeaders() }),
         ]);
 
         const owners = ownersRes.ok ? await ownersRes.json() : [];

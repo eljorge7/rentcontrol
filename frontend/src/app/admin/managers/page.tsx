@@ -47,8 +47,8 @@ export default function AdminManagersPage() {
     setIsLoading(true);
     try {
       const [managersRes, plansRes] = await Promise.all([
-        fetch(`${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}/users/managers`, { headers: getAuthHeaders() }),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}/management-plans`, { headers: getAuthHeaders() })
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/users/managers`, { headers: getAuthHeaders() }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/management-plans`, { headers: getAuthHeaders() })
       ]);
 
       if (managersRes.ok) setManagers(await managersRes.json());
@@ -72,7 +72,7 @@ export default function AdminManagersPage() {
       };
 
       const isEditing = !!formData.id;
-      const url = isEditing ? `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/users/${formData.id}` : `${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}/users`;
+      const url = isEditing ? `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/users/${formData.id}` : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/users`;
       const method = isEditing ? "PATCH" : "POST";
 
       const res = await fetch(url, {

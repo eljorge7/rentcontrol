@@ -35,7 +35,7 @@ export function ManagerOwnerChat({ managerId, managerName, ownerId, ownerName }:
     if (!open) return;
 
     // Conectar a WebSockets
-    const newSocket = io(`${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}`);
+    const newSocket = io(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}`);
     setSocket(newSocket);
 
     newSocket.on("connect", () => {

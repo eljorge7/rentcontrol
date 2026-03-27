@@ -35,7 +35,7 @@ export default function AdminChatPage() {
     fetchMessages();
 
     // In a real app we'd get the JWT or API Base URL from env config
-    const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}`;
+    const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}`;
     
     const newSocket = io(SOCKET_URL);
     setSocket(newSocket);

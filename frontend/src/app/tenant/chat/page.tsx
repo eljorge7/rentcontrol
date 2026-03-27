@@ -48,7 +48,7 @@ export default function TenantChatPage() {
       }
     }).catch(console.error);
 
-    const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}"}`;
+    const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}`;
     const newSocket = io(SOCKET_URL);
     setSocket(newSocket);
 
