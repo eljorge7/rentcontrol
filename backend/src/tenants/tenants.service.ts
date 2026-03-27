@@ -39,7 +39,7 @@ export class TenantsService {
       });
 
       // Dispatch Onboarding WhatsApp Message
-      const loginUrl = process.env.FRONTEND_URL || 'https://rentcontrol.radiotecpro.com';
+      const loginUrl = process.env.FRONTEND_URL || 'https://radiotecpro.com';
       const wpMessage = `👋 *¡Bienvenido a RentControl, ${newTenant.name}!* 🎉\n\nTu Administrador ha creado tu Portal Inmobiliario personalizado.\n\nDesde aquí podrás revisar tus recibos, descargar tus facturas y realizar tus pagos en línea de forma segura.\n\n🔗 *Accede aquí:* ${loginUrl}\n👤 *Usuario:* ${tenantData.email}\n🔑 *Contraseña Temporal:* ${plainPassword}\n\n⚠️ _Te recomendamos cambiar tu contraseña al ingresar por primera vez._\n\nAtentamente,\n*Equipo de Administración*`;
       
       if (newTenant.phone) {

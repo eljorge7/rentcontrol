@@ -75,7 +75,7 @@ export class ChargesService {
 
         // Dispatch Notifications asynchronously
         const mesText = today.toLocaleString('es-MX', { month: 'long' });
-        const loginUrl = process.env.FRONTEND_URL || 'https://rentcontrol.radiotecpro.com';
+        const loginUrl = process.env.FRONTEND_URL || 'https://radiotecpro.com';
         const wpMessage = `🔔 *RentControl - Renta de ${mesText}*\nHola ${lease.tenant.name}, este es un mensaje automático para notificarte que se ha generado exitosamente tu recibo de renta por *$${lease.rentAmount} MXN*.\n\n📅 *Vencimiento:* ${dueDate.toLocaleDateString('es-MX')}\n\nCon esto evitamos sorpresas. *Puedes realizar tu pago directamente en tu portal personalizado:* 🔗 ${loginUrl}\n\nRecuerda pagar a tiempo para evitar la suspensión automática de servicios. Tu pago nos ayuda a brindarte mejor servicio.\n\nAtentamente,\n*Administración de RentControl*`;
         
         if (lease.tenant.phone) {
@@ -201,7 +201,7 @@ export class ChargesService {
     // Dispatch Manual Trigger 
     if (newCharge.type === 'RENT' || newCharge.type === 'DEPOSIT') {
       const typeStr = newCharge.type === 'RENT' ? 'Renta' : 'Depósito';
-      const loginUrl = process.env.FRONTEND_URL || 'https://rentcontrol.radiotecpro.com';
+      const loginUrl = process.env.FRONTEND_URL || 'https://radiotecpro.com';
       const wpMessage = `🔔 *RentControl - Cargo de ${typeStr}*\nHola ${newCharge.lease.tenant.name}, este es un mensaje automático para notificarte que se ha generado un nuevo cargo en tu estado de cuenta por *$${newCharge.amount} MXN* bajo el concepto de: ${newCharge.description || 'Arrendamiento'}.\n\n📅 *Vencimiento:* ${newCharge.dueDate.toLocaleDateString('es-MX')}\n\n*Puedes realizar tu pago directamente en tu portal personalizado:* 🔗 ${loginUrl}\n\nAtentamente,\n*Administración de RentControl*`;
       
       if (newCharge.lease.tenant.phone) {

@@ -68,7 +68,7 @@ export class PenaltyService {
           this.logger.log(`Multa de $${charge.lease.lateFeeAmount} aplicada al contrato ${charge.leaseId} por recibo de renta vencido.`);
 
           // Notifications Dispatch
-          const loginUrl = process.env.FRONTEND_URL || 'https://rentcontrol.radiotecpro.com';
+          const loginUrl = process.env.FRONTEND_URL || 'https://radiotecpro.com';
           const wpMessage = `⚠️ *Aviso de Morosidad | RentControl*\nHola ${charge.lease.tenant?.name || 'Inquilino'},\n\nSe ha agotado el tiempo de gracia de tu Mensualidad. El sistema ha aplicado un cargo automático de *Penalización por Morosidad* por un monto de *$${charge.lease.lateFeeAmount} MXN*.\n\nPor favor, actualiza tu saldo a la brevedad para evitar la suspensión de tu servicio de internet.\n*Paga ahora desde tu portal:* 🔗 ${loginUrl}\n\nAtentamente,\n*Administración de RentControl*`;
           
           if (charge.lease.tenant?.phone) {

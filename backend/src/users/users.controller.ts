@@ -91,7 +91,7 @@ export class UsersController {
     const newUser = await this.usersService.create(userData as Prisma.UserCreateInput);
 
     // Dispatch Onboarding Notifications
-    const loginUrl = process.env.FRONTEND_URL || 'https://rentcontrol.radiotecpro.com';
+    const loginUrl = process.env.FRONTEND_URL || 'https://radiotecpro.com';
     const wpMessage = `👋 *¡Bienvenido a RentControl, ${body.name}!* 🎉\n\nTu Gestor te ha dado de alta en la plataforma.\n\nDesde tu Nuevo Portal VIP podrás monitorear tus propiedades, ver los ingresos generados y descargar tus comprobantes.\n\n🔗 *Accede aquí:* ${loginUrl}\n👤 *Usuario:* ${body.email}\n🔑 *Contraseña Temporal:* ${plainPassword}\n\n⚠️ _Te recomendamos cambiar tu contraseña al ingresar por primera vez._\n\nAtentamente,\n*Equipo de Administración*`;
     
     if (body.phone) {
@@ -173,7 +173,7 @@ export class UsersController {
 
     // Despachar Onboarding Pro para Gestores
     if (newUser.role === 'MANAGER' || newUser.role === 'ADMIN') {
-      const loginUrl = process.env.FRONTEND_URL || 'https://rentcontrol.radiotecpro.com';
+      const loginUrl = process.env.FRONTEND_URL || 'https://radiotecpro.com';
       const wpMessage = `👋 *¡Bienvenido a RentControl, ${newUser.name}!* 🎉\n\nEl Administrador Global te ha otorgado acceso como Gestor del Sistema.\n\nDesde el panel de control podrás dar de alta propiedades, inquilinos y monitorizar todos los ingresos en tiempo real.\n\n🔗 *Accede aquí:* ${loginUrl}\n👤 *Usuario:* ${newUser.email}\n🔑 *Contraseña Temporal:* ${plainPassword}\n\n⚠️ _Te recomendamos cambiar tu contraseña al ingresar._\n\nAtentamente,\n*Equipo de Administración*`;
       
       if (userData.phone) {
