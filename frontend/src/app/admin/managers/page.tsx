@@ -11,6 +11,7 @@ interface Manager {
   id: string;
   name: string;
   email: string;
+  phone?: string;
   isActive: boolean;
   managementPlanId: string | null;
   createdAt: string;
@@ -148,7 +149,7 @@ export default function AdminManagersPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <Button onClick={() => setIsModalOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/20 whitespace-nowrap">
+          <Button onClick={() => { setFormData({ id: "", name: "", email: "", phone: "", password: "" }); setIsModalOpen(true); }} className="bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/20 whitespace-nowrap">
             <Plus className="mr-2 h-4 w-4" />
             Registrar Gestor
           </Button>
@@ -201,7 +202,7 @@ export default function AdminManagersPage() {
                       id: manager.id,
                       name: manager.name,
                       email: manager.email,
-                      phone: "", // API doesn't return phone currently, keep empty or fetch
+                      phone: manager.phone || "",
                       password: "", // intentionally empty for safety
                     });
                     setIsModalOpen(true);

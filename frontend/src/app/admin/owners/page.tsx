@@ -11,6 +11,7 @@ interface Owner {
   id: string;
   name: string;
   email: string;
+  phone?: string;
   isActive: boolean;
   maxProperties: number;
   planType: string;
@@ -304,7 +305,7 @@ export default function AdminOwnersPage() {
                       id: owner.id,
                       name: owner.name,
                       email: owner.email,
-                      phone: "",
+                      phone: owner.phone || "",
                       maxProperties: owner.maxProperties,
                       planType: owner.planType || "SAAS",
                       managerId: owner.managerId || "",
