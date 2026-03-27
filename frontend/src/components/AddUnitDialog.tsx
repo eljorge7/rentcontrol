@@ -73,7 +73,8 @@ export function AddUnitDialog({ propertyId, onUnitAdded }: AddUnitDialogProps) {
       if (files.length > 0) {
         const formData = new FormData();
         files.forEach(f => formData.append('files', f));
-        const uploadRes = await api.post('/uploads', formData, {
+        // This assumes api is an axios instance
+        const uploadRes = await api.post('/upload', formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
         uploadedUrls = uploadRes.data.urls || [];
