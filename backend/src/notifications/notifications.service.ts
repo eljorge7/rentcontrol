@@ -94,37 +94,34 @@ export class NotificationsService implements OnModuleInit {
   async sendEmail(to: string, subject: string, htmlContent: string) {
     if (!to) return false;
     try {
-      const userSetting = await this.prisma.systemSetting.findUnique({ where: { key: 'SMTP_USER' } });
       const passSetting = await this.prisma.systemSetting.findUnique({ where: { key: 'SMTP_PASS' } });
-      const hostSetting = await this.prisma.systemSetting.findUnique({ where: { key: 'SMTP_HOST' } });
-      const portSetting = await this.prisma.systemSetting.findUnique({ where: { key: 'SMTP_PORT' } });
+      const apiToken = passSetting?.value || 're_DzSzoqao_JVS9TdHYHGtLVbJbRpizsDm9'; // Custom HTTP key reading
 
-      if (!userSetting || !passSetting) {
-        this.logger.warn('Transmisión de Email abortada: Parámetros SMTP no configurados en el Dashboard.');
-        return false;
+      // Usamos HTTPS puro (puerto 443) para esquivar permanentemente el bloqueo TCP 465/587 del VPS
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: 'RentControl <onboarding@resend.dev>', // Require verificar dominio en Resend para poner el de radiotec
+          to: [to],
+          subject: subject,
+          html: htmlContent,
+        })
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+         this.logger.error(`[Resend API Error]: ${JSON.stringify(data)}`);
+         return false;
       }
 
-      const transporter = nodemailer.createTransport({
-        host: hostSetting?.value || 'smtp.gmail.com',
-        port: parseInt(portSetting?.value || '587'),
-        secure: parseInt(portSetting?.value || '587') === 465,
-        auth: {
-          user: userSetting.value,
-          pass: passSetting.value,
-        },
-      });
-
-      const info = await transporter.sendMail({
-        from: `"RentControl Cloud" <${userSetting.value}>`,
-        to,
-        subject,
-        html: htmlContent,
-      });
-
-      this.logger.log(`[RentControl NodeMailer] Email despachado a la bandeja de ${to}: ${info.messageId}`);
+      this.logger.log(`[RentControl Resend HTTP] Email exitosamente inyectado a la bandeja de ${to} (ID: ${data.id})`);
       return true;
     } catch (e: any) {
-      this.logger.error(`Error de red disparando email a ${to}: ${e.message}`);
+      this.logger.error(`Error HTTP Crítico disparando email a ${to}: ${e.message}`);
       return false;
     }
   }
