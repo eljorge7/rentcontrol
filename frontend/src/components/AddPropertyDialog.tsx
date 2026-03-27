@@ -69,7 +69,7 @@ export function AddPropertyDialog({ owners, onPropertyAdded }: AddPropertyDialog
         files.forEach(f => formData.append('files', f));
         
         // This assumes api is an axios instance
-        const uploadRes = await api.post('/uploads', formData, {
+        const uploadRes = await api.post('/upload', formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
         uploadedUrls = uploadRes.data.urls || [];
