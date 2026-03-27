@@ -42,7 +42,8 @@ import { NotificationsModule } from './notifications/notifications.module';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     ServeStaticModule.forRoot({
-      rootPath: join(process.cwd(), 'public'),
+      rootPath: join(process.cwd(), 'uploads'),
+      serveRoot: '/uploads',
       serveStaticOptions: { index: false }
     }),
     PrismaModule, ScheduleModule.forRoot(), PropertiesModule, UnitsModule, TenantsModule, LeasesModule, ChargesModule, PaymentsModule, MikrotikModule, InvoicesModule, NetworkProfilesModule, LeaseServicesModule, ChatModule, AuthModule, UsersModule, ExpensesModule, IncidentsModule, ManagementPlansModule, CommissionsModule, EventTypesModule, StripeModule, MercadopagoModule, QuotationsModule, MetricsModule, PdfsModule, VouchersModule, SuppliersModule, UploadsModule, TasksModule, ChecklistsModule, PayoutsModule, NotificationsModule

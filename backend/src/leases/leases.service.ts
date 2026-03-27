@@ -145,6 +145,12 @@ export class LeasesService {
       },
     });
 
+    // Cancelar cargos pendientes vinculados a este contrato
+    await this.prisma.charge.updateMany({
+      where: { leaseId: id, status: 'PENDING' },
+      data: { status: 'CANCELLED' }
+    });
+
     // Liberar la unidad
     await this.prisma.unit.update({
       where: { id: lease.unitId },

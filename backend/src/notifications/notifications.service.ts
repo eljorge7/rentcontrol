@@ -22,7 +22,9 @@ export class NotificationsService implements OnModuleInit {
       this.whatsappClient = new Client({
         authStrategy: new LocalAuth({ dataPath: './whatsapp-session' }),
         puppeteer: {
-          args: ['--no-sandbox', '--disable-setuid-sandbox']
+          headless: true,
+          args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+          timeout: 60000
         }
       });
 

@@ -12,7 +12,7 @@ export class UploadsController {
   @Post()
   @UseInterceptors(FilesInterceptor('files', 10, {
     storage: diskStorage({
-      destination: './public/uploads',
+      destination: './uploads',
       filename: (req, file, cb) => {
         // Generate a random numeric string
         const randomName = Array(16).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('');
