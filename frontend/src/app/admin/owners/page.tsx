@@ -36,6 +36,7 @@ export default function AdminOwnersPage() {
     id: "",
     name: "",
     email: "",
+    phone: "",
     password: "",
     maxProperties: 2,
     planType: "SAAS",
@@ -123,6 +124,7 @@ export default function AdminOwnersPage() {
         const formPayload = new FormData();
         formPayload.append("name", formData.name);
         formPayload.append("email", formData.email);
+        if (formData.phone) formPayload.append("phone", formData.phone);
         if (formData.password) formPayload.append("password", formData.password);
         formPayload.append("planType", formData.planType);
         formPayload.append("maxProperties", formData.maxProperties.toString());
@@ -171,7 +173,7 @@ export default function AdminOwnersPage() {
 
   const resetForm = () => {
     setFormData({
-      id: "", name: "", email: "", password: "", maxProperties: 2, planType: "SAAS",
+      id: "", name: "", email: "", phone: "", password: "", maxProperties: 2, planType: "SAAS",
       managerId: user?.role === "MANAGER" ? user.id : "", 
       managementPlanId: "", legalName: "", rfc: "", taxRegime: "", bankName: "", bankAccount: "", bankClabe: ""
     });
@@ -302,6 +304,7 @@ export default function AdminOwnersPage() {
                       id: owner.id,
                       name: owner.name,
                       email: owner.email,
+                      phone: "",
                       maxProperties: owner.maxProperties,
                       planType: owner.planType || "SAAS",
                       managerId: owner.managerId || "",
@@ -375,6 +378,10 @@ export default function AdminOwnersPage() {
                     <div>
                       <label className="text-xs font-medium text-slate-700 uppercase tracking-wide">Correo Electrónico *</label>
                       <Input required type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} placeholder="juan@gmail.com" className="mt-1" />
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-slate-700 uppercase tracking-wide">Celular (WhatsApp)</label>
+                      <Input type="tel" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} placeholder="521..." className="mt-1" />
                     </div>
                     {!formData.id && (
                       <div>

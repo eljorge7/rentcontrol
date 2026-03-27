@@ -36,6 +36,7 @@ export default function AdminManagersPage() {
     id: "",
     name: "",
     email: "",
+    phone: "",
     password: "",
   });
 
@@ -67,6 +68,7 @@ export default function AdminManagersPage() {
       const payload = {
         name: formData.name,
         email: formData.email,
+        phone: formData.phone || undefined,
         password: formData.password || undefined,
         role: "MANAGER",
       };
@@ -86,7 +88,7 @@ export default function AdminManagersPage() {
 
       if (res.ok) {
         setIsModalOpen(false);
-        setFormData({ id: "", name: "", email: "", password: "" });
+        setFormData({ id: "", name: "", email: "", phone: "", password: "" });
         fetchData();
       } else {
         const error = await res.json();
@@ -199,6 +201,7 @@ export default function AdminManagersPage() {
                       id: manager.id,
                       name: manager.name,
                       email: manager.email,
+                      phone: "", // API doesn't return phone currently, keep empty or fetch
                       password: "", // intentionally empty for safety
                     });
                     setIsModalOpen(true);
@@ -270,6 +273,15 @@ export default function AdminManagersPage() {
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
                     placeholder="gestor@agencia.com" 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-700">Celular (WhatsApp)</label>
+                  <Input 
+                    type="tel" 
+                    value={formData.phone}
+                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                    placeholder="521..." 
                   />
                 </div>
                 <div className="space-y-2">

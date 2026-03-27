@@ -39,6 +39,7 @@ model User {
   role      Role       @default(TENANT)
   name      String
   isActive  Boolean    @default(true)
+  phone     String?
   maxProperties Int    @default(2) // Límite de propiedades permitidas (aplicable a OWNER)
   planType  PlanType   @default(SAAS) // Modelo de servicio aplicable a OWNER
   
