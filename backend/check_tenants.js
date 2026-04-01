@@ -1,14 +1,12 @@
 const { PrismaClient } = require('@prisma/client');
-
-async function main() {
+async function run() {
   const prisma = new PrismaClient();
   const tenants = await prisma.tenant.findMany({
-    include: {
-      owner: { select: { name: true } }
-    }
+    orderBy: { id: 'desc' },
+    take: 3
   });
-  console.log(JSON.stringify(tenants, null, 2));
+  console.log("=== ÚLTIMOS 3 INQUILINOS EN RENTCONTROL ===");
+  console.log(tenants);
   await prisma.$disconnect();
 }
-
-main().catch(e => console.error(e));
+run();

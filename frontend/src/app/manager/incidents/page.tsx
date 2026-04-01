@@ -107,6 +107,23 @@ export default function OwnerIncidentsPage() {
     }
   };
 
+  const [sendingNotificationId, setSendingNotificationId] = useState<string | null>(null);
+
+  const handleNotifySupplier = async (id: string) => {
+    setSendingNotificationId(id);
+    try {
+      const res = await api.post(`/incidents/${id}/notify-supplier`);
+      if (res.status === 201 || res.status === 200) {
+        alert("¡Mensaje de WhatsApp enviado exitosamente al proveedor!");
+      }
+    } catch (error: any) {
+      console.error("Error al notificar al proveedor:", error);
+      alert(error.response?.data?.message || "Fallo al enviar notificación por WhatsApp.");
+    } finally {
+      setSendingNotificationId(null);
+    }
+  };
+
   const handleProposeCost = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedIncident || !supplierCost || !rcMarkup) return;
@@ -235,14 +252,17 @@ export default function OwnerIncidentsPage() {
                     <p className="text-sm font-semibold">{incident.supplier.name}</p>
                     {incident.supplier.contactName && <p className="text-xs text-slate-500 font-medium">Atte: {incident.supplier.contactName}</p>}
                     <p className="text-xs text-slate-500 mb-2">{incident.supplier.category}</p>
-                    <a 
-                      href={`https://wa.me/${incident.supplier.phone?.replace(/\D/g, '') || ''}?text=${encodeURIComponent(`Hola, te asigné una orden de trabajo: ${window.location.origin}/ticket/${incident.id}`)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-2 text-xs flex justify-center items-center py-1.5 px-3 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold rounded-lg transition-colors w-full"
+                    <Button 
+                      onClick={() => handleNotifySupplier(incident.id)}
+                      disabled={sendingNotificationId === incident.id}
+                      className="mt-2 text-xs flex justify-center items-center py-1.5 px-3 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold rounded-lg transition-colors w-full h-auto"
                     >
-                      Enviar Link WhatsApp
-                    </a>
+                      {sendingNotificationId === incident.id ? (
+                         <><Loader2 className="h-3 w-3 animate-spin mr-1.5" /> Enviando...</>
+                      ) : (
+                         "Enviar Link WhatsApp"
+                      )}
+                    </Button>
                     
                     {incident.status === 'IN_PROGRESS' && (
                       <Button

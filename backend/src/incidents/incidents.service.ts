@@ -1,10 +1,14 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma } from '@prisma/client';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class IncidentsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+     private prisma: PrismaService,
+     private notificationsExt: NotificationsService
+  ) {}
 
   async create(data: Prisma.IncidentUncheckedCreateInput) {
     return this.prisma.incident.create({ data });
@@ -71,6 +75,36 @@ export class IncidentsService {
         ...(supplierId && { supplier: { connect: { id: supplierId } } })
       },
     });
+  }
+
+  async notifySupplier(id: string, user?: any) {
+    const incident = await this.findOne(id, user);
+    if (!incident.supplier || !incident.supplier.phone) {
+       throw new Error('No hay proveedor con teléfono asignado a este ticket.');
+    }
+
+    const tenantName = incident.tenant?.name || 'Inquilino';
+    const unitName = incident.unit?.name || 'la propiedad';
+    const description = incident.description;
+    
+    // Asumiendo que radiotecpro.com o localhost apuntan a frontend
+    // Aquí podrías usar una env var para host real, por ej process.env.FRONTEND_URL.
+    // Usaremos un URL genérico (el técnico tiene panel /ticket/:id).
+    const domain = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const link = `${domain}/ticket/${incident.id}`;
+
+    const msg = `¡Hola ${incident.supplier.contactName || incident.supplier.name}! 🛠️
+Tienes una nueva Orden de Trabajo asignada.\n
+📍 *Ubicación:* ${unitName}
+🗣️ *Inquilino:* ${tenantName}
+📋 *Problema Reportado:* "${description}"\n
+Por favor da clic en tu Panel Técnico Mágico para ver detalles completos, subir fotos o cotizar el costo de reparación:\n🔗 *${link}*`;
+
+    const success = await this.notificationsExt.sendWhatsAppMessage(incident.supplier.phone, msg);
+    if (!success) {
+       throw new Error('Fallo al enviar WhatsApp al proveedor vía la pasarela.');
+    }
+    return { success: true, message: "Notificación despachada al Técnico." };
   }
 
   async proposeCost(id: string, supplierCost: number, rcMarkup: number, user?: any) {

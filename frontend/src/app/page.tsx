@@ -14,6 +14,43 @@ export default function Home() {
   const [saasPlans, setSaasPlans] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Lead Catch Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [leadInterest, setLeadInterest] = useState("");
+  const [leadName, setLeadName] = useState("");
+  const [leadPhone, setLeadPhone] = useState("");
+  const [leadLoading, setLeadLoading] = useState(false);
+  const [leadSuccess, setLeadSuccess] = useState(false);
+
+  const openLeadModal = (interest: string) => {
+    setLeadInterest(interest);
+    setIsModalOpen(true);
+    setLeadSuccess(false);
+    setLeadName("");
+    setLeadPhone("");
+  };
+
+  const submitLeadWebhook = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLeadLoading(true);
+    try {
+      await axios.post("http://localhost:3002/api/inbox/webhooks/lead", { 
+        name: leadName, 
+        phone: leadPhone, 
+        interest: leadInterest 
+      });
+      setLeadSuccess(true);
+      setTimeout(() => setIsModalOpen(false), 4000);
+    } catch (error) {
+      console.error("OmniChat Matrix Fallback Triggered", error);
+      // Fallback in case OmniChat is down: Open WhatsApp Directly
+      window.open(`https://wa.me/526421644126?text=Hola,%20busco%20información%20sobre:%20${leadInterest}`, "_blank");
+      setIsModalOpen(false);
+    } finally {
+      setLeadLoading(false);
+    }
+  };
+
   useEffect(() => {
     const fetchPublicData = async () => {
       try {
@@ -169,11 +206,12 @@ export default function Home() {
                        <li className="flex items-center gap-3"><Check className="h-5 w-5 text-blue-600" /> <strong className="text-slate-900">{plan.uploadSpeed} Megas</strong> de Subida</li>
                        <li className="flex items-center gap-3"><Check className="h-5 w-5 text-blue-600" /> Dispositivos recomendados: {plan.downloadSpeed > 30 ? 'Ilimitados' : '1 a 3'}</li>
                      </ul>
-                     <a href={`https://wa.me/526421042123?text=Quiero%20contratar%20el%20plan%20${plan.name}`} target="_blank" rel="noopener noreferrer">
-                       <Button className={`mt-8 w-full h-12 rounded-xl text-lg ${isPopular ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-600/25' : 'bg-slate-900 text-white hover:bg-slate-800'}`}>
-                         Contratar
-                       </Button>
-                     </a>
+                     <Button 
+                       onClick={() => openLeadModal(`Plan Internet WISP: ${plan.name}`)}
+                       className={`mt-8 w-full h-10 rounded-lg font-bold ${isPopular ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md shadow-blue-600/25' : 'bg-slate-900 text-white hover:bg-slate-800'}`}
+                     >
+                       Me Interesa
+                     </Button>
                    </div>
                  );
                })}
@@ -246,10 +284,12 @@ export default function Home() {
                     ))
                   )}
                 </div>
-                
-                <a href="https://wa.me/526421042123?text=Quiero%20información%20sobre%20Planes%20RentControl" target="_blank" rel="noopener noreferrer">
-                  <Button className="w-full bg-white text-slate-900 hover:bg-slate-200 h-12 text-md font-bold">Solicitar Afiliación / Cotización</Button>
-                </a>
+                <Button 
+                  onClick={() => openLeadModal("Afiliación Software RentControl SaaS")}
+                  className="w-full bg-white text-slate-900 hover:bg-slate-200 h-10 text-sm font-bold rounded-lg"
+                >
+                  Solicitar Afiliación / Cotización
+                </Button>
               </div>
             </div>
           </div>
@@ -283,11 +323,12 @@ export default function Home() {
               </ul>
             </div>
             <div className="shrink-0 w-full md:w-auto mt-6 md:mt-0">
-              <a href="https://wa.me/526421042123?text=Hola,%20soy%20Técnico/Proveedor%20y%20me%20interesa%20unirme%20a%20la%20red%20de%20RentControl" target="_blank" rel="noopener noreferrer">
-                <Button className="w-full md:w-auto h-16 px-10 rounded-2xl bg-white text-indigo-900 hover:bg-slate-100 font-bold text-lg shadow-xl shadow-indigo-900/20 active:scale-95 transition-transform">
-                  Postularme como Proveedor
-                </Button>
-              </a>
+              <Button 
+                onClick={() => openLeadModal("Vacante Red de Técnicos RentControl")}
+                className="w-full md:w-auto h-12 px-8 rounded-xl bg-white text-indigo-900 hover:bg-slate-100 font-bold text-sm shadow-lg shadow-indigo-900/20 active:scale-95 transition-transform"
+              >
+                Postularme como Proveedor
+              </Button>
             </div>
           </div>
         </div>
@@ -393,6 +434,84 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* Headless WA Lead Capture Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 transition-all backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 my-auto">
+            {leadSuccess ? (
+              <div className="p-8 text-center">
+                <div className="w-16 h-16 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Check className="h-8 w-8 font-bold" />
+                </div>
+                <h3 className="text-xl font-black text-slate-900 mb-2">¡Solicitud Recibida!</h3>
+                <p className="text-sm text-slate-600 font-medium">
+                  Revisa tu WhatsApp. Nuestro asesor virtual <strong>OmniChat</strong> te ha enviado los detalles.
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={submitLeadWebhook}>
+                <div className="bg-slate-900 px-6 py-4 flex justify-between items-center relative overflow-hidden">
+                  <div>
+                    <h3 className="text-lg font-bold text-white relative z-10">Quiero Información</h3>
+                  </div>
+                </div>
+                
+                <div className="p-6 space-y-4">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Interés Muestra</label>
+                    <div className="bg-slate-50 border border-slate-200 text-slate-700 px-3 py-2 rounded-lg font-medium text-xs">
+                      {leadInterest}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Nombre Completo</label>
+                    <input 
+                      required
+                      type="text" 
+                      value={leadName}
+                      onChange={e => setLeadName(e.target.value)}
+                      placeholder="Ej. Juan Pérez" 
+                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Celular (WhatsApp)</label>
+                    <input 
+                      required
+                      type="tel" 
+                      value={leadPhone}
+                      onChange={e => setLeadPhone(e.target.value)}
+                      placeholder="Ej. 642 123 4567" 
+                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    />
+                  </div>
+
+                  <div className="pt-2 flex flex-col sm:flex-row gap-2">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={() => setIsModalOpen(false)}
+                      className="w-full sm:w-1/3 h-10 rounded-lg font-semibold"
+                    >
+                      Cancelar
+                    </Button>
+                    <Button 
+                      type="submit" 
+                      disabled={leadLoading || !leadName || !leadPhone}
+                      className="w-full sm:w-2/3 h-10 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-bold"
+                    >
+                      {leadLoading ? 'Conectando...' : 'Iniciar Conversación'}
+                    </Button>
+                  </div>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

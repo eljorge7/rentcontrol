@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { TenantSidebar } from "@/components/TenantSidebar";
+import { PwaInstallPrompt } from "@/components/PwaInstallPrompt";
 import api from "@/lib/api";
 
 export default function TenantLayout({
@@ -32,6 +33,7 @@ export default function TenantLayout({
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50">
+      <PwaInstallPrompt />
       <TenantSidebar />
       <div className="flex flex-1 flex-col overflow-y-auto">
         <header className="flex h-16 items-center justify-between border-b bg-white px-6 shadow-sm">

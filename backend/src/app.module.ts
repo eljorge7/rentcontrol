@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ConfigModule } from '@nestjs/config';
+import { OmniChatProxyController } from './omnichat/omnichat.controller';
 import { AppController } from './app.controller';
 import { AnnouncementsController } from './announcements/announcements.controller';
 import { AppService } from './app.service';
@@ -48,7 +49,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     }),
     PrismaModule, ScheduleModule.forRoot(), PropertiesModule, UnitsModule, TenantsModule, LeasesModule, ChargesModule, PaymentsModule, MikrotikModule, InvoicesModule, NetworkProfilesModule, LeaseServicesModule, ChatModule, AuthModule, UsersModule, ExpensesModule, IncidentsModule, ManagementPlansModule, CommissionsModule, EventTypesModule, StripeModule, MercadopagoModule, QuotationsModule, MetricsModule, PdfsModule, VouchersModule, SuppliersModule, UploadsModule, TasksModule, ChecklistsModule, PayoutsModule, NotificationsModule
   ],
-  controllers: [AppController, AnnouncementsController],
+  controllers: [AppController, AnnouncementsController, OmniChatProxyController],
   providers: [AppService],
 })
 export class AppModule {}

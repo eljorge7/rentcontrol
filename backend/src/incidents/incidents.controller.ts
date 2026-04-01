@@ -139,6 +139,13 @@ export class IncidentsController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.MANAGER)
+  @Post(':id/notify-supplier')
+  notifySupplier(@Param('id') id: string, @Request() req: any) {
+    return this.incidentsService.notifySupplier(id, req.user);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.MANAGER)
   @Delete(':id')
   remove(@Param('id') id: string, @Request() req: any) {
     return this.incidentsService.remove(id, req.user);

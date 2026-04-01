@@ -80,9 +80,9 @@ export function ManagerSidebar() {
           <div className="pt-4 pb-2 px-6 h-10">
             {!isCollapsed && <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Operaciones</p>}
           </div>
-          <Link href="/manager/inbox" className="flex items-center rounded-md px-4 py-2.5 text-sm font-medium hover:bg-slate-800 text-slate-300 hover:text-white mx-2 mb-2 bg-slate-800/50 border border-slate-700/50">
-            <MessageCircle className="mr-3 h-5 w-5 flex-shrink-0 text-blue-400" />
-            {!isCollapsed && <span className="font-semibold text-blue-100">Inbox (Mensajes)</span>}
+          <Link href="http://localhost:3003" target="_blank" rel="noopener noreferrer" className="flex items-center rounded-md px-4 py-2.5 text-sm font-medium hover:bg-indigo-900 text-indigo-300 hover:text-white mx-2 mb-2 bg-indigo-950/50 border border-indigo-500/50 shadow-md">
+            <MessageCircle className="mr-3 h-5 w-5 flex-shrink-0 text-indigo-400" />
+            {!isCollapsed && <span className="font-bold text-indigo-100">OmniChat CRM</span>}
           </Link>
           <Link href="/manager/finances" className="flex items-center rounded-md px-4 py-2.5 text-sm font-medium hover:bg-slate-800 text-slate-300 hover:text-white mx-2">
             <Activity className="mr-3 h-5 w-5 flex-shrink-0 text-emerald-400" />

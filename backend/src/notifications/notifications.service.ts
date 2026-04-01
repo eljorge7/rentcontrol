@@ -17,76 +17,50 @@ export class NotificationsService implements OnModuleInit {
   }
 
   private initWhatsApp() {
-    this.logger.log('Inicializando WhatsApp Web Client...');
-    try {
-      this.whatsappClient = new Client({
-        authStrategy: new LocalAuth({ dataPath: './whatsapp-session' }),
-        puppeteer: {
-          headless: true,
-          args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
-          timeout: 60000
-        }
-      });
-
-      this.whatsappClient.on('qr', (qr) => {
-        this.logger.log('WhatsApp QR Code generado. Esperando escaneo desde la App de RentControl...');
-        this.qrCodeString = qr; 
-        this.isWhatsappReady = false;
-      });
-
-      this.whatsappClient.on('ready', () => {
-        this.logger.log('WhatsApp Client is Ready! Servidor Conectado Exitosamente.');
-        this.isWhatsappReady = true;
-        this.qrCodeString = null;
-      });
-
-      this.whatsappClient.on('authenticated', () => {
-        this.logger.log('WhatsApp Web Autenticado con éxito.');
-      });
-
-      this.whatsappClient.on('auth_failure', msg => {
-        this.logger.error('WhatsApp Authentication failure', msg);
-        this.isWhatsappReady = false;
-      });
-
-      this.whatsappClient.on('disconnected', (reason) => {
-        this.logger.warn('WhatsApp Client was disconnected', reason);
-        this.isWhatsappReady = false;
-      });
-
-      this.whatsappClient.initialize().catch(err => {
-        this.logger.error('Fallo iniciando whatsapp-web.js', err);
-      });
-    } catch(e) {
-      this.logger.error('Error catastrófico iniciando WhatsApp', e);
-    }
+    this.logger.log('Desactivando Motor WA Local: Delegando tareas de mensajería al Gateway central de OmniChat...');
+    this.isWhatsappReady = true; // Forzamos a true para que el sistema pase las validaciones de envío
   }
 
   async getWhatsAppStatus() {
     return {
-      isReady: this.isWhatsappReady,
-      qrCode: this.qrCodeString
+      isReady: true,
+      qrCode: null,
+      message: "Delegado a OmniChat Gateway"
     };
   }
 
   async sendWhatsAppMessage(phone: string, message: string) {
-    if (!this.isWhatsappReady) {
-      this.logger.warn('Intento de envío de WhatsApp abortado: El dispositivo celular no está vinculado al servidor.');
-      return false;
-    }
     if (!phone) return false;
     try {
       let formattedNumber = phone.replace(/\D/g, ''); 
       if (formattedNumber.length === 10) {
-        formattedNumber = `521${formattedNumber}`; // Mexican standard
+        formattedNumber = `521${formattedNumber}`; // Estándar México
       }
-      const chatId = `${formattedNumber}@c.us`;
       
-      await this.whatsappClient.sendMessage(chatId, message);
-      this.logger.log(`[RentControl Bot] WhatsApp disparado exitosamente a ${formattedNumber}`);
+      const payload = {
+        phone: formattedNumber,
+        text: message
+      };
+      
+      const response = await fetch('http://127.0.0.1:3002/api/v1/messages/send', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer sk_24af03088b47aac20bae7b1df07f8399',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+         const data = await response.json();
+         this.logger.error(`[OmniChat API Error]: ${JSON.stringify(data)}`);
+         return false;
+      }
+
+      this.logger.log(`[RentControl -> OmniChat] WhatsApp B2B delegado exitosamente a ${formattedNumber}`);
       return true;
     } catch (e: any) {
-      this.logger.error(`Error de red disparando WhatsApp a ${phone}: ${e.message}`);
+      this.logger.error(`Error delegando WhatsApp a OmniChat para ${phone}: ${e.message}`);
       return false;
     }
   }
