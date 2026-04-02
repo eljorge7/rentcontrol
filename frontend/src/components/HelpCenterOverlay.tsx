@@ -24,22 +24,26 @@ export default function HelpCenterOverlay() {
     {
       icon: <Users className="w-5 h-5 text-blue-500" />,
       title: "1. Registrar Inquilinos",
-      desc: "Ve a la sección 'Inquilinos', haz click en 'Añadir' y asígnales una Unidad. Esto les generará acceso al portal."
+      desc: "Ve a la sección 'Inquilinos', haz click en 'Añadir' y asígnales una Unidad. Esto les generará acceso al portal.",
+      href: "/admin/tenants"
     },
     {
       icon: <DollarSign className="w-5 h-5 text-emerald-500" />,
       title: "2. Cobranza Mensual",
-      desc: "Al crear un nuevo Contrato, los cargos se automatizan cada mes. El inquilino recibe un WhatsApp de la IA."
+      desc: "Al crear un nuevo Contrato, los cargos se automatizan cada mes. El inquilino recibe un WhatsApp de la IA.",
+      href: "/admin/leases"
     },
     {
       icon: <Wrench className="w-5 h-5 text-amber-500" />,
       title: "3. Red de Proveedores",
-      desc: "Si un inquilino reporta un daño por WhatsApp, la IA crea un Ticket. Tú solo lo asignas a tu plomero."
+      desc: "Si un inquilino reporta un daño por WhatsApp, la IA crea un Ticket. Tú solo lo asignas a tu plomero.",
+      href: "/admin/incidents"
     },
     {
       icon: <MessageSquare className="w-5 h-5 text-indigo-500" />,
       title: "4. OmniChat B2B",
-      desc: "Para configurar tu WhatsApp, ve a OmniChat y escanea el QR. La IA tomará el control automáticamente."
+      desc: "Para configurar tu WhatsApp, ve a OmniChat y escanea el QR. La IA tomará el control automáticamente.",
+      href: "https://omnichat.radiotecpro.com" 
     }
   ];
 
@@ -70,18 +74,18 @@ export default function HelpCenterOverlay() {
         <div className="flex-1 overflow-y-auto p-2">
            <div className="space-y-2 p-2">
              {guides.map((g, idx) => (
-                <div key={idx} className="bg-slate-50 border border-slate-100 p-4 rounded-2xl hover:bg-white hover:shadow-md transition-all group cursor-pointer relative overflow-hidden">
+                <a key={idx} href={g.href} onClick={() => setIsOpen(false)} className="block bg-slate-50 border border-slate-100 p-4 rounded-2xl hover:bg-white hover:shadow-md transition-all group cursor-pointer relative overflow-hidden">
                    <div className="absolute top-0 left-0 w-1 h-full bg-slate-200 group-hover:bg-blue-500 transition-colors" />
                    <div className="flex gap-4 items-start pl-2">
                      <div className="bg-white p-2 rounded-xl shadow-sm ring-1 ring-slate-100 flex-shrink-0">
                        {g.icon}
                      </div>
                      <div>
-                       <h3 className="font-bold text-slate-800 text-sm mb-1 group-hover:text-blue-700 transition-colors">{g.title}</h3>
+                       <h3 className="font-bold text-slate-800 text-sm mb-1 group-hover:text-blue-700 transition-colors flex items-center gap-1">{g.title} <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all -ml-2 group-hover:ml-0" /></h3>
                        <p className="text-xs text-slate-500 leading-relaxed font-medium">{g.desc}</p>
                      </div>
                    </div>
-                </div>
+                </a>
              ))}
            </div>
            
