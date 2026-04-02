@@ -94,7 +94,7 @@ export function Sidebar() {
             <DollarSign className="mr-3 h-5 w-5 flex-shrink-0 text-slate-500" />
             {!isCollapsed && <span>Pagos y Cargos</span>}
           </Link>
-          <Link href="http://localhost:3003" target="_blank" className="flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-indigo-100 mx-2 text-indigo-600 bg-indigo-50/50 border border-indigo-200 shadow-sm mt-2 mb-2">
+          <Link href={process.env.NEXT_PUBLIC_OMNICHAT_URL || "https://omnichat.radiotecpro.com"} target="_blank" className="flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-indigo-100 mx-2 text-indigo-600 bg-indigo-50/50 border border-indigo-200 shadow-sm mt-2 mb-2">
             <MessageSquare className="mr-3 h-5 w-5 flex-shrink-0 text-indigo-600" />
             {!isCollapsed && <span className="font-bold">OmniChat CRM</span>}
           </Link>
