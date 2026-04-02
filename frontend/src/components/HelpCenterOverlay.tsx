@@ -1,16 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { HelpCircle, X, BookOpen, Users, DollarSign, MessageSquare, ChevronRight, Wrench } from "lucide-react";
+import { HelpCircle, X, Headphones, Search, PlusCircle, CreditCard, PenTool, ChevronDown, Wrench } from "lucide-react";
 
 export default function HelpCenterOverlay() {
   const [isOpen, setIsOpen] = useState(false);
+  const [expandedId, setExpandedId] = useState<number | null>(null);
 
   if (!isOpen) {
     return (
       <button 
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-2xl transition-all hover:scale-105 z-50 group flex items-center justify-center"
+        className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-2xl transition-all hover:scale-105 z-[90] group flex items-center justify-center animate-in zoom-in"
       >
          <HelpCircle className="w-6 h-6" />
          <span className="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs group-hover:ml-3 transition-all duration-300 ease-in-out font-bold">
@@ -20,85 +21,105 @@ export default function HelpCenterOverlay() {
     );
   }
 
-  const guides = [
+  const faqs = [
     {
-      icon: <Users className="w-5 h-5 text-blue-500" />,
-      title: "1. Registrar Inquilinos",
-      desc: "Ve a la sección 'Inquilinos', haz click en 'Añadir' y asígnales una Unidad. Esto les generará acceso al portal.",
-      href: "/admin/tenants"
+      id: 1,
+      icon: <PlusCircle className="w-5 h-5 text-blue-500" />,
+      question: "¿Cómo doy de alta a un Inquilino?",
+      answer: "Ve a la pestaña 'Inquilinos' en tu menú lateral. Haz clic en 'Añadir Inquilino'. Primero debes llenar sus datos de contacto y luego, obligatoriamente, asignarlo a una Propiedad/Unidad para que el sistema le genere su portal de Autogestión."
     },
     {
-      icon: <DollarSign className="w-5 h-5 text-emerald-500" />,
-      title: "2. Cobranza Mensual",
-      desc: "Al crear un nuevo Contrato, los cargos se automatizan cada mes. El inquilino recibe un WhatsApp de la IA.",
-      href: "/admin/leases"
+      id: 2,
+      icon: <CreditCard className="w-5 h-5 text-emerald-500" />,
+      question: "¿Cómo se le cobra la renta mensualmente?",
+      answer: "No tienes que hacer nada manual. Al momento en que vinculas a un inquilino con un 'Contrato' (Lease), el servidor Grupo Hurtado genera automáticamente sus recargos cada inicio de mes y le manda recordatorios por WhatsApp vía OmniChat."
     },
     {
+      id: 3,
       icon: <Wrench className="w-5 h-5 text-amber-500" />,
-      title: "3. Red de Proveedores",
-      desc: "Si un inquilino reporta un daño por WhatsApp, la IA crea un Ticket. Tú solo lo asignas a tu plomero.",
-      href: "/admin/incidents"
+      question: "¿Cómo funcionan los tickets de proveedores?",
+      answer: "El Inquilino le manda un WhatsApp a tu número quejándose de alguna falla. Nuestro bot IA procesará el problema, creará el ticket en esta plataforma y tú podrás enviarle un link web a tu técnico (Plomero/Herrero) para que suba fotos de la reparación sin necesidad de tener cuenta."
     },
     {
-      icon: <MessageSquare className="w-5 h-5 text-indigo-500" />,
-      title: "4. OmniChat B2B",
-      desc: "Para configurar tu WhatsApp, ve a OmniChat y escanea el QR. La IA tomará el control automáticamente.",
-      href: "https://omnichat.radiotecpro.com" 
+      id: 4,
+      icon: <PenTool className="w-5 h-5 text-purple-500" />,
+      question: "¿Cómo cobro el servicio de Internet y Rentas al mismo tiempo?",
+      answer: "Si el inquilino contrata internet de RadioTec, simplemente añade el cargo en su Contrato con el tipo 'INTERNET'. Se sumará dentro del mismo recibo mensual en su portal junto a la Renta."
     }
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end p-4 sm:p-6 mb-4">
+    <div className="fixed inset-0 z-[100] flex justify-end p-4 sm:p-6 font-sans">
       <div 
-        className="absolute inset-0 bg-slate-900/20 backdrop-blur-sm"
+        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={() => setIsOpen(false)}
       />
-      <div className="relative w-full max-w-sm bg-white h-full max-h-[85vh] self-end rounded-3xl shadow-2xl overflow-hidden flex flex-col font-sans animate-in slide-in-from-bottom-10 fade-in duration-300">
+      <div className="relative w-full max-w-md bg-white h-full self-end rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-right-8 duration-300">
         
-        {/* Header */}
-        <div className="bg-slate-900 p-6 text-white shrink-0 relative">
+        {/* Header Elegante */}
+        <div className="bg-slate-900 p-8 text-white relative shrink-0">
           <button 
             onClick={() => setIsOpen(false)}
             className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors bg-slate-800 p-2 rounded-full"
           >
             <X className="w-4 h-4" />
           </button>
-          <div className="flex items-center gap-3 mb-2">
-            <BookOpen className="w-6 h-6 text-blue-400" />
-            <h2 className="text-xl font-black tracking-tight">Centro de Ayuda</h2>
+          
+          <div className="bg-blue-600/20 w-12 h-12 rounded-2xl flex items-center justify-center mb-4 text-blue-400">
+            <Headphones className="w-6 h-6" />
           </div>
-          <p className="text-slate-400 text-sm font-medium">Guía Rápida para dominar el Ecosistema Hurtado.</p>
+          <h2 className="text-2xl font-black tracking-tight mb-2">Base de Conocimiento</h2>
+          <p className="text-slate-400 text-sm font-medium">Encuentra respuestas rápidas sobre cómo operar el Ecosistema Grupo Hurtado.</p>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-2">
-           <div className="space-y-2 p-2">
-             {guides.map((g, idx) => (
-                <a key={idx} href={g.href} onClick={() => setIsOpen(false)} className="block bg-slate-50 border border-slate-100 p-4 rounded-2xl hover:bg-white hover:shadow-md transition-all group cursor-pointer relative overflow-hidden">
-                   <div className="absolute top-0 left-0 w-1 h-full bg-slate-200 group-hover:bg-blue-500 transition-colors" />
-                   <div className="flex gap-4 items-start pl-2">
-                     <div className="bg-white p-2 rounded-xl shadow-sm ring-1 ring-slate-100 flex-shrink-0">
-                       {g.icon}
-                     </div>
-                     <div>
-                       <h3 className="font-bold text-slate-800 text-sm mb-1 group-hover:text-blue-700 transition-colors flex items-center gap-1">{g.title} <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all -ml-2 group-hover:ml-0" /></h3>
-                       <p className="text-xs text-slate-500 leading-relaxed font-medium">{g.desc}</p>
-                     </div>
-                   </div>
-                </a>
-             ))}
-           </div>
-           
-           <div className="p-4 mt-2">
-             <div className="bg-blue-50 rounded-2xl p-5 border border-blue-100">
-                <h4 className="text-sm font-bold text-blue-900 mb-2">¿Soporte Técnico?</h4>
-                <p className="text-xs text-blue-700 font-medium mb-4">El equipo de ingeniería de Antigravity está monitoreando la infraestructura 24/7.</p>
-                <a href="mailto:soporte@radiotecpro.com" className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 px-4 rounded-xl inline-flex items-center gap-2 transition-colors">
-                  Contactar Soporte <ChevronRight className="w-4 h-4" />
-                </a>
-             </div>
-           </div>
+        {/* Búsqueda (Visual only) */}
+        <div className="px-6 -mt-5 relative z-10 shrink-0">
+            <div className="bg-white rounded-xl shadow-md border border-slate-200 p-2 flex items-center gap-2">
+                <Search className="w-5 h-5 text-slate-400 ml-2" />
+                <input 
+                  type="text" 
+                  readOnly 
+                  placeholder="¿Cómo cobrar recargos?" 
+                  className="w-full text-sm font-medium focus:outline-none placeholder:text-slate-300 text-slate-700 bg-transparent"
+                />
+            </div>
         </div>
+
+        {/* Content (Accordion) */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+            {faqs.map((faq) => (
+               <div 
+                 key={faq.id} 
+                 className={`border rounded-2xl transition-all duration-300 overflow-hidden cursor-pointer ${
+                    expandedId === faq.id ? 'border-blue-200 bg-blue-50/50 shadow-sm' : 'border-slate-200 bg-white hover:border-slate-300'
+                 }`}
+                 onClick={() => setExpandedId(expandedId === faq.id ? null : faq.id)}
+               >
+                  <div className="p-4 flex items-center gap-4">
+                     <div className="bg-white p-2 rounded-xl border border-slate-100 shrink-0">
+                        {faq.icon}
+                     </div>
+                     <h3 className="font-bold text-slate-800 text-sm flex-1">{faq.question}</h3>
+                     <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform duration-300 shrink-0 ${expandedId === faq.id ? 'rotate-180 text-blue-500' : ''}`} />
+                  </div>
+                  
+                  <div className={`overflow-hidden transition-all duration-300 ease-in-out px-4 ${expandedId === faq.id ? 'max-h-48 pb-4 opacity-100' : 'max-h-0 opacity-0'}`}>
+                     <div className="pt-2 border-t border-blue-100 pl-14">
+                        <p className="text-sm text-slate-600 font-medium leading-relaxed">{faq.answer}</p>
+                     </div>
+                  </div>
+               </div>
+            ))}
+            
+            <div className="mt-8 bg-slate-50 border border-slate-200 rounded-2xl p-5 text-center">
+                <h4 className="font-bold text-slate-800 mb-2">¿Problemas Técnicos Graves?</h4>
+                <p className="text-sm text-slate-500 mb-4 font-medium">Si el sitio se cae o la IA envía mensajes erróneos, contáctanos directo.</p>
+                <a href="mailto:soporte@radiotecpro.com" className="bg-slate-900 hover:bg-black text-white px-5 py-2.5 rounded-xl text-sm font-bold w-full inline-flex justify-center transition-colors shadow-lg active:scale-95">
+                   Soporte Nivel 3 
+                </a>
+            </div>
+        </div>
+
       </div>
     </div>
   );

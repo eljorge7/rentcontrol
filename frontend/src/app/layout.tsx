@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { AuthProvider } from "@/components/AuthProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import HelpCenterOverlay from "@/components/HelpCenterOverlay";
+import WelcomeTourModal from "@/components/WelcomeTourModal";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
@@ -42,6 +43,7 @@ export default function RootLayout({
           <AuthProvider>
             {children}
             <HelpCenterOverlay />
+            <WelcomeTourModal />
           </AuthProvider>
         </ThemeProvider>
       </body>
