@@ -42,7 +42,8 @@ export class NotificationsService implements OnModuleInit {
         text: message
       };
       
-      const response = await fetch('http://127.0.0.1:3002/api/v1/messages/send', {
+      const baseUrl = process.env.OMNICHAT_API_URL || 'http://127.0.0.1:3002';
+      const response = await fetch(`${baseUrl}/api/v1/messages/send`, {
         method: 'POST',
         headers: {
           'Authorization': 'Bearer sk_24af03088b47aac20bae7b1df07f8399',

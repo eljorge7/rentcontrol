@@ -5,12 +5,13 @@ import { getAuthHeaders } from "@/lib/auth";
 import { useAuth } from "@/components/AuthProvider";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
-  Building2, TrendingUp, Wallet, UserCircle2, AlertTriangle, Activity, ShieldCheck, PieChart, DollarSign
+  Building2, TrendingUp, Wallet, UserCircle2, AlertTriangle, Activity, ShieldCheck, PieChart, DollarSign, FileText
 } from "lucide-react";
 import { OwnerManagerChat } from "@/components/OwnerManagerChat";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { SimpleBarChart } from "@/components/dashboard/SimpleBarChart";
 import { SimplePieChart } from "@/components/dashboard/SimplePieChart";
+import { CollectionFunnel } from "@/components/dashboard/CollectionFunnel";
 import api from "@/lib/api";
 
 interface DashboardStats {
@@ -19,6 +20,8 @@ interface DashboardStats {
     netIncome: number;
     expenses: number;
     uncollectedDebt: number;
+    prevCollectedRevenue?: number;
+    prevNetIncome?: number;
   };
   operations: {
     totalUnits: number;
@@ -64,17 +67,34 @@ export default function OwnerDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [metrics, setMetrics] = useState<OwnerMetrics | null>(null);
 
+  const [dateRange, setDateRange] = useState<string>("this_month");
+
   useEffect(() => {
     if (user?.id) {
-      fetchData(user.id);
-    }
-  }, [user]);
+      let startDate = "";
+      let endDate = "";
 
-  const fetchData = async (ownerId: string) => {
+      const today = new Date();
+      if (dateRange === "this_month") {
+        startDate = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
+        endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split('T')[0];
+      } else if (dateRange === "last_month") {
+        startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1).toISOString().split('T')[0];
+        endDate = new Date(today.getFullYear(), today.getMonth(), 0).toISOString().split('T')[0];
+      } else if (dateRange === "ytd") {
+        startDate = new Date(today.getFullYear(), 0, 1).toISOString().split('T')[0];
+        endDate = today.toISOString().split('T')[0];
+      }
+      fetchData(user.id, startDate, endDate);
+    }
+  }, [user, dateRange]);
+
+  const fetchData = async (ownerId: string, startDate?: string, endDate?: string) => {
     try {
+      const queryStr = startDate ? `?startDate=${startDate}&endDate=${endDate}` : "";
       const [dashRes, metricsRes] = await Promise.all([
-        fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/dashboard/owner/${ownerId}`, { headers: getAuthHeaders() }),
-        api.get('/metrics/owner')
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/dashboard/owner/${ownerId}${queryStr}`, { headers: getAuthHeaders() }),
+        api.get(`/metrics/owner${queryStr}`)
       ]);
       const data = await dashRes.json();
       setStats(data);
@@ -88,11 +108,60 @@ export default function OwnerDashboard() {
 
   const { financials, operations, manager, managementPlan, chartData, propertiesData } = stats;
 
+  // Helper to calculate growth percentage
+  const calcGrowth = (current: number, prev: number | undefined) => {
+    if (!prev || prev === 0) return { value: "Sin histórico", isPositive: true, rawPct: 0 };
+    const pct = ((current - prev) / prev) * 100;
+    return { 
+      value: "vs periodo ant.", 
+      isPositive: pct >= 0,
+      rawPct: Math.abs(pct)
+    };
+  };
+
+  const exportToCSV = () => {
+    if (!stats) return;
+    const rows = [
+      ["Propiedad", "Ingresos Periodo", "Utilidad Neta Periodo"],
+      ...stats.propertiesData.map(p => [p.name, p.revenue, p.netProfit])
+    ];
+    const csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `Rendimiento_Cartera_${dateRange}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12">
-      <div className="flex flex-col gap-1">
-        <h2 className="text-2xl font-bold tracking-tight text-slate-900">Resumen de Inversión</h2>
-        <p className="text-slate-500">Transparencia y control operativo de tus propiedades delegadas.</p>
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight text-slate-900">Resumen de Inversión</h2>
+          <p className="text-slate-500">Transparencia y control operativo de tus propiedades delegadas.</p>
+        </div>
+        
+        <div className="flex items-center gap-4">
+           {/* Date Picker */}
+           <div className="flex items-center gap-2">
+             <label className="text-sm font-bold text-slate-500 uppercase tracking-wider">Periodo</label>
+             <select 
+               className="bg-white border border-slate-200 text-slate-700 font-medium py-2 px-4 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm"
+               value={dateRange}
+               onChange={e => setDateRange(e.target.value)}
+             >
+               <option value="this_month">Este Mes</option>
+               <option value="last_month">Mes Pasado</option>
+               <option value="ytd">Año a la fecha (YTD)</option>
+             </select>
+           </div>
+           {/* Export Button */}
+           <button onClick={exportToCSV} className="bg-slate-900 hover:bg-slate-800 text-white font-medium py-2 px-4 rounded-xl shadow-sm transition-colors flex items-center gap-2 text-sm">
+             <FileText className="h-4 w-4" /> Exportar CSV
+           </button>
+        </div>
       </div>
 
       {/* KPI Cards */}
@@ -100,51 +169,61 @@ export default function OwnerDashboard() {
         <StatCard
           title="MRR (Retorno Esperado Mes)"
           value={`$${metrics.expectedMRR.toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
-          icon={<DollarSign size={20} />}
+          icon={<DollarSign size={20} className="text-emerald-600" />}
           subtitle={`${metrics.totalProperties} Propiedades`}
         />
         <StatCard
           title="Utilidad Neta General"
           value={`$${financials.netIncome.toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
-          icon={<TrendingUp size={20} />}
-          trend={{ value: 'Ingreso Neto', isPositive: financials.netIncome >= 0 }}
+          icon={<TrendingUp size={20} className="text-indigo-600" />}
+          trend={calcGrowth(financials.netIncome, financials.prevNetIncome)}
+          sparklineData={[{val: financials.prevNetIncome || 0}, {val: financials.netIncome}]}
         />
         <StatCard
           title="Cartera Vencida (Deuda)"
           value={`$${financials.uncollectedDebt.toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
-          icon={<Wallet size={20} color="#EF4444" />}
+          icon={<Wallet size={20} className="text-rose-600" />}
           subtitle="Rentabilidad pendiente"
+          trend={{ value: "monto inactivo", isPositive: false }}
         />
         <StatCard
           title="Tasa de Desocupación"
           value={`${operations.vacancyRate.toFixed(1)}%`}
-          icon={<Building2 size={20} color="#F59E0B" />}
+          icon={<Building2 size={20} className="text-amber-500" />}
           subtitle={`${operations.totalUnits - operations.occupiedUnits} de ${operations.totalUnits} vacíos`}
         />
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-3 mt-8">
         {/* CHART */}
-        <Card className="md:col-span-2 shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-lg">Rendimiento Histórico (6 Meses)</CardTitle>
+        <Card className="md:col-span-2 border-0 shadow-xl bg-white/70 backdrop-blur-xl dark:bg-slate-900/80 rounded-[2rem] overflow-hidden group">
+          <CardHeader className="border-b border-slate-100/50 pb-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle className="text-xl font-bold text-slate-900">Rendimiento Histórico (6 Meses)</CardTitle>
+                <p className="text-sm font-medium text-slate-500 mt-1">Evolución de ingresos netos e inversión en mantenimiento</p>
+              </div>
+              <div className="bg-emerald-50 p-3 rounded-2xl">
+                <Activity className="text-emerald-600" />
+              </div>
+            </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-8">
             <SimpleBarChart 
               data={chartData} 
               xAxisKey="name" 
               bars={[
-                { dataKey: "income", color: "#10B981", name: "Ingreso Total" },
-                { dataKey: "expenses", color: "#F43F5E", name: "Gastos / Mto" }
+                { dataKey: "income", color: "#10B981", name: "Ingreso Total" }, // Emerald-500
+                { dataKey: "expenses", color: "#F43F5E", name: "Gastos / Mto" } // Rose-500
               ]} 
-              height={300}
+              height={320}
             />
           </CardContent>
         </Card>
 
         {/* SIDE PANELS */}
         <div className="space-y-6">
-          <Card className="shadow-sm">
+          <Card className="border-0 shadow-lg bg-white/70 backdrop-blur-xl dark:bg-slate-900/80 rounded-3xl overflow-hidden">
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2 text-slate-700">
                 <PieChart className="h-5 w-5 text-indigo-500" />
@@ -162,8 +241,9 @@ export default function OwnerDashboard() {
                <p className="text-center text-xs text-slate-500 mt-2 font-medium">{metrics.activeUnitsCount} Rentados vs {metrics.totalUnits - metrics.activeUnitsCount} Libres</p>
             </CardContent>
           </Card>
-          <Card className="shadow-sm bg-slate-50">
-            <CardHeader className="pb-3">
+          
+          <Card className="border-0 shadow-lg bg-slate-50/70 backdrop-blur-xl dark:bg-slate-800/80 rounded-3xl overflow-hidden">
+            <CardHeader className="pb-3 border-b border-slate-100/50">
               <CardTitle className="text-lg flex items-center gap-2">
                 <UserCircle2 className="h-5 w-5 text-blue-600" />
                 Gestor Asignado
@@ -197,8 +277,8 @@ export default function OwnerDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="shadow-sm">
-            <CardHeader className="pb-3">
+          <Card className="border-0 shadow-lg bg-white/70 backdrop-blur-xl dark:bg-slate-900/80 rounded-3xl overflow-hidden">
+            <CardHeader className="pb-3 border-b border-slate-100/50">
               <CardTitle className="text-base flex items-center gap-2">
                 <AlertTriangle className={`h-5 w-5 ${operations.openIncidents > 0 ? 'text-amber-500' : 'text-slate-400'}`} />
                 Tickets Críticos
@@ -216,6 +296,18 @@ export default function OwnerDashboard() {
               ) : (
                 <p className="text-xs text-emerald-600 mt-2 font-medium">Todo opera con normalidad.</p>
               )}
+            </CardContent>
+          </Card>
+          
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-amber-50 to-white dark:from-amber-900/20 dark:to-slate-900/80 rounded-3xl overflow-hidden">
+            <CardHeader className="pb-3 text-center border-b border-amber-100/50">
+              <CardTitle className="text-lg flex items-center justify-center gap-2 text-amber-900">
+                <Wallet className="h-5 w-5 text-amber-600" />
+                Salud de Cobranza
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CollectionFunnel collected={financials.collectedRevenue} pending={financials.uncollectedDebt} />
             </CardContent>
           </Card>
         </div>

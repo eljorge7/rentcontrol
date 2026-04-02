@@ -47,6 +47,27 @@ export class OmniChatProxyController {
 
     // Extraer datos para el prompt
     const lease = tenant.leases[0];
+
+    // Novedad: Extraer datos financieros reales
+    const pendingCharges = await this.prisma.charge.findMany({
+       where: { leaseId: lease.id, status: 'PENDING' },
+       orderBy: { dueDate: 'asc' }
+    });
+
+    const totalDeuda = pendingCharges.reduce((sum, c) => sum + c.amount, 0);
+    const nextDueDate = pendingCharges.length > 0 ? pendingCharges[0].dueDate : null;
+
+    let financialContext = "El inquilino ESTÁ AL CORRIENTE, no debe nada.";
+    if (totalDeuda > 0) {
+       financialContext = `El inquilino TIENE UN SALDO PENDIENTE de $${totalDeuda} MXN. `;
+       if (nextDueDate) {
+          financialContext += `El cargo más antiguo o próximo a vencer es del ${nextDueDate.toLocaleDateString('es-MX')}. `;
+       }
+       const desglose = pendingCharges.map(c => `- ${c.type}: $${c.amount}`).join(', ');
+       financialContext += `Categorías de deuda: ${desglose}. `;
+       financialContext += `Dile amablemente que puede pagar en su portal usando tarjeta o OXXO al link: https://radiotecpro.com/tenant/billing`;
+    }
+
     return {
       found: true,
       hasActiveLease: true,
@@ -55,6 +76,7 @@ export class OmniChatProxyController {
       unitId: lease.unitId,
       unitName: lease.unit.name,
       propertyName: lease.unit.property.name,
+      financialContext: financialContext
     };
   }
 

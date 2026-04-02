@@ -69,9 +69,9 @@ export default function LoginPage() {
             <div className="bg-white/10 p-4 inline-flex rounded-2xl backdrop-blur-md mb-8 border border-white/20 shadow-xl">
               <Building2 className="h-12 w-12 text-white drop-shadow-md" />
             </div>
-            <h1 className="text-4xl font-bold mb-4 tracking-tight drop-shadow-sm">RentControl</h1>
+            <h1 className="text-4xl font-bold mb-4 tracking-tight drop-shadow-sm">Grupo Hurtado</h1>
             <p className="text-blue-100 text-lg leading-relaxed font-medium">
-              Gestión inteligente para propietarios, administradores e inquilinos. Todo en un solo lugar.
+              Internet Fibra y Gestión Inmobiliaria
             </p>
           </div>
         </div>

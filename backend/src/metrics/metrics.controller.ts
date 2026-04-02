@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, UseGuards, Request, Query } from '@nestjs/common';
 import { MetricsService } from './metrics.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -11,21 +11,32 @@ export class MetricsController {
 
   @Get('admin')
   @Roles('ADMIN')
-  async getAdminMetrics() {
-    return this.metricsService.getAdminMetrics();
+  async getAdminMetrics(
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    return this.metricsService.getAdminMetrics(startDate, endDate);
   }
 
   @Get('manager')
   @Roles('MANAGER')
-  async getManagerMetrics(@Request() req: any) {
+  async getManagerMetrics(
+    @Request() req: any,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
     const managerId = req.user.userId;
-    return this.metricsService.getManagerMetrics(managerId);
+    return this.metricsService.getManagerMetrics(managerId, startDate, endDate);
   }
 
   @Get('owner')
   @Roles('OWNER')
-  async getOwnerMetrics(@Request() req: any) {
+  async getOwnerMetrics(
+    @Request() req: any,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
     const ownerId = req.user.userId;
-    return this.metricsService.getOwnerMetrics(ownerId);
+    return this.metricsService.getOwnerMetrics(ownerId, startDate, endDate);
   }
 }

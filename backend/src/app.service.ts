@@ -9,21 +9,36 @@ export class AppService {
     return 'Hello World!';
   }
 
-  async getDashboardStats() {
+  async getDashboardStats(startDateStr?: string, endDateStr?: string) {
     const today = new Date();
-    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    const firstDay = startDateStr ? new Date(startDateStr + 'T00:00:00') : new Date(today.getFullYear(), today.getMonth(), 1);
+    const lastDay = endDateStr ? new Date(endDateStr + 'T23:59:59.999Z') : today;
 
-    // 1. Financials
+    // Previous period calculation for MoM
+    const msDiff = lastDay.getTime() - firstDay.getTime();
+    const prevFirstDay = new Date(firstDay.getTime() - msDiff);
+    const prevLastDay = new Date(lastDay.getTime() - msDiff);
+
+    // 1. Financials (Current)
     const [
       collectedRevenueAggr,
       expensesAggr,
       uncollectedDebtAggr,
       pendingPayrollAggr
     ] = await Promise.all([
-      this.prisma.payment.aggregate({ _sum: { amount: true }, where: { date: { gte: firstDay } } }),
-      this.prisma.expense.aggregate({ _sum: { amount: true }, where: { date: { gte: firstDay } } }),
-      this.prisma.charge.aggregate({ _sum: { amount: true }, where: { status: { in: ['PENDING', 'PARTIAL'] } } }),
+      this.prisma.payment.aggregate({ _sum: { amount: true }, where: { date: { gte: firstDay, lte: lastDay } } }),
+      this.prisma.expense.aggregate({ _sum: { amount: true }, where: { date: { gte: firstDay, lte: lastDay } } }),
+      this.prisma.charge.aggregate({ _sum: { amount: true }, where: { status: { in: ['PENDING', 'PARTIAL'] } } }), // Deuda es histórica, no acotada
       this.prisma.commission.aggregate({ _sum: { amount: true }, where: { status: 'PENDING' } }),
+    ]);
+
+    // Financials (Previous)
+    const [
+      prevCollectedRevenueAggr,
+      prevExpensesAggr
+    ] = await Promise.all([
+      this.prisma.payment.aggregate({ _sum: { amount: true }, where: { date: { gte: prevFirstDay, lt: firstDay } } }),
+      this.prisma.expense.aggregate({ _sum: { amount: true }, where: { date: { gte: prevFirstDay, lt: firstDay } } }),
     ]);
 
     const collectedRevenue = collectedRevenueAggr._sum.amount || 0;
@@ -31,6 +46,10 @@ export class AppService {
     const netIncome = collectedRevenue - expenses;
     const uncollectedDebt = uncollectedDebtAggr._sum.amount || 0;
     const pendingPayroll = pendingPayrollAggr._sum.amount || 0;
+
+    const prevCollectedRevenue = prevCollectedRevenueAggr._sum.amount || 0;
+    const prevExpenses = prevExpensesAggr._sum.amount || 0;
+    const prevNetIncome = prevCollectedRevenue - prevExpenses;
 
     // 2. Infrastructure & Mikrotik
     const [
@@ -105,7 +124,9 @@ export class AppService {
         netIncome,
         expenses,
         uncollectedDebt,
-        pendingPayroll
+        pendingPayroll,
+        prevCollectedRevenue,
+        prevNetIncome
       },
       infrastructure: {
         onlineRouters,
@@ -124,9 +145,14 @@ export class AppService {
     };
   }
 
-  async getOwnerDashboardStats(ownerId: string) {
+  async getOwnerDashboardStats(ownerId: string, startDateStr?: string, endDateStr?: string) {
     const today = new Date();
-    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    const firstDay = startDateStr ? new Date(startDateStr + 'T00:00:00') : new Date(today.getFullYear(), today.getMonth(), 1);
+    const lastDay = endDateStr ? new Date(endDateStr + 'T23:59:59.999Z') : today;
+
+    const msDiff = lastDay.getTime() - firstDay.getTime();
+    const prevFirstDay = new Date(firstDay.getTime() - msDiff);
+    const prevLastDay = new Date(lastDay.getTime() - msDiff);
 
     const owner = await this.prisma.user.findUnique({
       where: { id: ownerId },
@@ -140,7 +166,7 @@ export class AppService {
     });
     const propertyIds = properties.map(p => p.id);
 
-    // 1. Financials
+    // 1. Financials (Current)
     const [
       collectedRevenueAggr,
       expensesAggr,
@@ -148,11 +174,11 @@ export class AppService {
     ] = await Promise.all([
       this.prisma.payment.aggregate({
         _sum: { amount: true },
-        where: { date: { gte: firstDay }, charge: { lease: { unit: { propertyId: { in: propertyIds } } } } }
+        where: { date: { gte: firstDay, lte: lastDay }, charge: { lease: { unit: { propertyId: { in: propertyIds } } } } }
       }),
       this.prisma.expense.aggregate({
         _sum: { amount: true },
-        where: { date: { gte: firstDay }, propertyId: { in: propertyIds } }
+        where: { date: { gte: firstDay, lte: lastDay }, propertyId: { in: propertyIds } }
       }),
       this.prisma.charge.aggregate({
         _sum: { amount: true },
@@ -160,10 +186,29 @@ export class AppService {
       })
     ]);
 
+    // Financials (Previous)
+    const [
+      prevCollectedRevenueAggr,
+      prevExpensesAggr
+    ] = await Promise.all([
+      this.prisma.payment.aggregate({
+        _sum: { amount: true },
+        where: { date: { gte: prevFirstDay, lt: firstDay }, charge: { lease: { unit: { propertyId: { in: propertyIds } } } } }
+      }),
+      this.prisma.expense.aggregate({
+        _sum: { amount: true },
+        where: { date: { gte: prevFirstDay, lt: firstDay }, propertyId: { in: propertyIds } }
+      })
+    ]);
+
     const collectedRevenue = collectedRevenueAggr._sum.amount || 0;
     const expenses = expensesAggr._sum.amount || 0;
     const netIncome = collectedRevenue - expenses;
     const uncollectedDebt = uncollectedDebtAggr._sum.amount || 0;
+
+    const prevCollectedRevenue = prevCollectedRevenueAggr._sum.amount || 0;
+    const prevExpenses = prevExpensesAggr._sum.amount || 0;
+    const prevNetIncome = prevCollectedRevenue - prevExpenses;
 
     // 2. Operations
     const [totalUnits, occupiedUnits, openIncidents] = await Promise.all([
@@ -204,11 +249,11 @@ export class AppService {
     const propertiesDataPromises = properties.map(async (p) => {
       const pInc = await this.prisma.payment.aggregate({
         _sum: { amount: true },
-        where: { date: { gte: firstDay }, charge: { lease: { unit: { propertyId: p.id } } } }
+        where: { date: { gte: firstDay, lte: lastDay }, charge: { lease: { unit: { propertyId: p.id } } } }
       });
       const pExp = await this.prisma.expense.aggregate({
         _sum: { amount: true },
-        where: { date: { gte: firstDay }, propertyId: p.id }
+        where: { date: { gte: firstDay, lte: lastDay }, propertyId: p.id }
       });
       const rev = pInc._sum.amount || 0;
       const exp = pExp._sum.amount || 0;
@@ -226,7 +271,9 @@ export class AppService {
         collectedRevenue,
         netIncome,
         expenses,
-        uncollectedDebt
+        uncollectedDebt,
+        prevCollectedRevenue,
+        prevNetIncome
       },
       operations: {
         totalUnits,

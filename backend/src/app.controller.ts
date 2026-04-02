@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller()
@@ -11,8 +11,11 @@ export class AppController {
   }
 
   @Get('dashboard')
-  getDashboardStats() {
-    return this.appService.getDashboardStats();
+  getDashboardStats(
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    return this.appService.getDashboardStats(startDate, endDate);
   }
 
   @Get('dashboard/tenant/:id')
@@ -21,8 +24,12 @@ export class AppController {
   }
 
   @Get('dashboard/owner/:id')
-  getOwnerDashboardStats(@Param('id') id: string) {
-    return this.appService.getOwnerDashboardStats(id);
+  getOwnerDashboardStats(
+    @Param('id') id: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    return this.appService.getOwnerDashboardStats(id, startDate, endDate);
   }
 
   @Get('dashboard/owner/:id/billing')
