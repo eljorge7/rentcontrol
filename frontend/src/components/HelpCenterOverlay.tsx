@@ -10,7 +10,7 @@ export default function HelpCenterOverlay() {
   const pathname = usePathname();
 
   // No mostrar en rutas públicas (login, registro, landing page, links publicos de factura)
-  if (pathname === '/' || pathname === '/login' || pathname === '/registro' || pathname.startsWith('/quote') || pathname.startsWith('/ticket')) {
+  if (pathname.includes('/login') || pathname.includes('/registro') || pathname === '/' || pathname.includes('/quote') || pathname.includes('/ticket')) {
     return null;
   }
 
