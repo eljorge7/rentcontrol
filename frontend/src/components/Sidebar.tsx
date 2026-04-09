@@ -54,6 +54,10 @@ export function Sidebar() {
         <Layers className="mr-3 h-5 w-5 flex-shrink-0 text-indigo-600" />
         {!isCollapsed && <span className="text-indigo-700 font-bold tracking-tight">App Store Integrations</span>}
       </Link>
+      <a href="https://omnichat.radiotecpro.com/login" target="_blank" rel="noopener noreferrer" className="flex items-center rounded-md px-3 py-2 text-sm font-medium mt-2 mx-2 hover:bg-purple-100 bg-purple-50 border border-purple-200 shadow-sm transition-all hover:-translate-y-0.5">
+        <MessageSquare className="mr-3 h-5 w-5 flex-shrink-0 text-purple-600" />
+        {!isCollapsed && <span className="text-purple-700 font-black tracking-tight">OmniChat Consola IA</span>}
+      </a>
     </>
   );
 
@@ -63,6 +67,10 @@ export function Sidebar() {
         <LayoutDashboard className="mr-3 h-5 w-5 flex-shrink-0 text-indigo-600" />
         {!isCollapsed && <span className="font-bold">Dashboard de Rentas</span>}
       </Link>
+      <a href="https://omnichat.radiotecpro.com/login" target="_blank" rel="noopener noreferrer" className="flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-emerald-200 mx-2 mt-1 text-emerald-800 bg-emerald-100 shadow-sm border border-emerald-200 transition-all hover:-translate-y-0.5 animate-pulse">
+        <MessageSquare className="mr-3 h-5 w-5 flex-shrink-0 text-emerald-600" />
+        {!isCollapsed && <span className="font-black">Bandeja OmniChat IA</span>}
+      </a>
       <Link href="/admin/properties" className="flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-slate-200 mx-2 mt-1">
         <Building2 className="mr-3 h-5 w-5 flex-shrink-0 text-slate-500" />
         {!isCollapsed && <span>Propiedades</span>}

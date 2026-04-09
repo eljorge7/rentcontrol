@@ -87,16 +87,22 @@ export default function Home() {
           </div>
           <div className="hidden lg:flex gap-8 text-sm font-medium text-slate-600">
             <Link href="#internet" className="hover:text-blue-600 transition-colors">Internet WISP</Link>
-            <Link href="#gestion" className="hover:text-blue-600 transition-colors">Gestión RentControl</Link>
+            <Link href="#gestion" className="hover:text-blue-600 transition-colors">RentControl API</Link>
+            <Link href="#omnichat" className="hover:text-emerald-600 font-bold text-emerald-600 transition-colors inline-flex items-center gap-1"><MessageSquare className="w-4 h-4"/> OmniChat IA</Link>
             <Link href="#proveedores" className="hover:text-blue-600 transition-colors">Para Técnicos</Link>
           </div>
           <div className="flex gap-2 sm:gap-4 items-center">
+            <a href="https://omnichat.radiotecpro.com/login" target="_blank" rel="noopener noreferrer">
+              <Button variant="outline" size="sm" className="hidden md:flex rounded-xl border-emerald-200 text-emerald-700 hover:bg-emerald-50 px-3 sm:px-5 font-bold h-9 sm:h-10">
+                <MessageSquare className="mr-2 h-4 w-4" /> Bot IA
+              </Button>
+            </a>
             <a href="https://clientes.portalinternet.net/accounts/login/?next=/panel/" target="_blank" rel="noopener noreferrer">
-              <Button variant="outline" size="sm" className="rounded-full border-blue-200 text-blue-700 hover:bg-blue-50 px-3 sm:px-5 text-xs sm:text-sm h-9 sm:h-10">
+              <Button variant="outline" size="sm" className="rounded-xl border-blue-200 text-blue-700 hover:bg-blue-50 px-3 sm:px-5 font-bold h-9 sm:h-10">
                 Portal WISP
               </Button>
             </a>
-            <Link href="/login" className="inline-flex items-center justify-center rounded-xl text-xs sm:text-sm font-medium transition-colors h-9 sm:h-10 px-4 sm:px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white shadow-md shadow-slate-900/20">
+            <Link href="/login" className="inline-flex items-center justify-center rounded-xl text-xs sm:text-sm font-bold transition-colors h-9 sm:h-10 px-4 sm:px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white shadow-md shadow-slate-900/20">
               <Building2 className="hidden sm:inline-block mr-2 h-4 w-4" />
               RentControl
             </Link>
@@ -296,6 +302,53 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Propuesta de Valor OmniChat */}
+      <section id="omnichat" className="py-24 bg-white relative overflow-hidden">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+             <div className="order-2 lg:order-1 relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 blur-3xl opacity-20 rounded-full"></div>
+                <div className="relative rounded-3xl bg-slate-50 border border-slate-200 p-8 shadow-2xl flex flex-col items-center justify-center min-h-[400px]">
+                   <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mb-6 shadow-inner relative">
+                      <div className="absolute inset-0 bg-emerald-400 rounded-full animate-ping opacity-20"></div>
+                      <MessageSquare className="h-10 w-10 text-emerald-600" />
+                   </div>
+                   <h3 className="text-2xl font-black text-slate-900 mb-2">IA Entrenada para tus Clientes</h3>
+                   <p className="text-center text-slate-600 max-w-sm mb-6 font-medium">OmniChat lee tus cuartos, inquilinos y facturas en tiempo real y responde a prospectos por WhatsApp de forma 100% autónoma y humana.</p>
+                   <Button onClick={() => openLeadModal("Demostración OmniChat AI")} className="bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg shadow-emerald-600/30 font-bold px-8 h-12 rounded-xl text-md">Solicitar Acceso a OmniChat</Button>
+                </div>
+             </div>
+             
+             <div className="order-1 lg:order-2">
+                 <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 text-sm text-emerald-700 mb-6 font-bold">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Sistema Inteligente WhatsApp
+                 </div>
+                 <h2 className="text-3xl md:text-5xl font-black tracking-tight mb-6 text-slate-900">Vende, cobra y soporta mientras duermes.</h2>
+                 <p className="text-lg text-slate-600 mb-8 max-w-xl">
+                    Olvídate de responder el mismo mensaje "Info" 100 veces al día. OmniChat integra la cobranza de inquilinos de RentControl en un solo cerebro automatizado por IA que trabaja 24/7.
+                 </p>
+                 
+                 <div className="space-y-6">
+                 <div className="flex gap-4">
+                   <div className="flex-shrink-0 mt-1"><Target className="h-6 w-6 text-emerald-500" /></div>
+                   <div>
+                     <h4 className="text-xl font-bold text-slate-900">Lectura de Intención Exacta</h4>
+                     <p className="text-slate-600 mt-1">El motor detecta si el usuario quiere rentar un local comercial o reportar un lavabo roto, aplicando flujos de inteligencia artificial nativos.</p>
+                   </div>
+                 </div>
+                 <div className="flex gap-4">
+                   <div className="flex-shrink-0 mt-1"><Building2 className="h-6 w-6 text-indigo-500" /></div>
+                   <div>
+                     <h4 className="text-xl font-bold text-slate-900">Catálogo M2M Extendido</h4>
+                     <p className="text-slate-600 mt-1">Sincronización Machine-to-Machine directa con la BBDD de RentControl. Informa precios y unidades disponibles sin que abras tu laptop.</p>
+                   </div>
+                 </div>
+                 </div>
+             </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Técnicos */}
       <section id="proveedores" className="py-20 bg-indigo-600 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-repeat"></div>
@@ -418,6 +471,7 @@ export default function Home() {
               <ul className="space-y-3">
                 <li><a href="https://clientes.portalinternet.net/accounts/login/?next=/panel/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors">Portal de Clientes WISP</a></li>
                 <li><Link href="/login" className="hover:text-blue-400 transition-colors">Acceso RentControl Nube</Link></li>
+                <li><a href="https://omnichat.radiotecpro.com/login" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors font-bold">Consola OmniChat IA</a></li>
               </ul>
             </div>
             <div>
