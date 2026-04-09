@@ -6,6 +6,8 @@ import { Plus, UserCog, Edit, Trash2, Phone, Mail, Wrench, Search } from "lucide
 import { Input } from "@/components/ui/input";
 import api from "@/lib/api";
 import { AddSupplierDialog } from "@/components/AddSupplierDialog";
+import { UploadXmlDialog } from "@/components/UploadXmlDialog";
+import { DollarSign, UploadCloud } from "lucide-react";
 
 interface Supplier {
   id: string;
@@ -14,12 +16,16 @@ interface Supplier {
   phone: string | null;
   email: string | null;
   category: string;
+  rfc?: string | null;
+  taxRegime?: string | null;
+  expenses?: { id: string; amount: number; date: string; category: string }[];
 }
 
 export default function SuppliersPage() {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -93,6 +99,9 @@ export default function SuppliersPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
+          <Button onClick={() => setIsUploadModalOpen(true)} className="bg-emerald-600 hover:bg-emerald-700 text-white whitespace-nowrap">
+            <UploadCloud className="mr-2 h-4 w-4" /> Buzón Facturas
+          </Button>
           <Button onClick={() => { setEditingSupplier(null); setIsAddModalOpen(true); }} className="bg-indigo-600 hover:bg-indigo-700 text-white whitespace-nowrap">
             <Plus className="mr-2 h-4 w-4" /> Registrar Técnico
           </Button>
@@ -144,6 +153,19 @@ export default function SuppliersPage() {
                   {supplier.email || <span className="text-slate-400 italic">Sin correo</span>}
                 </div>
               </div>
+
+              {/* Módulo de Gastos FacturaPro */}
+              <div className="mt-4 pt-4 border-t border-slate-100">
+                <div className="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-100">
+                   <div className="flex items-center gap-2">
+                     <DollarSign className="h-5 w-5 text-emerald-500" />
+                     <span className="text-sm font-semibold text-slate-700">Gastos Registrados</span>
+                   </div>
+                   <span className="text-lg font-bold text-slate-900">
+                      ${supplier.expenses ? supplier.expenses.reduce((acc, current) => acc + current.amount, 0).toLocaleString() : '0.00'}
+                   </span>
+                </div>
+              </div>
             </div>
           ))
         )}
@@ -154,6 +176,12 @@ export default function SuppliersPage() {
         initialData={editingSupplier}
         onClose={() => { setIsAddModalOpen(false); setEditingSupplier(null); }} 
         onSave={handleSave} 
+      />
+
+      <UploadXmlDialog
+        isOpen={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+        onUploaded={fetchSuppliers}
       />
     </div>
   );

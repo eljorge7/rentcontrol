@@ -20,29 +20,29 @@ enum PlanType {
 }
 
 model ManagementPlan {
-  id          String   @id @default(uuid())
-  name        String
-  description String?
-  commission  Float // Porcentaje de comisión (Ej. 10 para 10%)
-  fixedFee    Float // Cuota fija mensual (Ej. 500 para $500 MXN)
-  maxProperties Int @default(5) // Límite de propiedades para dueños bajo este plan
-  owners      User[]   // Dueños suscritos a este plan ("clientes" del gestor)
-  quotations  Quotation[] // Cotizaciones usando este plan
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String      @id @default(uuid())
+  name          String
+  description   String?
+  commission    Float // Porcentaje de comisión (Ej. 10 para 10%)
+  fixedFee      Float // Cuota fija mensual (Ej. 500 para $500 MXN)
+  maxProperties Int         @default(5) // Límite de propiedades para dueños bajo este plan
+  owners        User[] // Dueños suscritos a este plan ("clientes" del gestor)
+  quotations    Quotation[] // Cotizaciones usando este plan
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 }
 
 model User {
-  id        String     @id @default(uuid())
-  email     String     @unique
-  password  String
-  role      Role       @default(TENANT)
-  name      String
-  isActive  Boolean    @default(true)
-  phone     String?
-  maxProperties Int    @default(2) // Límite de propiedades permitidas (aplicable a OWNER)
-  planType  PlanType   @default(SAAS) // Modelo de servicio aplicable a OWNER
-  
+  id            String   @id @default(uuid())
+  email         String   @unique
+  password      String
+  role          Role     @default(TENANT)
+  name          String
+  isActive      Boolean  @default(true)
+  phone         String?
+  maxProperties Int      @default(2) // Límite de propiedades permitidas (aplicable a OWNER)
+  planType      PlanType @default(SAAS) // Modelo de servicio aplicable a OWNER
+
   // Facturación Universal (Admin, Manager, Owner, etc.)
   rfc             String?
   taxRegimen      String?
@@ -50,196 +50,202 @@ model User {
   requiresInvoice Boolean @default(false)
   taxDocumentUrl  String?
 
-  
   // Relations
-  properties Property[]
-  tenants    Tenant[]
-  ownedTenants Tenant[] @relation("TenantOwner")
-  
+  properties   Property[]
+  tenants      Tenant[]
+  ownedTenants Tenant[]   @relation("TenantOwner")
+
   // Agency Model Relations (Manager -> Owner)
   managerId        String?
   manager          User?           @relation("ManagerToOwner", fields: [managerId], references: [id])
   managedOwners    User[]          @relation("ManagerToOwner")
   managementPlanId String?
   managementPlan   ManagementPlan? @relation(fields: [managementPlanId], references: [id])
-  
+
   // KYC & Owner Details
-  ownerProfile     OwnerProfile?
-  
+  ownerProfile OwnerProfile?
+
   // Financials for Manager & Owner
-  commissions      Commission[]    @relation("ManagerCommissions")
-  payrolls         Payroll[]       @relation("ManagerPayroll")
-  ownerPayouts     OwnerPayout[]   @relation("OwnerPayouts")
-  managerPayouts   OwnerPayout[]   @relation("ManagerPayouts")
-  
-  quotations       Quotation[]     @relation("ManagerQuotations")
-  platformEarnings PlatformEarning[] @relation("ManagerEarnings")
-  suppliers        Supplier[]      @relation("ManagerSuppliers")
-  vouchers         HotspotVoucher[] @relation("ManagerVouchers")
+  commissions    Commission[]  @relation("ManagerCommissions")
+  payrolls       Payroll[]     @relation("ManagerPayroll")
+  ownerPayouts   OwnerPayout[] @relation("OwnerPayouts")
+  managerPayouts OwnerPayout[] @relation("ManagerPayouts")
+
+  quotations       Quotation[]          @relation("ManagerQuotations")
+  platformEarnings PlatformEarning[]    @relation("ManagerEarnings")
+  suppliers        Supplier[]           @relation("ManagerSuppliers")
+  vouchers         HotspotVoucher[]     @relation("ManagerVouchers")
   checklists       InventoryChecklist[] @relation("ManagerChecklists")
-  
+
+  // Módulo SaaS (App Store)
+  subscriptions UserSubscription[] @relation("UserSubscriptions")
+
+  // FacturaPro Ecosistema & Ajustes
+  facturaProSettings FacturaProSettings?
+  facturaproTenantId String? // Enlace One-ID al ecosistema FacturaPro
+  apiKeys          ApiKey[]            @relation("UserApiKeys")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OwnerProfile {
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  // Perfil Legal/Fiscal
+  legalName   String?
+  rfc         String?
+  taxRegime   String?
+  bankName    String?
+  bankAccount String?
+  bankClabe   String?
+
+  // Documentos KYC (URLs de S3 / disco duro)
+  ineUrl           String?
+  rfcDocumentUrl   String?
+  addressProofUrl  String?
+  propertyDeedUrl  String?
+  bankStatementUrl String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Property {
+  id               String           @id @default(uuid())
+  name             String
+  address          String           @db.Text
+  description      String?
+  lat              Float?
+  lng              Float?
+  mapUrl           String?
+  photos           String           @default("[]")
+  amenities        String           @default("[]")
+  maintenanceLimit Float            @default(1500) // Límite pre-autorizado de reparaciones
+  ownerId          String?
+  owner            User?            @relation(fields: [ownerId], references: [id])
+  units            Unit[]
+  expenses         Expense[]
+  routers          MikrotikRouter[]
+  announcements    Announcement[]
+  vouchers         HotspotVoucher[]
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+}
+
+model Unit {
+  id          String     @id @default(uuid())
+  propertyId  String
+  property    Property   @relation(fields: [propertyId], references: [id])
+  name        String // ej. "Depto 1" o "Local A"
+  basePrice   Float
+  isOccupied  Boolean    @default(false)
+  photos      String     @default("[]")
+  description String?    @db.Text
+  area        Float?
+  bedrooms    Int?
+  bathrooms   Float?
+  isFurnished Boolean    @default(false)
+  amenities   String     @default("[]")
+  leases      Lease[]
+  incidents   Incident[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Tenant {
+  id              String  @id @default(uuid())
+  name            String
+  email           String  @unique
+  phone           String?
+  // Facturación
+  rfc             String?
+  taxRegimen      String?
+  zipCode         String?
+  requiresInvoice Boolean @default(false)
+  taxDocumentUrl  String?
+
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id])
+
+  ownerId String?
+  owner   User?   @relation("TenantOwner", fields: [ownerId], references: [id])
+
+  leases    Lease[]
+  incidents Incident[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 }
 
-model OwnerProfile {
-  id              String   @id @default(uuid())
-  userId          String   @unique
-  user            User     @relation(fields: [userId], references: [id])
-  
-  // Perfil Legal/Fiscal
-  legalName       String?
-  rfc             String?
-  taxRegime       String?
-  bankName        String?
-  bankAccount     String?
-  bankClabe       String?
-  
-  // Documentos KYC (URLs de S3 / disco duro)
-  ineUrl          String?
-  rfcDocumentUrl  String?
-  addressProofUrl String?
-  propertyDeedUrl String?
-  bankStatementUrl String?
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-}
-
-model Property {
-  id          String   @id @default(uuid())
-  name        String
-  address     String   @db.Text
-  description String?
-  lat         Float?
-  lng         Float?
-  mapUrl      String?
-  photos      String   @default("[]")
-  amenities   String   @default("[]")
-  maintenanceLimit Float @default(1500) // Límite pre-autorizado de reparaciones
-  ownerId     String?
-  owner       User?    @relation(fields: [ownerId], references: [id])
-  units       Unit[]
-  expenses    Expense[]
-  routers     MikrotikRouter[]
-  announcements Announcement[]
-  vouchers    HotspotVoucher[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-model Unit {
-  id            String    @id @default(uuid())
-  propertyId    String
-  property      Property  @relation(fields: [propertyId], references: [id])
-  name          String    // ej. "Depto 1" o "Local A"
-  basePrice     Float
-  isOccupied    Boolean   @default(false)
-  photos        String    @default("[]")
-  description   String?   @db.Text
-  area          Float?
-  bedrooms      Int?
-  bathrooms     Float?
-  isFurnished   Boolean   @default(false)
-  amenities     String    @default("[]")
-  leases        Lease[]
-  incidents     Incident[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-}
-
-model Tenant {
-  id          String    @id @default(uuid())
-  name        String
-  email       String    @unique
-  phone       String?
-  // Facturación
-  rfc         String?
-  taxRegimen  String?
-  zipCode     String?
-  requiresInvoice Boolean @default(false)
-  taxDocumentUrl  String?
-  
-  
-  userId      String?   @unique
-  user        User?     @relation(fields: [userId], references: [id])
-  
-  ownerId     String?
-  owner       User?     @relation("TenantOwner", fields: [ownerId], references: [id])
-  
-  leases      Lease[]
-  incidents   Incident[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-}
-
 model Lease {
-  id          String    @id @default(uuid())
-  unitId      String
-  unit        Unit      @relation(fields: [unitId], references: [id])
-  tenantId    String
-  tenant      Tenant    @relation(fields: [tenantId], references: [id])
-  startDate   DateTime
-  endDate     DateTime?
-  rentAmount  Float
-  paymentDay  Int       // Ej. pagar los días 5 de cada mes
-  lateFeeAmount Float   @default(0) // Ej. multa fija de 500 pesos por retraso
-  gracePeriodDays Int   @default(3) // Ej. 3 días de tolerancia después del paymentDay
-  status      String    @default("ACTIVE") // ACTIVE, TERMINATED
-  charges     Charge[]
-  services    LeaseService[]
-  checklists  InventoryChecklist[]
+  id                  String               @id @default(uuid())
+  unitId              String
+  unit                Unit                 @relation(fields: [unitId], references: [id])
+  tenantId            String
+  tenant              Tenant               @relation(fields: [tenantId], references: [id])
+  startDate           DateTime
+  endDate             DateTime?
+  rentAmount          Float
+  paymentDay          Int // Ej. pagar los días 5 de cada mes
+  lateFeeAmount       Float                @default(0) // Ej. multa fija de 500 pesos por retraso
+  gracePeriodDays     Int                  @default(3) // Ej. 3 días de tolerancia después del paymentDay
+  status              String               @default("ACTIVE") // ACTIVE, TERMINATED
+  charges             Charge[]
+  services            LeaseService[]
+  checklists          InventoryChecklist[]
   tenantSignatureUrl  String?
   managerSignatureUrl String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
 }
 
 model Charge {
-  id          String    @id @default(uuid())
-  leaseId     String
-  lease       Lease     @relation(fields: [leaseId], references: [id])
-  amount      Float
-  type        String    // RENT, INTERNET, MAINTENANCE, PENALTY
-  dueDate     DateTime
-  description String?
-  penaltyApplied Boolean @default(false) // Flag de seguridad para no duplicar recargos en este recibo
-  status      String    @default("PENDING") // PENDING, PAID, PARTIAL, CANCELLED
-  payments    Payment[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id             String    @id @default(uuid())
+  leaseId        String
+  lease          Lease     @relation(fields: [leaseId], references: [id])
+  amount         Float
+  type           String // RENT, INTERNET, MAINTENANCE, PENALTY
+  dueDate        DateTime
+  description    String?
+  penaltyApplied Boolean   @default(false) // Flag de seguridad para no duplicar recargos en este recibo
+  status         String    @default("PENDING") // PENDING, PAID, PARTIAL, CANCELLED
+  payments       Payment[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }
 
 model Payment {
-  id               String    @id @default(uuid())
+  id               String   @id @default(uuid())
   chargeId         String
-  charge           Charge    @relation(fields: [chargeId], references: [id])
+  charge           Charge   @relation(fields: [chargeId], references: [id])
   amount           Float
-  date             DateTime  @default(now())
-  method           String    // CASH, SPEI, STRIPE, MERCADOPAGO
-  reference        String?   // Para guardar folios de transferencia o recibos
-  invoiceRequested Boolean   @default(false)
+  date             DateTime @default(now())
+  method           String // CASH, SPEI, STRIPE, MERCADOPAGO
+  reference        String? // Para guardar folios de transferencia o recibos
+  invoiceRequested Boolean  @default(false)
   invoice          Invoice?
-  
-  commission       Commission?
-  
-  ownerPayoutId    String?
-  ownerPayout      OwnerPayout?   @relation(fields: [ownerPayoutId], references: [id])
-  
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+
+  commission Commission?
+
+  ownerPayoutId String?
+  ownerPayout   OwnerPayout? @relation(fields: [ownerPayoutId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Invoice {
-  id          String   @id @default(uuid())
-  paymentId   String   @unique
-  payment     Payment  @relation(fields: [paymentId], references: [id])
-  uuidSAT     String?  // UUID timbrado
-  xmlUrl      String?
-  pdfUrl      String?
-  status      String   @default("ISSUED") // PENDING, ISSUED, CANCELLED
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(uuid())
+  paymentId String   @unique
+  payment   Payment  @relation(fields: [paymentId], references: [id])
+  uuidSAT   String? // UUID timbrado
+  xmlUrl    String?
+  pdfUrl    String?
+  status    String   @default("ISSUED") // PENDING, ISSUED, CANCELLED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Expense {
@@ -248,55 +254,66 @@ model Expense {
   property    Property? @relation(fields: [propertyId], references: [id])
   amount      Float
   date        DateTime  @default(now())
-  category    String    // MAINTENANCE, TAXES, UTILITIES, OTHER
+  category    String // MAINTENANCE, TAXES, UTILITIES, OTHER
   description String?
-  
+
+  // CFDI / XML integration
+  xmlUrl      String?   @db.Text
+  uuidSAT     String?   @unique
+  evidenceUrl String?   // Opcional para PDFs/Fotos del recibo
+
+  supplierId  String?
+  supplier    Supplier? @relation(fields: [supplierId], references: [id])
+
   ownerPayoutId String?
   ownerPayout   OwnerPayout? @relation(fields: [ownerPayoutId], references: [id])
-  
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Supplier {
-  id          String     @id @default(uuid())
-  name        String     // Razón Social o Empresa
-  contactName String?    // Nombre del técnico (ej. Roberto)
+  id          String  @id @default(uuid())
+  name        String // Razón Social o Empresa
+  rfc         String? // RFC para facturación
+  taxRegime   String? // Régimen fiscal del emisor
+  contactName String? // Nombre del técnico (ej. Roberto)
   phone       String?
   email       String?
-  category    String     // PLUMBING, ELECTRICAL, NETWORK, GENERAL
-  
-  managerId   String?
-  manager     User?      @relation("ManagerSuppliers", fields: [managerId], references: [id])
-  
-  incidents   Incident[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  category    String // PLUMBING, ELECTRICAL, NETWORK, GENERAL
+
+  managerId String?
+  manager   User?   @relation("ManagerSuppliers", fields: [managerId], references: [id])
+
+  incidents Incident[]
+  expenses  Expense[]  // Relación con los gastos registrados
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 }
 
 model Incident {
-  id          String    @id @default(uuid())
-  unitId      String
-  unit        Unit      @relation(fields: [unitId], references: [id])
-  tenantId    String
-  tenant      Tenant    @relation(fields: [tenantId], references: [id])
-  supplierId  String?
-  supplier    Supplier? @relation(fields: [supplierId], references: [id])
-  
-  cost          Float?
-  supplierCost  Float?
-  rcMarkup      Float?    @default(0.05) // 5% base markup
-  finalCharge   Float?
-  billedTo      String?   // "OWNER" | "TENANT" | null
-  
-  supplierNotes String?   @db.Text
+  id         String    @id @default(uuid())
+  unitId     String
+  unit       Unit      @relation(fields: [unitId], references: [id])
+  tenantId   String
+  tenant     Tenant    @relation(fields: [tenantId], references: [id])
+  supplierId String?
+  supplier   Supplier? @relation(fields: [supplierId], references: [id])
+
+  cost         Float?
+  supplierCost Float?
+  rcMarkup     Float?  @default(0.05) // 5% base markup
+  finalCharge  Float?
+  billedTo     String? // "OWNER" | "TENANT" | null
+
+  supplierNotes String? @db.Text
   evidenceUrl   String?
-  
-  status      String    @default("PENDING") // PENDING, IN_PROGRESS, RESOLVED, CANCELLED
-  priority    String    @default("LOW") // LOW, MEDIUM, HIGH, URGENT
-  description String    @db.Text
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+
+  status      String   @default("PENDING") // PENDING, IN_PROGRESS, RESOLVED, CANCELLED
+  priority    String   @default("LOW") // LOW, MEDIUM, HIGH, URGENT
+  description String   @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 // ----------------------------------------------------
@@ -304,28 +321,28 @@ model Incident {
 // ----------------------------------------------------
 
 model Message {
-  id          String   @id @default(uuid())
-  text        String   @db.Text
-  senderId    String
-  senderRole  String
-  senderName  String
-  receiverId  String?
+  id           String   @id @default(uuid())
+  text         String   @db.Text
+  senderId     String
+  senderRole   String
+  senderName   String
+  receiverId   String?
   receiverRole String?
-  read        Boolean  @default(false)
-  createdAt   DateTime @default(now())
+  read         Boolean  @default(false)
+  createdAt    DateTime @default(now())
 }
 
 model Announcement {
-  id          String   @id @default(uuid())
-  title       String
-  content     String   @db.Text
-  authorId    String
-  authorRole  String   // ADMIN, MANAGER, OWNER
-  targetRole  String?  // Ej. TENANT, OWNER (null = Global)
-  propertyId  String?  // Si es solo para una propiedad
-  property    Property? @relation(fields: [propertyId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String    @id @default(uuid())
+  title      String
+  content    String    @db.Text
+  authorId   String
+  authorRole String // ADMIN, MANAGER, OWNER
+  targetRole String? // Ej. TENANT, OWNER (null = Global)
+  propertyId String? // Si es solo para una propiedad
+  property   Property? @relation(fields: [propertyId], references: [id])
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
 
 // ----------------------------------------------------
@@ -333,34 +350,34 @@ model Announcement {
 // ----------------------------------------------------
 
 model NetworkProfile {
-  id            String   @id @default(uuid())
-  name          String   // e.g. "20 Megas", "50 Megas"
-  downloadSpeed Int      // in Mbps
-  uploadSpeed   Int      // in Mbps
-  price         Float    @default(0) // Costo mensual del paquete
+  id            String         @id @default(uuid())
+  name          String // e.g. "20 Megas", "50 Megas"
+  downloadSpeed Int // in Mbps
+  uploadSpeed   Int // in Mbps
+  price         Float          @default(0) // Costo mensual del paquete
   services      LeaseService[]
 }
 
 model MikrotikRouter {
-  id          String   @id @default(uuid())
-  name        String
-  ipAddress   String
-  apiPort     Int      @default(8728)
-  username    String
-  password    String   // Encrypted before saving
-  isActive    Boolean  @default(true)
+  id        String  @id @default(uuid())
+  name      String
+  ipAddress String
+  apiPort   Int     @default(8728)
+  username  String
+  password  String // Encrypted before saving
+  isActive  Boolean @default(true)
 
   // VPN Cloud Config
-  vpnIp       String?  // IP Estática interna asiganada por el túnel VPN
-  vpnUser     String?  // Usuario SSTP/VPN
-  vpnPassword String?  // Password SSTP/VPN
-  vpnHost     String?  // IP/Dominio del Servidor VPN (ej. vpn.radiotecpro.com)
+  vpnIp       String? // IP Estática interna asiganada por el túnel VPN
+  vpnUser     String? // Usuario SSTP/VPN
+  vpnPassword String? // Password SSTP/VPN
+  vpnHost     String? // IP/Dominio del Servidor VPN (ej. vpn.radiotecpro.com)
 
-  propertyId  String?
-  property    Property? @relation(fields: [propertyId], references: [id])
-  vouchers    HotspotVoucher[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  propertyId String?
+  property   Property?        @relation(fields: [propertyId], references: [id])
+  vouchers   HotspotVoucher[]
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
 }
 
 model LeaseService {
@@ -369,7 +386,7 @@ model LeaseService {
   lease            Lease          @relation(fields: [leaseId], references: [id])
   networkProfileId String
   profile          NetworkProfile @relation(fields: [networkProfileId], references: [id])
-  ipAddress        String?        // Assigned IP (optional for PPPoE if assigned dynamically)
+  ipAddress        String? // Assigned IP (optional for PPPoE if assigned dynamically)
   pppoeUser        String?        @unique
   pppoePassword    String?
   macAddress       String?
@@ -379,38 +396,38 @@ model LeaseService {
 }
 
 model Commission {
-  id          String   @id @default(uuid())
+  id          String @id @default(uuid())
   amount      Float
-  systemFee   Float    @default(0) // Ganancia del sistema retenida (15% o margen)
+  systemFee   Float  @default(0) // Ganancia del sistema retenida (15% o margen)
   description String
-  status      String   @default("PENDING") // PENDING, PAID
-  
-  managerId   String
-  manager     User     @relation("ManagerCommissions", fields: [managerId], references: [id])
-  
-  paymentId   String?  @unique
-  payment     Payment? @relation(fields: [paymentId], references: [id])
-  
-  payrollId   String?
-  payroll     Payroll? @relation(fields: [payrollId], references: [id])
+  status      String @default("PENDING") // PENDING, PAID
+
+  managerId String
+  manager   User   @relation("ManagerCommissions", fields: [managerId], references: [id])
+
+  paymentId String?  @unique
+  payment   Payment? @relation(fields: [paymentId], references: [id])
+
+  payrollId String?
+  payroll   Payroll? @relation(fields: [payrollId], references: [id])
 
   eventTypeId String?
   eventType   EventType? @relation(fields: [eventTypeId], references: [id])
-  
+
   platformEarning PlatformEarning?
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model EventType {
-  id          String   @id @default(uuid())
-  name        String   // "Instalación", "Visita Técnica", etc
+  id          String       @id @default(uuid())
+  name        String // "Instalación", "Visita Técnica", etc
   description String?
-  basePrice   Float    // Default commission price
+  basePrice   Float // Default commission price
   commissions Commission[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
 model Payroll {
@@ -418,32 +435,32 @@ model Payroll {
   totalAmount Float
   status      String   @default("PAID")
   date        DateTime @default(now())
-  
-  managerId   String
-  manager     User     @relation("ManagerPayroll", fields: [managerId], references: [id])
-  
+
+  managerId String
+  manager   User   @relation("ManagerPayroll", fields: [managerId], references: [id])
+
   commissions Commission[]
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Quotation {
-  id               String          @id @default(uuid())
+  id               String         @id @default(uuid())
   prospectName     String
   prospectEmail    String?
   managerId        String
-  manager          User            @relation("ManagerQuotations", fields: [managerId], references: [id])
+  manager          User           @relation("ManagerQuotations", fields: [managerId], references: [id])
   managementPlanId String
-  managementPlan   ManagementPlan  @relation(fields: [managementPlanId], references: [id])
-  propertyCount    Int             @default(1)
+  managementPlan   ManagementPlan @relation(fields: [managementPlanId], references: [id])
+  propertyCount    Int            @default(1)
   totalAmount      Float
-  status           String          @default("DRAFT") // DRAFT, SENT, ACCEPTED, REJECTED
-  cfdiUse          String?   // G03, P01, etc (SAT)
-  taxRegime        String?   // 601, 612, etc (SAT)
-  
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  status           String         @default("DRAFT") // DRAFT, SENT, ACCEPTED, REJECTED
+  cfdiUse          String? // G03, P01, etc (SAT)
+  taxRegime        String? // 601, 612, etc (SAT)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // ----------------------------------------------------
@@ -451,87 +468,191 @@ model Quotation {
 // ----------------------------------------------------
 
 model SystemSetting {
-  id          String   @id @default(uuid())
-  key         String   @unique
-  value       String   @db.Text
+  id          String  @id @default(uuid())
+  key         String  @unique
+  value       String  @db.Text
   description String?
-  isSecret    Boolean  @default(false)
+  isSecret    Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ----------------------------------------------------
+// FacturaPro Ecosystem Settings & Keys
+// ----------------------------------------------------
+
+model FacturaProSettings {
+  id                  String   @id @default(uuid())
+  userId              String   @unique
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
+  invoicePrefix       String   @default("F-")
+  invoiceCurrentFolio Int      @default(1)
+  
+  quotePrefix         String   @default("COT-")
+  quoteCurrentFolio   Int      @default(1)
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model ApiKey {
+  id          String   @id @default(uuid())
+  key         String   @unique // Hash o token generado
+  name        String   // Ej. "Conexión OmniChat"
+  isActive    Boolean  @default(true)
+  
+  userId      String
+  user        User     @relation("UserApiKeys", fields: [userId], references: [id], onDelete: Cascade)
+
+  lastUsedAt  DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
 model PlatformEarning {
-  id          String   @id @default(uuid())
+  id          String @id @default(uuid())
   amount      Float
   description String
-  
-  managerId   String?
-  manager     User?    @relation("ManagerEarnings", fields: [managerId], references: [id])
-  
-  commissionId String? @unique
-  commission  Commission? @relation(fields: [commissionId], references: [id])
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+
+  managerId String?
+  manager   User?   @relation("ManagerEarnings", fields: [managerId], references: [id])
+
+  commissionId String?     @unique
+  commission   Commission? @relation(fields: [commissionId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model HotspotVoucher {
-  id          String   @id @default(uuid())
-  code        String   @unique
-  password    String?
-  duration    Int
-  price       Float    @default(0)
-  status      String   @default("AVAILABLE")
-  
-  propertyId  String?
-  property    Property? @relation(fields: [propertyId], references: [id])
-  
-  routerId    String?
-  router      MikrotikRouter? @relation(fields: [routerId], references: [id])
+  id       String  @id @default(uuid())
+  code     String  @unique
+  password String?
+  duration Int
+  price    Float   @default(0)
+  status   String  @default("AVAILABLE")
 
-  managerId   String
-  manager     User     @relation("ManagerVouchers", fields: [managerId], references: [id])
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  propertyId String?
+  property   Property? @relation(fields: [propertyId], references: [id])
+
+  routerId String?
+  router   MikrotikRouter? @relation(fields: [routerId], references: [id])
+
+  managerId String
+  manager   User   @relation("ManagerVouchers", fields: [managerId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model InventoryChecklist {
-  id          String    @id @default(uuid())
-  leaseId     String
-  lease       Lease     @relation(fields: [leaseId], references: [id], onDelete: Cascade)
-  type        String    // "MOVE_IN" or "MOVE_OUT"
-  date        DateTime  @default(now())
-  notes       String?   @db.Text
-  items       Json      // Array: [{ name: 'Puerta Principal', status: 'OK', photos: ['url'], notes: '' }]
-  managerId   String    
-  manager     User      @relation("ManagerChecklists", fields: [managerId], references: [id])
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        String   @id @default(uuid())
+  leaseId   String
+  lease     Lease    @relation(fields: [leaseId], references: [id], onDelete: Cascade)
+  type      String // "MOVE_IN" or "MOVE_OUT"
+  date      DateTime @default(now())
+  notes     String?  @db.Text
+  items     Json // Array: [{ name: 'Puerta Principal', status: 'OK', photos: ['url'], notes: '' }]
+  managerId String
+  manager   User     @relation("ManagerChecklists", fields: [managerId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model OwnerPayout {
-  id               String    @id @default(uuid())
-  ownerId          String
-  owner            User      @relation("OwnerPayouts", fields: [ownerId], references: [id])
-  managerId        String
-  manager          User      @relation("ManagerPayouts", fields: [managerId], references: [id])
-  
-  startDate        DateTime
-  endDate          DateTime
-  
+  id        String @id @default(uuid())
+  ownerId   String
+  owner     User   @relation("OwnerPayouts", fields: [ownerId], references: [id])
+  managerId String
+  manager   User   @relation("ManagerPayouts", fields: [managerId], references: [id])
+
+  startDate DateTime
+  endDate   DateTime
+
   totalRents       Float
   totalCommissions Float
   totalExpenses    Float
   netAmount        Float
-  
-  status           String    @default("PENDING") // PENDING, PAID
-  notes            String?   @db.Text
-  
-  payments         Payment[]
-  expenses         Expense[]
-  
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+
+  status String  @default("PENDING") // PENDING, PAID
+  notes  String? @db.Text
+
+  payments Payment[]
+  expenses Expense[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ----------------------------------------------------
+// Módulo SaaS Premium (App Store / Integraciones)
+// ----------------------------------------------------
+
+model SoftwareApp {
+  id          String  @id @default(uuid())
+  name        String // Ej. "FacturaPro", "OmniChat"
+  slug        String  @unique
+  description String  @db.Text
+  iconUrl     String? // Icon/Logo de la App
+  isActive    Boolean @default(true)
+
+  tiers AppTier[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AppTier {
+  id    String      @id @default(uuid())
+  appId String
+  app   SoftwareApp @relation(fields: [appId], references: [id])
+
+  name         String // Ej. "Emprendedor", "PyME", "Corporativo"
+  monthlyPrice Float // Precio mensual
+  annualPrice  Float // Precio anual (ya con desc.)
+
+  // Limites Lógicos (Timbres o features)
+  monthlyStamps    Int   @default(0) // 50, 300, 2000...  -1 = Ilimitado
+  overageMarginPct Float @default(0.1) // "Margen" para sobrepasar, ej. 10%
+
+  featuresJson      Json // Lista de pros. Ej. ["Módulo web", "Sin comisión"]
+  hasExpenseControl Boolean @default(false)
+  hasApiAccess      Boolean @default(false)
+
+  isActive Boolean @default(true)
+
+  subscriptions UserSubscription[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model UserSubscription {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation("UserSubscriptions", fields: [userId], references: [id])
+
+  tierId String
+  tier   AppTier @relation(fields: [tierId], references: [id])
+
+  billingCycle String @default("MONTHLY") // MONTHLY, ANNUAL
+  status       String @default("ACTIVE") // ACTIVE, PENDING, CANCELLED, SUSPENDED
+
+  availableStamps Int      @default(0) // Contador mensual o anual residual
+  nextBillingDate DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SystemAnnouncement {
+  id         String   @id @default(uuid())
+  message    String
+  targetRole String   @default("ALL") // ALL, TENANT, OWNER, MANAGER
+  type       String   @default("INFO") // INFO, MAINTENANCE, PROMO, ALERT
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }

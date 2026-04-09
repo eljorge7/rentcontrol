@@ -50,12 +50,8 @@ export function NotificationsSettings() {
   };
 
   const fetchWhatsAppStatus = async () => {
-    try {
-      const res = await api.get('/notifications/whatsapp/status');
-      setWpStatus(res.data);
-    } catch (e) {
-      console.error("No se pudo obtener el status de whatsapp");
-    }
+    // Ya no hacemos ping al antiguo Gateway WebJS
+    setWpStatus({ isReady: true, qrCode: null });
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,33 +90,16 @@ export function NotificationsSettings() {
             Tus notificaciones automáticas gratuitas. Escanea este código para ligar RentControl al celular de tu empresa. No cierres tu sesión en el celular físico o perderás la conexión.
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col items-center justify-center p-6 space-y-4">
-          
-          {wpStatus.isReady ? (
-            <div className="flex flex-col items-center justify-center space-y-3 p-8 bg-emerald-50 border border-emerald-100 rounded-xl w-full">
-              <CheckCircle2 className="h-16 w-16 text-emerald-500" />
-              <h3 className="text-xl font-bold text-emerald-800">WhatsApp Conectado</h3>
-              <p className="text-emerald-600 text-center max-w-sm">
-                El motor de notificaciones está enviando mensajes activamente con tu cuenta afiliada.
-              </p>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center py-6 px-4 bg-slate-50 border border-slate-200 rounded-xl w-full">
+            <div className="bg-indigo-100 text-indigo-600 p-4 rounded-full mb-4 shadow-inner">
+               <MessageCircle className="h-8 w-8" />
             </div>
-          ) : wpStatus.qrCode ? (
-            <div className="flex flex-col items-center space-y-4 p-8 bg-white border border-slate-200 rounded-xl shadow-sm">
-              <div className="bg-white p-4 rounded-lg shadow-inner border border-slate-100">
-                <QRCodeSVG value={wpStatus.qrCode} size={250} />
-              </div>
-              <p className="text-slate-600 font-medium animate-pulse flex items-center">
-                <RefreshCw className="h-4 w-4 mr-2 animate-spin text-slate-400" />
-                Esperando escaneo desde tu celular...
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center space-y-3 p-12 bg-slate-50 border border-slate-200 rounded-xl w-full border-dashed">
-              <Loader2 className="h-10 w-10 text-slate-400 animate-spin" />
-              <p className="text-slate-500 text-sm">Generando sesión criptográfica QR...</p>
-            </div>
-          )}
-
+            <h3 className="text-xl font-bold text-slate-800 mb-2">Conectado a OmniChat</h3>
+            <p className="text-slate-500 text-center max-w-md text-sm leading-relaxed">
+              El ruteo local de WhatsApp Web (QR) ha sido deshabilitado. Todas las notificaciones de sistema ahora se enrutan de manera oficial y centralizada a través del ecosistema <strong>OmniChat M2M (Machine to Machine)</strong>.
+            </p>
+          </div>
         </CardContent>
       </Card>
 

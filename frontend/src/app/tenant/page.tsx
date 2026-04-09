@@ -8,6 +8,7 @@ import { DollarSign, FileText, Bell, AlertTriangle, ShieldCheck } from "lucide-r
 import api from "@/lib/api";
 import { cleanDescription } from "@/lib/utils";
 import { UpdateTaxProfileDialog } from "@/components/UpdateTaxProfileDialog";
+import { AppStoreBanner } from "@/components/AppStoreBanner";
 
 export default function TenantDashboard() {
   const router = useRouter();
@@ -78,6 +79,8 @@ export default function TenantDashboard() {
           </Button>
         </div>
       </div>
+
+      <AppStoreBanner role="tenant" />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card className="border-l-4 border-l-red-500">

@@ -188,7 +188,8 @@ export default function TenantBillingPage() {
                           </div>
                           {charge.status !== 'REPORTED' && (
                             <div className="flex flex-col gap-2">
-                              <button 
+                              {/* STRIPE OCULTO HASTA ESTAR EN RED PÚBLICA / HTTPS */}
+                              {/* <button 
                                 onClick={async () => {
                                   try {
                                     const res = await api.post('/stripe/create-checkout-session', { chargeId: charge.id });
@@ -204,7 +205,7 @@ export default function TenantBillingPage() {
                               >
                                 <CreditCard className="mr-2 h-4 w-4" />
                                 Pagar con Stripe
-                              </button>
+                              </button> */}
                               
                               <button 
                                 onClick={async () => {
@@ -236,7 +237,7 @@ export default function TenantBillingPage() {
                     </div>
 
                     {charge.payments && charge.payments.length > 0 && (
-                      <div className="mt-4 pl-4 border-l-2 border-slate-100 space-y-2">
+                      <div className="mt-4 pl-4 border-l-2 border-slate-100 space-y-3">
                         {charge.payments.map((payment: any, idx: number) => (
                           <div key={idx} className="flex justify-between items-center text-sm">
                             <div className="flex items-center gap-2">
@@ -244,7 +245,39 @@ export default function TenantBillingPage() {
                               <span className="text-slate-600">Abono {new Date(payment.date).toLocaleDateString()}</span>
                               <span className="text-xs px-1.5 py-0.5 bg-slate-100 rounded text-slate-500 font-mono">{payment.method}</span>
                             </div>
-                            <span className="font-semibold text-emerald-700">+${payment.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                            <div className="flex items-center gap-3">
+                               <span className="font-semibold text-emerald-700">+${payment.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                               {payment.invoice ? (
+                                  <button 
+                                     onClick={() => {
+                                        const fpId = payment.invoice.xmlUrl;
+                                        if (fpId && fpId.startsWith('http')) {
+                                           window.open(fpId, '_blank');
+                                        } else {
+                                           const baseUrl = typeof window !== 'undefined' ? `http://${window.location.hostname}:3005` : 'http://localhost:3005';
+                                           window.open(`${baseUrl}/invoices/${fpId}/pdf`, '_blank');
+                                        }
+                                     }} 
+                                     className="flex items-center gap-1 text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded hover:bg-blue-100 transition-colors font-bold">
+                                     <FileText className="w-3 h-3" /> CFDI Listo
+                                  </button>
+                               ) : (
+                                  <button 
+                                     onClick={async () => {
+                                        if(!confirm('¿Deseas solicitar factura para este abono?')) return;
+                                        try {
+                                           await api.post(`/payments/${payment.id}/invoice`);
+                                           alert('Factura Solicitada Exitosamente');
+                                           fetchCharges();
+                                        } catch(e) {
+                                           alert('Tu arrendador no tiene activada la facturación, o faltan tus datos fiscales.');
+                                        }
+                                     }} 
+                                     className="flex items-center gap-1 text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200 transition-colors font-bold">
+                                     Solicitar Factura
+                                  </button>
+                               )}
+                            </div>
                           </div>
                         ))}
                       </div>

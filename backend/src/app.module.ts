@@ -38,6 +38,11 @@ import { TasksModule } from './tasks/tasks.module';
 import { ChecklistsModule } from './checklists/checklists.module';
 import { PayoutsModule } from './payouts/payouts.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { FacturaproModule } from './facturapro/facturapro.module';
+import { AppsModule } from './apps/apps.module';
+import { FacturaproSettingsModule } from './facturapro-settings/facturapro-settings.module';
+import { SaasOnboardingModule } from './saas-onboarding/saas-onboarding.module';
+import { SettingsModule } from './settings/settings.module';
 
 @Module({
   imports: [
@@ -47,7 +52,7 @@ import { NotificationsModule } from './notifications/notifications.module';
       serveRoot: '/uploads',
       serveStaticOptions: { index: false }
     }),
-    PrismaModule, ScheduleModule.forRoot(), PropertiesModule, UnitsModule, TenantsModule, LeasesModule, ChargesModule, PaymentsModule, MikrotikModule, InvoicesModule, NetworkProfilesModule, LeaseServicesModule, ChatModule, AuthModule, UsersModule, ExpensesModule, IncidentsModule, ManagementPlansModule, CommissionsModule, EventTypesModule, StripeModule, MercadopagoModule, QuotationsModule, MetricsModule, PdfsModule, VouchersModule, SuppliersModule, UploadsModule, TasksModule, ChecklistsModule, PayoutsModule, NotificationsModule
+    PrismaModule, ScheduleModule.forRoot(), PropertiesModule, UnitsModule, TenantsModule, LeasesModule, ChargesModule, PaymentsModule, MikrotikModule, InvoicesModule, NetworkProfilesModule, LeaseServicesModule, ChatModule, AuthModule, UsersModule, ExpensesModule, IncidentsModule, ManagementPlansModule, CommissionsModule, EventTypesModule, StripeModule, MercadopagoModule, QuotationsModule, MetricsModule, PdfsModule, VouchersModule, SuppliersModule, UploadsModule, TasksModule, ChecklistsModule, PayoutsModule, NotificationsModule, FacturaproModule, AppsModule, FacturaproSettingsModule, SaasOnboardingModule, SettingsModule
   ],
   controllers: [AppController, AnnouncementsController, OmniChatProxyController],
   providers: [AppService],

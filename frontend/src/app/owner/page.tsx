@@ -12,6 +12,7 @@ import { StatCard } from "@/components/dashboard/StatCard";
 import { SimpleBarChart } from "@/components/dashboard/SimpleBarChart";
 import { SimplePieChart } from "@/components/dashboard/SimplePieChart";
 import { CollectionFunnel } from "@/components/dashboard/CollectionFunnel";
+import { AppStoreBanner } from "@/components/AppStoreBanner";
 import api from "@/lib/api";
 
 interface DashboardStats {
@@ -163,6 +164,8 @@ export default function OwnerDashboard() {
            </button>
         </div>
       </div>
+
+      <AppStoreBanner role="owner" />
 
       {/* KPI Cards */}
       <div className="grid gap-4 md:grid-cols-4">

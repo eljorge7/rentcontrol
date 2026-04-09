@@ -151,6 +151,10 @@ export function OwnerSidebar() {
                 <AlertCircle className={`${isCollapsed ? 'mr-0' : 'mr-3'} h-4 w-4 text-slate-400 shrink-0`} />
                 {!isCollapsed && <span>Tickets Mantenimiento</span>}
               </Link>
+              <Link href="/owner/store" className={`flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-indigo-900 bg-indigo-900/30 text-indigo-200 mt-2 ${isCollapsed ? 'justify-center' : ''}`} title="App Store">
+                <Building2 className={`${isCollapsed ? 'mr-0' : 'mr-3'} h-4 w-4 text-indigo-400 shrink-0`} />
+                {!isCollapsed && <span className="font-bold">App Store (Módulos)</span>}
+              </Link>
             </>
           )}
 

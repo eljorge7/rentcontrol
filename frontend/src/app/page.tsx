@@ -112,9 +112,9 @@ export default function Home() {
         </div>
         
         <div className="container relative mx-auto px-4 text-center md:px-6">
-          <div className="inline-flex items-center rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-sm text-blue-300 mb-8 backdrop-blur-sm">
+          <div className="inline-flex items-center rounded-full border-blue-500/30 bg-blue-500/10 px-3 py-1 text-sm text-blue-300 mb-8 backdrop-blur-sm">
             <span className="flex h-2 w-2 rounded-full bg-blue-500 mr-2 animate-pulse"></span>
-            Líderes tecnológicos en Navojoa
+            Líderes en Tecnología SaaS Inmobiliaria
           </div>
           <h1 className="mx-auto max-w-4xl text-5xl font-black tracking-tight text-white sm:text-7xl mb-6">
             Conectamos tu mundo. <br className="hidden md:block"/> <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Administramos tus rentas.</span>
@@ -429,8 +429,8 @@ export default function Home() {
             </div>
           </div>
           <div className="mt-16 pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
-            <p>&copy; {new Date().getFullYear()} RadioTecPro y RentControl. Todos los derechos reservados.</p>
-            <p className="text-slate-500">Navojoa, Sonora, México.</p>
+            <p>&copy; {new Date().getFullYear()} MAJIA OS Corp. Todos los derechos reservados.</p>
+            <p className="text-slate-500">Hecho con ❤️ por Grupo Hurtado.</p>
           </div>
         </div>
       </footer>

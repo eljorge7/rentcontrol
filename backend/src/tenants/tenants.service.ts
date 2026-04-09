@@ -5,11 +5,14 @@ import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { NotificationsService } from '../notifications/notifications.service';
 
+import { FacturaProService } from '../facturapro/facturapro.service';
+
 @Injectable()
 export class TenantsService {
   constructor(
     private prisma: PrismaService,
-    private notifications: NotificationsService
+    private notifications: NotificationsService,
+    private facturaProService: FacturaProService
   ) {}
 
   async create(createTenantDto: CreateTenantDto) {
@@ -68,6 +71,11 @@ export class TenantsService {
           </div>
         </div>`;
       this.notifications.sendEmail(tenantData.email, 'Bienvenido a RentControl - Acceso a tu Portal', emailHtml);
+
+      // Fire & Forget: M2M Sync con FacturaPro
+      this.facturaProService.syncTenantToCustomer(newTenant.id).catch(err => {
+         console.warn("Fallo transparente al sincronizar con FacturaPro", err);
+      });
 
       return newTenant;
     });

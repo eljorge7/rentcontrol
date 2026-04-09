@@ -114,8 +114,10 @@ export default function AdminDashboardPage() {
     <div className="space-y-6 pb-12">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900">Executive Dashboard</h2>
-          <p className="text-slate-500">Centro de mando y salud general del negocio consolidado.</p>
+          <h2 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
+             <Building2 className="w-6 h-6 text-indigo-600" /> Dashboard Operativo (RentControl)
+          </h2>
+          <p className="text-slate-500">Centro de mando y salud financiera de tus propiedades e inquilinos.</p>
         </div>
         
         <div className="flex items-center gap-2">
@@ -134,33 +136,36 @@ export default function AdminDashboardPage() {
       
       {/* GLOBAL KPIs */}
       <div className="grid gap-4 md:grid-cols-4">
+        {/* KPI Cards con aspecto refinado */}
+        <div className="bg-gradient-to-br from-indigo-900 via-slate-900 to-black rounded-2xl p-1 shadow-lg shadow-indigo-900/10">
+          <StatCard
+            title="Ingreso Bruto (Real)"
+            value={`$${financials.collectedRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
+            icon={<Wallet size={20} className="text-emerald-400" />}
+            trend={calcGrowth(financials.collectedRevenue, financials.prevCollectedRevenue)}
+            sparklineData={[{val: 10}, {val: 25}, {val: 15}, {val: 45}, {val: 30}, {val: financials.collectedRevenue}]}
+          />
+        </div>
         <StatCard
-          title="Comisiones SaaS (15%)"
-          value={`$${platformEarnings.toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
-          icon={<Briefcase size={20} className="text-blue-600" />}
-          subtitle="Tus ingresos de sistema"
-          trend={{ value: "vs mes anterior", isPositive: true, rawPct: 5.2 }}
-        />
-        <StatCard
-          title="MRR Consolidado"
+          title="MRR Inmobiliario"
           value={`$${metrics.expectedMRR.toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
           icon={<Activity size={20} className="text-emerald-600" />}
           trend={calcGrowth(metrics.expectedMRR, financials.prevCollectedRevenue)}
-          subtitle="Ingreso Mensual Recurrente"
+          subtitle="Rentas Fijas Mensuales"
         />
         <StatCard
-          title="Ingreso Bruto (Real)"
-          value={`$${financials.collectedRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
-          icon={<Wallet size={20} className="text-indigo-600" />}
-          trend={calcGrowth(financials.collectedRevenue, financials.prevCollectedRevenue)}
-          sparklineData={[{val: 10}, {val: 25}, {val: 15}, {val: 45}, {val: 30}, {val: financials.collectedRevenue}]}
-        />
-        <StatCard
-          title="Deuda Latente"
+          title="Deuda Morosa"
           value={`$${financials.uncollectedDebt.toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
           icon={<AlertTriangle size={20} className="text-rose-600" />}
-          subtitle="Rentas pendientes"
-          trend={{ value: "deuda morosa", isPositive: false }}
+          subtitle="Rentas atrasadas"
+          trend={{ value: "atención urgente", isPositive: false }}
+        />
+        <StatCard
+          title="Nómina / Comisiones"
+          value={`$${platformEarnings.toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
+          icon={<Briefcase size={20} className="text-blue-600" />}
+          subtitle="Margen de Administración (15%)"
+          trend={{ value: "estable", isPositive: true, rawPct: 5.2 }}
         />
       </div>
 
@@ -170,10 +175,10 @@ export default function AdminDashboardPage() {
           <CardHeader className="border-b border-slate-100/50 pb-6">
             <div className="flex justify-between items-center">
               <div>
-                <CardTitle className="text-xl font-bold text-slate-900">Histórico de Flujo de Efectivo</CardTitle>
-                <p className="text-sm font-medium text-slate-500 mt-1">Ingresos brutos y Gastos operativos en todo el ecosistema</p>
+                <CardTitle className="text-xl font-bold text-slate-900">Histórico de Flujo de Cajas</CardTitle>
+                <p className="text-sm font-medium text-slate-500 mt-1">Ingresos de rentas vs Gastos de mantenimiento</p>
               </div>
-              <div className="bg-indigo-50 p-3 rounded-2xl">
+              <div className="bg-indigo-50 p-3 rounded-2xl border border-indigo-100 shadow-sm">
                 <TrendingUp className="text-indigo-600" />
               </div>
             </div>

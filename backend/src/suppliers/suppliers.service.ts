@@ -15,6 +15,7 @@ export class SuppliersService {
     const whereClause = managerId ? { managerId } : {};
     return this.prisma.supplier.findMany({
       where: whereClause,
+      include: { expenses: true },
       orderBy: { name: 'asc' },
     });
   }
@@ -24,6 +25,7 @@ export class SuppliersService {
       where: { id },
       include: {
         incidents: true,
+        expenses: true,
       }
     });
     if (!supplier) throw new NotFoundException(`Supplier with ID ${id} not found`);

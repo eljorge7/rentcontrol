@@ -6,17 +6,18 @@ import { AuthProvider } from "@/components/AuthProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import HelpCenterOverlay from "@/components/HelpCenterOverlay";
 import WelcomeTourModal from "@/components/WelcomeTourModal";
+import WhatsAppWidget from "@/components/WhatsAppWidget";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
-  title: "Grupo Hurtado | Internet y Rentas",
-  description: "Buzón de Autogestión para Clientes de RadioTec Internet y Edificios RentControl.",
+  title: "MAJIA OS | Ecosistema Corporativo",
+  description: "Buzón de Autogestión para Clientes MAJIA OS.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Grupo Hurtado",
+    title: "MAJIA OS",
   },
   formatDetection: {
     telephone: false,
@@ -44,6 +45,7 @@ export default function RootLayout({
             {children}
             <HelpCenterOverlay />
             <WelcomeTourModal />
+            <WhatsAppWidget />
           </AuthProvider>
         </ThemeProvider>
       </body>

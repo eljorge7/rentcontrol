@@ -1,11 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { HelpCircle, X, Headphones, Search, PlusCircle, CreditCard, PenTool, ChevronDown, Wrench } from "lucide-react";
 
 export default function HelpCenterOverlay() {
   const [isOpen, setIsOpen] = useState(false);
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const pathname = usePathname();
+
+  // No mostrar en rutas públicas (login, registro, landing page, links publicos de factura)
+  if (pathname === '/' || pathname === '/login' || pathname === '/registro' || pathname.startsWith('/quote') || pathname.startsWith('/ticket')) {
+    return null;
+  }
 
   if (!isOpen) {
     return (
@@ -114,9 +121,12 @@ export default function HelpCenterOverlay() {
             <div className="mt-8 bg-slate-50 border border-slate-200 rounded-2xl p-5 text-center">
                 <h4 className="font-bold text-slate-800 mb-2">¿Problemas Técnicos Graves?</h4>
                 <p className="text-sm text-slate-500 mb-4 font-medium">Si el sitio se cae o la IA envía mensajes erróneos, contáctanos directo.</p>
-                <a href="mailto:soporte@radiotecpro.com" className="bg-slate-900 hover:bg-black text-white px-5 py-2.5 rounded-xl text-sm font-bold w-full inline-flex justify-center transition-colors shadow-lg active:scale-95">
+                <a href="mailto:soporte@radiotecpro.com" className="bg-slate-900 hover:bg-black text-white px-5 py-2.5 rounded-xl text-sm font-bold w-full inline-flex justify-center transition-colors shadow-lg active:scale-95 mb-3">
                    Soporte Nivel 3 
                 </a>
+                <button onClick={() => setIsOpen(false)} className="bg-white border-2 border-slate-200 hover:bg-slate-100 hover:border-slate-300 text-slate-700 px-5 py-2.5 rounded-xl text-sm font-bold w-full inline-flex justify-center transition-colors active:scale-95 text-center flex items-center justify-center gap-2">
+                   <X className="w-4 h-4" /> Cerrar Centro de Ayuda
+                </button>
             </div>
         </div>
 

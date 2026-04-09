@@ -80,7 +80,8 @@ export class NotificationsService implements OnModuleInit {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: 'RentControl <onboarding@resend.dev>', // Require verificar dominio en Resend para poner el de radiotec
+          from: 'Ecosistema Agency OS <notificaciones@radiotecpro.com>', 
+          reply_to: 'jorge.hurtado@radiotecpro.com',
           to: [to],
           subject: subject,
           html: htmlContent,

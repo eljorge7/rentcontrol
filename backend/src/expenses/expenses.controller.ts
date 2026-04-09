@@ -18,6 +18,13 @@ export class ExpensesController {
   }
 
   @Roles(Role.ADMIN, Role.MANAGER, Role.OWNER)
+  @Post('upload-xml')
+  uploadXml(@Request() req: any, @Body('xmlContent') xmlContent: string, @Body('propertyId') propertyId?: string) {
+    if (!xmlContent) return { error: "xmlContent es requerido" };
+    return this.expensesService.parseXmlAndCreateExpense(xmlContent, propertyId, req.user);
+  }
+
+  @Roles(Role.ADMIN, Role.MANAGER, Role.OWNER)
   @Get()
   findAll(@Request() req: any, @Query('propertyId') propertyId?: string) {
     return this.expensesService.findAll(req.user, propertyId);

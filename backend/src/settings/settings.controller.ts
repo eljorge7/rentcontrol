@@ -10,7 +10,7 @@ export class SettingsController {
   constructor(private readonly settingsService: SettingsService) {}
 
   @Get()
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'OWNER')
   async findAll() {
     // Return all settings, including secrets (Only Admin can do this)
     const settings = await this.settingsService.findAllPublic();
@@ -20,7 +20,7 @@ export class SettingsController {
   }
 
   @Post('bulk')
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'OWNER')
   async updateBulk(@Body() updateData: Record<string, string>) {
     return this.settingsService.upsertBulk(updateData);
   }

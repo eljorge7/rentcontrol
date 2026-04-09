@@ -10,7 +10,8 @@ import {
   LogOut,
   AlertTriangle,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Zap
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { useState } from "react";
@@ -55,6 +56,12 @@ export function TenantSidebar() {
           <Settings className={`${isCollapsed ? '' : 'mr-3'} h-5 w-5 text-slate-400`} />
           {!isCollapsed && "Ajustes"}
         </Link>
+        <div className="pt-2">
+          <Link href="/tenant/store" className={`flex items-center rounded-md py-2 ${isCollapsed ? 'justify-center px-0' : 'px-3'} text-sm font-medium hover:bg-indigo-900 bg-indigo-900/30 text-indigo-200 mt-2 border border-indigo-500/20`} title="Beneficios Adicionales">
+            <Zap className={`${isCollapsed ? '' : 'mr-3'} h-5 w-5 text-emerald-400`} />
+            {!isCollapsed && <span className="font-bold">Facturación & Beneficios</span>}
+          </Link>
+        </div>
       </nav>
       <div className="mt-auto border-t border-slate-700 pt-4">
         <button 

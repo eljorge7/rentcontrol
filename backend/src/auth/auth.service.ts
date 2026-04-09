@@ -20,12 +20,14 @@ export class AuthService {
   }
 
   async login(user: any) {
+    const subscriptionStatus = await this.usersService.getSubscriptionStatus(user.id, user.role, user.email);
     const payload = { 
       email: user.email, 
       sub: user.id, 
       role: user.role,
       planType: user.planType,
-      maxProperties: user.maxProperties
+      maxProperties: user.maxProperties,
+      subscriptionStatus
     };
     return {
       access_token: this.jwtService.sign(payload),
@@ -35,7 +37,8 @@ export class AuthService {
         name: user.name,
         role: user.role,
         planType: user.planType,
-        maxProperties: user.maxProperties
+        maxProperties: user.maxProperties,
+        subscriptionStatus
       }
     };
   }

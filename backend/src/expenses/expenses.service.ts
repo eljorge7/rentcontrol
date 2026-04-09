@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma } from '@prisma/client';
+import { XMLParser } from 'fast-xml-parser';
 
 @Injectable()
 export class ExpensesService {
@@ -23,6 +24,69 @@ export class ExpensesService {
         date: data.date ? new Date(data.date as string | Date) : undefined
       },
     });
+  }
+
+  async parseXmlAndCreateExpense(xmlContent: string, propertyId: string | undefined, user: any) {
+    try {
+      const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "" });
+      const jsonObj = parser.parse(xmlContent);
+
+      const comprobante = jsonObj["cfdi:Comprobante"];
+      if (!comprobante) throw new BadRequestException("El XML no es un CFDI válido");
+
+      const emisor = comprobante["cfdi:Emisor"];
+      const total = parseFloat(comprobante.Total);
+      const uuidNode = comprobante["cfdi:Complemento"]?.["tfd:TimbreFiscalDigital"];
+      const uuidSAT = uuidNode ? uuidNode.UUID : null;
+
+      if (!emisor || !emisor.Rfc) throw new BadRequestException("No se encontró el emisor en el XML");
+
+      const rfc = emisor.Rfc;
+      const name = emisor.Nombre || rfc;
+      const taxRegime = emisor.RegimenFiscal;
+      
+      const managerId = user.role === 'MANAGER' ? user.userId : (user.role === 'OWNER' ? user.managerId : undefined);
+
+      // Ver si el Proveedor (Supplier) existe
+      let supplier = await this.prisma.supplier.findFirst({
+        where: { rfc, managerId }
+      });
+
+      if (!supplier) {
+        supplier = await this.prisma.supplier.create({
+          data: {
+            name,
+            rfc,
+            taxRegime,
+            category: 'GENERAL', // Default
+            managerId
+          }
+        });
+      }
+
+      // Evitar duplicados por UUID
+      if (uuidSAT) {
+        const existing = await this.prisma.expense.findFirst({ where: { uuidSAT } });
+        if (existing) throw new BadRequestException(`El CFDI ${uuidSAT} ya fue registrado.`);
+      }
+
+      const expense = await this.prisma.expense.create({
+        data: {
+          propertyId,
+          amount: total,
+          category: 'MAINTENANCE',
+          description: `Gasto amparado por CFDI de ${name}`,
+          supplierId: supplier.id,
+          uuidSAT,
+          xmlUrl: xmlContent.substring(0, 500) // Solo guardamos una parte o el contenido como "url" text por ahora
+        }
+      });
+
+      return { expense, supplier };
+    } catch (e) {
+      if (e instanceof BadRequestException) throw e;
+      throw new BadRequestException("Fallo procesando el XML CFDI: " + e.message);
+    }
   }
 
   async findAll(user: any, propertyId?: string) {

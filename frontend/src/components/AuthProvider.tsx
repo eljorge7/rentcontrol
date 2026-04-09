@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(currentUser);
       setLoading(false);
 
-      const isPublicRoute = pathname.startsWith('/quote') || pathname.startsWith('/ticket');
+      const isPublicRoute = pathname.startsWith('/quote') || pathname.startsWith('/ticket') || pathname === '/registro';
 
       if (!currentUser && !pathname.includes('/login') && pathname !== '/' && !isPublicRoute) {
         router.push('/login');
@@ -36,8 +36,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         // Allow public routes for authenticated users as well without forcing role redirects
         if (isPublicRoute) return;
 
+        // Tenant Enforcement (Bloqueo por Suscripción)
+        const isSuspended = currentUser.subscriptionStatus === 'PAST_DUE' || currentUser.subscriptionStatus === 'SUSPENDED';
+        if (isSuspended && pathname !== '/suspended') {
+            router.push('/suspended');
+            return;
+        }
+        if (isSuspended && pathname === '/suspended') {
+            return; // Permite quedarse en la página de bloqueo
+        }
+
         // Evaluate if the current path violates the user's role limits
-        const isLoginOrRoot = pathname === '/login' || pathname === '/';
+        const isLoginOrRoot = pathname === '/login' || pathname === '/' || pathname === '/suspended';
         
         switch (currentUser.role) {
           case 'ADMIN':

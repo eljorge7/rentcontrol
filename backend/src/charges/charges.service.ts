@@ -254,7 +254,9 @@ export class ChargesService {
         lease: {
           include: { tenant: true, unit: { include: { property: true } } }
         },
-        payments: true
+        payments: {
+           include: { invoice: true }
+        }
       },
       orderBy: { dueDate: 'desc' }
     });

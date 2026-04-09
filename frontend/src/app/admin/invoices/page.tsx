@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Receipt, FileText, Download, CheckCircle, Clock, Search } from "lucide-react";
+import { Receipt, FileText, Download, CheckCircle, Clock, Search, ArrowRight, ExternalLink } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import api from "@/lib/api";
 
@@ -44,6 +44,18 @@ export default function InvoicesListPage() {
     fetchInvoices();
   }, []);
 
+  const handleGoToFacturaPro = async () => {
+    try {
+      const response = await api.get('/facturapro-settings/sso-link');
+      if (response.data && response.data.url) {
+         window.open(response.data.url, '_blank');
+      }
+    } catch (error) {
+      console.error("SSO Error:", error);
+      alert("Error al conectar con FacturaPro. Asegúrate de tener permisos.");
+    }
+  };
+
   const filteredInvoices = invoices.filter(inv => {
     const tenantName = `${inv.payment?.charge?.lease?.tenant?.firstName || ''} ${inv.payment?.charge?.lease?.tenant?.lastName || ''}`.trim();
     return tenantName.toLowerCase().includes(searchTerm.toLowerCase());
@@ -53,9 +65,14 @@ export default function InvoicesListPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold tracking-tight text-slate-900">Facturación (CFDI 4.0)</h2>
-        <Button>
-          <Receipt className="mr-2 h-4 w-4" /> Timbrar Factura Global
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button variant="outline" className="text-emerald-600 border-emerald-200 hover:bg-emerald-50 font-bold" onClick={handleGoToFacturaPro}>
+             <ExternalLink className="mr-2 h-4 w-4" /> Centro de Facturación Avanzado
+          </Button>
+          <Button>
+            <Receipt className="mr-2 h-4 w-4" /> Timbrar Factura Global
+          </Button>
+        </div>
       </div>
 
       <Card>

@@ -84,7 +84,7 @@ export function ManagerSidebar() {
             <MessageCircle className="mr-3 h-5 w-5 flex-shrink-0 text-indigo-400" />
             {!isCollapsed && <span className="font-bold text-indigo-100">OmniChat CRM</span>}
           </Link>
-          <Link href="/manager/finances" className="flex items-center rounded-md px-4 py-2.5 text-sm font-medium hover:bg-slate-800 text-slate-300 hover:text-white mx-2">
+          <Link href="/manager/finances" className="flex items-center rounded-md px-4 py-2.5 text-sm font-medium hover:bg-slate-800 text-slate-300 hover:text-white mx-2 mb-2">
             <Activity className="mr-3 h-5 w-5 flex-shrink-0 text-emerald-400" />
             {!isCollapsed && <span>Dashboard Financiero</span>}
           </Link>
@@ -108,9 +108,9 @@ export function ManagerSidebar() {
             <Ticket className="mr-3 h-5 w-5 flex-shrink-0 text-cyan-400" />
             {!isCollapsed && <span>Fichas WiFi</span>}
           </Link>
-          <Link href="/manager/plans" className="flex items-center rounded-md px-4 py-2.5 text-sm font-medium hover:bg-slate-800 text-slate-300 hover:text-white mx-2">
+          <Link href="/manager/store" className="flex items-center rounded-md px-4 py-2.5 text-sm font-medium hover:bg-slate-800 text-slate-300 hover:text-white mx-2">
             <Briefcase className="mr-3 h-5 w-5 flex-shrink-0 text-indigo-400" />
-            {!isCollapsed && <span>Catálogo SaaS</span>}
+            {!isCollapsed && <span>App Store (Módulos)</span>}
           </Link>
           
           <div className="pt-4 pb-2 px-6 h-10">
@@ -126,6 +126,10 @@ export function ManagerSidebar() {
         <Link href="/manager/settings" className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
           <Settings className="mr-3 h-5 w-5 flex-shrink-0 text-slate-400" />
           {!isCollapsed && <span>Mi Perfil</span>}
+        </Link>
+        <Link href="/manager/settings/facturapro" className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+          <Briefcase className="mr-3 h-5 w-5 flex-shrink-0 text-indigo-400" />
+          {!isCollapsed && <span>Ecosistema FacturaPro</span>}
         </Link>
         <button 
           onClick={logout}

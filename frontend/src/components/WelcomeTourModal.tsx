@@ -1,16 +1,23 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { Building2, MessageSquare, DollarSign, Wallet, ArrowRight, Check } from "lucide-react";
 
 export default function WelcomeTourModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const pathname = usePathname();
 
   // Truco: Para forzar el tour al purgar localStorage durante pruebas
   // localStorage.removeItem('rentcontrol_tour_seen')
   
   useEffect(() => {
+    // No mostrar en rutas públicas (login, registro, landing page, links publicos de factura)
+    if (pathname === '/' || pathname === '/login' || pathname === '/registro' || pathname.startsWith('/quote') || pathname.startsWith('/ticket')) {
+      return;
+    }
+
     // Retraso de 1 segundo post-login para la elegancia de la animación
     const timer = setTimeout(() => {
       if (!localStorage.getItem("rentcontrol_tour_seen")) {
@@ -18,7 +25,7 @@ export default function WelcomeTourModal() {
       }
     }, 1000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [pathname]);
 
   const handleFinish = () => {
     localStorage.setItem("rentcontrol_tour_seen", "true");
@@ -30,7 +37,7 @@ export default function WelcomeTourModal() {
   const slides = [
     {
       icon: <Building2 className="w-16 h-16 text-blue-500 mx-auto" />,
-      title: "Bienvenido a Grupo Hurtado OS",
+      title: "Bienvenido a MAJIA OS",
       description: "La plataforma definitiva donde todos los hilos de tus bienes raíces y telecomunicaciones se conectan. Automatiza todo, para que operes nada."
     },
     {

@@ -10,6 +10,43 @@ import { Role } from '@prisma/client';
 export class AnnouncementsController {
   constructor(private prisma: PrismaService) {}
 
+  // ----------------------------------------------------
+  // SYSTEM ANNOUNCEMENTS (GLOBAL BROADCASTS)
+  // ----------------------------------------------------
+  @Roles(Role.ADMIN)
+  @Post('system')
+  async createSystemAnnouncement(@Body() body: any) {
+    const { message, targetRole, type } = body;
+    return this.prisma.systemAnnouncement.create({
+      data: { message, targetRole, type }
+    });
+  }
+
+  @Get('system')
+  async getSystemAnnouncements(@Request() req: any) {
+    const role = req.user.role; // ADMIN, MANAGER, OWNER, TENANT
+    if (role === 'ADMIN') {
+       return this.prisma.systemAnnouncement.findMany({ orderBy: { createdAt: 'desc' } });
+    } else {
+       return this.prisma.systemAnnouncement.findMany({
+         where: { 
+           isActive: true,
+           OR: [{ targetRole: 'ALL' }, { targetRole: role }]
+         },
+         orderBy: { createdAt: 'desc' }
+       });
+    }
+  }
+
+  @Roles(Role.ADMIN)
+  @Delete('system/:id')
+  async deleteSystemAnnouncement(@Param('id') id: string) {
+    return this.prisma.systemAnnouncement.delete({ where: { id } });
+  }
+
+  // ----------------------------------------------------
+  // PROPERTY-LEVEL ANNOUNCEMENTS
+  // ----------------------------------------------------
   @Roles(Role.ADMIN, Role.MANAGER, Role.OWNER)
   @Post()
   async createAnnouncement(@Body() body: any, @Request() req: any) {

@@ -44,4 +44,25 @@ export class UsersService {
       where: { id },
     });
   }
+
+  async getSubscriptionStatus(userId: string, role: string, email: string): Promise<string> {
+    let status = 'ACTIVE';
+    if (role === 'OWNER' || role === 'MANAGER') {
+      const sub = await this.prisma.userSubscription.findFirst({
+        where: { userId },
+        orderBy: { createdAt: 'desc' }
+      });
+      if (sub) status = sub.status;
+    } else if (role === 'TENANT') {
+      const tenant = await this.prisma.tenant.findUnique({ where: { email } });
+      if (tenant && tenant.ownerId) {
+        const sub = await this.prisma.userSubscription.findFirst({
+          where: { userId: tenant.ownerId },
+          orderBy: { createdAt: 'desc' }
+        });
+        if (sub) status = sub.status;
+      }
+    }
+    return status;
+  }
 }

@@ -3,10 +3,17 @@ import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { MikrotikService } from '../mikrotik/mikrotik.service';
+import { FacturaProService } from '../facturapro/facturapro.service';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class PaymentsService {
-  constructor(private prisma: PrismaService, private mikrotik: MikrotikService) {}
+  constructor(
+     private prisma: PrismaService, 
+     private mikrotik: MikrotikService,
+     private facturaPro: FacturaProService,
+     private notifications: NotificationsService
+  ) {}
 
   async create(createPaymentDto: CreatePaymentDto, user: any) {
     // 1. Verificar que el cargo existe y el usuario tiene permisos
@@ -121,12 +128,51 @@ export class PaymentsService {
         console.error("Error intentando restaurar internet en Mikrotik tras pago:", err);
       }
       // ---------------------------------------------
+      
+      // ---- FACTURAPRO TIMBRADO M2M AUTOMÁTICO ----
+      try {
+         const tenant = charge.lease?.tenant;
+         if (tenant && tenant.requiresInvoice) {
+            console.log(`Disparando Timbrado Automático para Tenant ${tenant.email}...`);
+            this.facturaPro.issueInvoice(payment.id).catch(e => {
+               console.error("M2M Timbrado en Background Falló:", e);
+            });
+         }
+      } catch (e) {
+         console.error("M2M Pre-Check Falló:", e);
+      }
+      // ---------------------------------------------
+      // ---------------------------------------------
     } else if (totalPaid > 0) {
       // Si el monto no cubre la totalidad pero hay algo pagado, es un pago parcial
       await this.prisma.charge.update({
         where: { id: charge.id },
         data: { status: 'PARTIAL' }
       });
+    }
+
+    // 4. ---- NOTIFICACIÓN WHATSAPP Y CORREO OMNICHAT ----
+    try {
+       const tenant = charge.lease?.tenant;
+       if (tenant) {
+          const tenantPortalUrl = `${process.env.FRONTEND_URL || 'https://radiotecpro.com'}`;
+          let wpMessage = `✅ *¡Pago Confirmado!*\n\nHola ${tenant.name}, hemos registrado exitosamente tu pago por la cantidad de *$${payment.amount} MXN* bajo el concepto de *${charge.description || 'Renta/Servicios'}*.\n\n`;
+          
+          if (totalPaid >= charge.amount) {
+              wpMessage += `Status: *PAGADO EN SU TOTALIDAD* 🎉\n¡Gracias por tu puntualidad! Si tus servicios habían sido suspendidos, ya fueron reactivados automáticamente.\n\n`;
+          } else {
+              const remaining = charge.amount - totalPaid;
+              wpMessage += `Status: *PAGO PARCIAL* ⏳\nResta un saldo pendiente de *$${remaining} MXN* para liquidar este recibo.\n\n`;
+          }
+
+          wpMessage += `Consultar Estado de cuenta / Descargar CFDI:\n🔗 ${tenantPortalUrl}`;
+          
+          if (tenant.phone) {
+             this.notifications.sendWhatsAppMessage(tenant.phone, wpMessage);
+          }
+       }
+    } catch (e) {
+       console.error("Error al disparar notificación de WhatsApp por pago", e);
     }
 
     return payment;
@@ -187,5 +233,21 @@ export class PaymentsService {
     return this.prisma.payment.delete({
       where: { id },
     });
+  }
+
+  async requestManualInvoice(id: string, user: any) {
+    const payment = await this.findOne(id, user); // Valida acceso
+    if (payment.invoice) {
+       throw new BadRequestException("Este pago ya tiene una factura solicitada/emitida.");
+    }
+    
+    // Marcar como solicitado
+    await this.prisma.payment.update({
+       where: { id },
+       data: { invoiceRequested: true }
+    });
+
+    // Disparar Timbrado M2M
+    return this.facturaPro.issueInvoice(id);
   }
 }

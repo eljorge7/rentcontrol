@@ -40,4 +40,10 @@ export class PaymentsController {
   remove(@Request() req: any, @Param('id') id: string) {
     return this.paymentsService.remove(id, req.user);
   }
+
+  @Post(':id/invoice')
+  @Roles('ADMIN', 'MANAGER', 'TENANT')
+  async requestInvoice(@Request() req: any, @Param('id') id: string) {
+    return this.paymentsService.requestManualInvoice(id, req.user);
+  }
 }
