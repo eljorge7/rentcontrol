@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Wifi, Zap, Shield, PhoneCall, ChevronRight, Check, Building2, Star, Target, CandlestickChart, Users, Wrench } from "lucide-react";
+import { Wifi, Zap, Shield, PhoneCall, ChevronRight, Check, Building2, Star, Target, CandlestickChart, Users, Wrench, MessageSquare } from "lucide-react";
 import axios from "axios";
 
 // Using native fetch or axios to the public endpoints.
