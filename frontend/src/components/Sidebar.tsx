@@ -117,28 +117,13 @@ export function Sidebar() {
       </Link>
       
       <div className="pt-4 pb-2 h-10">
-        {!isCollapsed && <p className="px-5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Agencias y Equipo</p>}
+        {!isCollapsed && <p className="px-5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Agencias y Gestores</p>}
       </div>
       <Link href="/admin/managers" className="flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-slate-200 mx-2">
         <Briefcase className="mr-3 h-5 w-5 flex-shrink-0 text-slate-500" />
         {!isCollapsed && <span>Gestores Internos</span>}
       </Link>
-      <Link href="/admin/hr/employees" className="flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-slate-200 mx-2">
-        <Users className="mr-3 h-5 w-5 flex-shrink-0 text-slate-500" />
-        {!isCollapsed && <span>Directorio Empleados</span>}
-      </Link>
-      <Link href="/admin/hr/attendance" className="flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-slate-200 mx-2">
-        <Activity className="mr-3 h-5 w-5 flex-shrink-0 text-orange-500" />
-        {!isCollapsed && <span>Asistencias / Faltas</span>}
-      </Link>
-      <Link href="/admin/hr/time-off" className="flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-slate-200 mx-2">
-        <Layers className="mr-3 h-5 w-5 flex-shrink-0 text-teal-500" />
-        {!isCollapsed && <span>Bandeja Vacaciones</span>}
-      </Link>
-      <Link href="/admin/hr/payroll" className="flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-slate-200 mx-2">
-        <Receipt className="mr-3 h-5 w-5 flex-shrink-0 text-indigo-500" />
-        {!isCollapsed && <span>Motor de Nómina ERP</span>}
-      </Link>
+
       <Link href="/admin/payouts" className="flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-slate-200 mx-2">
         <DollarSign className="mr-3 h-5 w-5 flex-shrink-0 text-emerald-500" />
         {!isCollapsed && <span>Liquidaciones (Dueños)</span>}
