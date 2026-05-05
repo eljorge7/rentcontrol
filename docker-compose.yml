@@ -27,6 +27,8 @@ services:
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER:-admin}:${POSTGRES_PASSWORD:-admin123}@db:5432/${POSTGRES_DB:-rentcontrol}?schema=public
       - PUBLIC_URL=https://radiotecpro.com/api
+      - FACTURAPRO_API_URL=https://facturapro.radiotecpro.com/api
+      - FACTURAPRO_FRONTEND_URL=https://facturapro.radiotecpro.com
       # Las demás variables de entorno se leerán de tu archivo .env local
     env_file:
       - ./backend/.env
