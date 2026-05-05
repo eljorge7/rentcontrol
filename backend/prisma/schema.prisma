@@ -12,6 +12,7 @@ enum Role {
   OWNER
   MANAGER
   TENANT
+  EMPLOYEE
 }
 
 enum PlanType {
@@ -84,6 +85,13 @@ model User {
   facturaProSettings FacturaProSettings?
   facturaproTenantId String? // Enlace One-ID al ecosistema FacturaPro
   apiKeys          ApiKey[]            @relation("UserApiKeys")
+
+  // HR & Payroll
+  employeeProfile  EmployeeProfile?
+  managedPayrollRuns PayrollRun[]      @relation("ManagerPayrollRuns")
+  payslips         Payslip[]           @relation("EmployeePayslips")
+  timeOffRequests  TimeOffRequest[]    @relation("EmployeeTimeOff")
+  attendanceRecords AttendanceRecord[] @relation("EmployeeAttendance")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -656,3 +664,102 @@ model SystemAnnouncement {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
+
+// ----------------------------------------------------
+// Human Resources & Payroll
+// ----------------------------------------------------
+
+model EmployeeProfile {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  jobTitle    String?
+  department  String?
+  baseSalary  Float    @default(0)
+  
+  bankName    String?
+  bankAccount String?
+  bankClabe   String?
+  nss         String?
+  curp        String?
+  
+  hireDate    DateTime @default(now())
+  isActive    Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PayrollRun {
+  id          String    @id @default(uuid())
+  name        String    // e.g., "1ra Quincena Mayo 2026"
+  startDate   DateTime
+  endDate     DateTime
+  paymentDate DateTime?
+  status      String    @default("DRAFT") // DRAFT, APPROVED, PAID
+  
+  managerId   String
+  manager     User      @relation("ManagerPayrollRuns", fields: [managerId], references: [id])
+  
+  payslips    Payslip[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Payslip {
+  id            String      @id @default(uuid())
+  payrollRunId  String
+  payrollRun    PayrollRun  @relation(fields: [payrollRunId], references: [id], onDelete: Cascade)
+  
+  employeeId    String
+  employee      User        @relation("EmployeePayslips", fields: [employeeId], references: [id])
+  
+  baseSalary    Float
+  bonus         Float       @default(0)
+  deductions    Float       @default(0)
+  netAmount     Float
+  
+  modifiers     Json?       // {"bonuses": [{"reason": "Puntualidad", "amount": 500}]}
+  status        String      @default("DRAFT") // DRAFT, ISSUED, PAID
+  evidenceUrl   String?
+  
+  // SAT CFDI Nómina
+  uuidSAT       String?     @unique
+  xmlUrl        String?
+  
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model TimeOffRequest {
+  id          String   @id @default(uuid())
+  employeeId  String
+  employee    User     @relation("EmployeeTimeOff", fields: [employeeId], references: [id], onDelete: Cascade)
+  type        String   // VACATION, SICK_LEAVE, UNPAID_LEAVE
+  startDate   DateTime
+  endDate     DateTime
+  reason      String?  @db.Text
+  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  
+  managerId   String?  // Quién autorizó
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AttendanceRecord {
+  id          String   @id @default(uuid())
+  employeeId  String
+  employee    User     @relation("EmployeeAttendance", fields: [employeeId], references: [id], onDelete: Cascade)
+  date        DateTime
+  type        String   // ABSENCE, LATE
+  notes       String?  @db.Text
+  
+  recordedById String? // RRHH que lo capturó
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+

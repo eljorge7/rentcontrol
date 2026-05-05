@@ -43,16 +43,24 @@ import { AppsModule } from './apps/apps.module';
 import { FacturaproSettingsModule } from './facturapro-settings/facturapro-settings.module';
 import { SaasOnboardingModule } from './saas-onboarding/saas-onboarding.module';
 import { SettingsModule } from './settings/settings.module';
+import { InfrastructureModule } from './infrastructure/infrastructure.module';
+import { EmployeesModule } from './employees/employees.module';
+import { PayrollRunsModule } from './payroll-runs/payroll-runs.module';
+import { AttendanceModule } from './attendance/attendance.module';
+import { TimeOffModule } from './time-off/time-off.module';
+
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'uploads'),
       serveRoot: '/uploads',
       serveStaticOptions: { index: false }
     }),
-    PrismaModule, ScheduleModule.forRoot(), PropertiesModule, UnitsModule, TenantsModule, LeasesModule, ChargesModule, PaymentsModule, MikrotikModule, InvoicesModule, NetworkProfilesModule, LeaseServicesModule, ChatModule, AuthModule, UsersModule, ExpensesModule, IncidentsModule, ManagementPlansModule, CommissionsModule, EventTypesModule, StripeModule, MercadopagoModule, QuotationsModule, MetricsModule, PdfsModule, VouchersModule, SuppliersModule, UploadsModule, TasksModule, ChecklistsModule, PayoutsModule, NotificationsModule, FacturaproModule, AppsModule, FacturaproSettingsModule, SaasOnboardingModule, SettingsModule
+    PrismaModule, ScheduleModule.forRoot(), PropertiesModule, UnitsModule, TenantsModule, LeasesModule, ChargesModule, PaymentsModule, MikrotikModule, InvoicesModule, NetworkProfilesModule, LeaseServicesModule, ChatModule, AuthModule, UsersModule, ExpensesModule, IncidentsModule, ManagementPlansModule, CommissionsModule, EventTypesModule, StripeModule, MercadopagoModule, QuotationsModule, MetricsModule, PdfsModule, VouchersModule, SuppliersModule, UploadsModule, TasksModule, ChecklistsModule, PayoutsModule, NotificationsModule, FacturaproModule, AppsModule, FacturaproSettingsModule, SaasOnboardingModule, SettingsModule, InfrastructureModule, EmployeesModule, PayrollRunsModule, AttendanceModule, TimeOffModule
   ],
   controllers: [AppController, AnnouncementsController, OmniChatProxyController],
   providers: [AppService],

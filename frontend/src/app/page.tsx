@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Wifi, Zap, Shield, PhoneCall, ChevronRight, Check, Building2, Star, Target, CandlestickChart, Users, Wrench, MessageSquare } from "lucide-react";
+import { Wifi, Zap, Shield, PhoneCall, ChevronRight, Check, Building2, Star, Target, CandlestickChart, Users, Wrench, MessageSquare, Calculator, Store, FileText, PieChart, PlayCircle, Receipt, Bot, User, ChevronDown } from "lucide-react";
 import axios from "axios";
 
 // Using native fetch or axios to the public endpoints.
@@ -21,6 +21,55 @@ export default function Home() {
   const [leadPhone, setLeadPhone] = useState("");
   const [leadLoading, setLeadLoading] = useState(false);
   const [leadSuccess, setLeadSuccess] = useState(false);
+  const [activeImage, setActiveImage] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'internet' | 'rentcontrol' | 'facturapro' | 'omnichat'>('internet');
+
+  const rentControlImages = ["/images/demos/rentcontrol_1.png", "/images/demos/rentcontrol_2.png", "/images/demos/rentcontrol_3.png"];
+  const facturaProImages = ["/images/demos/facturapro_1.png", "/images/demos/facturapro_2.png", "/images/demos/facturapro_3.png"];
+  const omniChatImages = ["/images/demos/omnichat_1.png", "/images/demos/omnichat_2.png", "/images/demos/omnichat_3.png"];
+
+  const ScreenshotCarousel = ({ images, title }: { images: string[], title: string }) => {
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    useEffect(() => {
+      const timer = setInterval(() => {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+      }, 4000); // 4 seconds per slide
+      return () => clearInterval(timer);
+    }, [images.length]);
+
+    return (
+      <div className="relative w-full aspect-video group cursor-pointer" onClick={() => setActiveImage(images[currentIndex])}>
+        {/* Overlay Hover */}
+        <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-30 backdrop-blur-sm">
+          <div className="bg-white text-slate-900 px-6 py-3 rounded-full font-bold flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-all shadow-xl">
+            <PlayCircle className="w-5 h-5 text-indigo-600" /> Ampliar Galería
+          </div>
+        </div>
+        
+        {/* Images */}
+        {images.map((img, idx) => (
+          <img
+            key={idx}
+            src={img}
+            alt={`${title} Screenshot ${idx + 1}`}
+            className={`absolute inset-0 w-full h-full object-cover object-top transition-opacity duration-1000 ${idx === currentIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+          />
+        ))}
+
+        {/* Dots */}
+        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-3 z-20">
+          {images.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={(e) => { e.stopPropagation(); setCurrentIndex(idx); }}
+              className={`w-2.5 h-2.5 rounded-full transition-all shadow-md ${idx === currentIndex ? 'bg-white scale-125' : 'bg-white/40 hover:bg-white/70'}`}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   const openLeadModal = (interest: string) => {
     setLeadInterest(interest);
@@ -49,6 +98,12 @@ export default function Home() {
     } finally {
       setLeadLoading(false);
     }
+  };
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, tabId: 'internet' | 'rentcontrol' | 'facturapro' | 'omnichat') => {
+    e.preventDefault();
+    setActiveTab(tabId);
+    document.getElementById('ecosistema')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
@@ -86,306 +141,375 @@ export default function Home() {
             <img src="/logo-transparent.png" alt="RadioTec Pro" className="h-[40px] sm:h-[50px] object-contain drop-shadow-sm" />
           </div>
           <div className="hidden lg:flex gap-8 text-sm font-medium text-slate-600">
-            <Link href="#internet" className="hover:text-blue-600 transition-colors">Internet WISP</Link>
-            <Link href="#gestion" className="hover:text-blue-600 transition-colors">RentControl API</Link>
-            <Link href="#omnichat" className="hover:text-emerald-600 font-bold text-emerald-600 transition-colors inline-flex items-center gap-1"><MessageSquare className="w-4 h-4"/> OmniChat IA</Link>
-            <Link href="#proveedores" className="hover:text-blue-600 transition-colors">Para Técnicos</Link>
+            <a href="#ecosistema" onClick={(e) => handleNavClick(e, 'internet')} className="hover:text-blue-600 transition-colors cursor-pointer">Internet WISP</a>
+            <a href="#ecosistema" onClick={(e) => handleNavClick(e, 'rentcontrol')} className="hover:text-blue-600 transition-colors cursor-pointer">RentControl API</a>
+            <a href="#ecosistema" onClick={(e) => handleNavClick(e, 'facturapro')} className="hover:text-violet-600 font-bold text-violet-600 transition-colors inline-flex items-center gap-1 cursor-pointer"><Calculator className="w-4 h-4"/> FacturaPro ERP</a>
+            <a href="#ecosistema" onClick={(e) => handleNavClick(e, 'omnichat')} className="hover:text-emerald-600 font-bold text-emerald-600 transition-colors inline-flex items-center gap-1 cursor-pointer"><MessageSquare className="w-4 h-4"/> OmniChat IA</a>
           </div>
           <div className="flex gap-2 sm:gap-4 items-center">
-            <a href="https://omnichat.radiotecpro.com/login" target="_blank" rel="noopener noreferrer">
-              <Button variant="outline" size="sm" className="hidden md:flex rounded-xl border-emerald-200 text-emerald-700 hover:bg-emerald-50 px-3 sm:px-5 font-bold h-9 sm:h-10">
-                <MessageSquare className="mr-2 h-4 w-4" /> Bot IA
+            <div className="relative group">
+              <Button className="rounded-xl font-bold h-9 sm:h-10 px-4 sm:px-5 bg-slate-900 hover:bg-slate-800 text-white shadow-md shadow-slate-900/20 gap-2">
+                <User className="w-4 h-4 hidden sm:block" />
+                Mi Cuenta
+                <ChevronDown className="w-4 h-4 group-hover:rotate-180 transition-transform duration-200" />
               </Button>
-            </a>
-            <a href="https://clientes.portalinternet.net/accounts/login/?next=/panel/" target="_blank" rel="noopener noreferrer">
-              <Button variant="outline" size="sm" className="rounded-xl border-blue-200 text-blue-700 hover:bg-blue-50 px-3 sm:px-5 font-bold h-9 sm:h-10">
-                Portal WISP
-              </Button>
-            </a>
-            <Link href="/login" className="inline-flex items-center justify-center rounded-xl text-xs sm:text-sm font-bold transition-colors h-9 sm:h-10 px-4 sm:px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white shadow-md shadow-slate-900/20">
-              <Building2 className="hidden sm:inline-block mr-2 h-4 w-4" />
-              RentControl
-            </Link>
+              
+              {/* Dropdown Menu */}
+              <div className="absolute right-0 mt-2 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right scale-95 group-hover:scale-100 z-50 pt-2">
+                <div className="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden py-2">
+                  <a href="https://clientes.portalinternet.net/accounts/login/?next=/panel/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 text-slate-700 hover:text-blue-700 transition-colors font-medium">
+                    <Wifi className="w-4 h-4 text-blue-600" />
+                    Portal WISP
+                  </a>
+                  <Link href="/login" className="flex items-center gap-3 px-4 py-3 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 transition-colors font-medium">
+                    <Building2 className="w-4 h-4 text-indigo-600" />
+                    RentControl
+                  </Link>
+                  <div className="h-px bg-slate-100 my-1 mx-4"></div>
+                  <a href="https://facturapro.radiotecpro.com/login" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-4 py-3 hover:bg-violet-50 text-slate-700 hover:text-violet-700 transition-colors font-medium">
+                    <Calculator className="w-4 h-4 text-violet-600" />
+                    FacturaPro ERP
+                  </a>
+                  <a href="https://omnichat.radiotecpro.com/login" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-4 py-3 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 transition-colors font-medium">
+                    <Bot className="w-4 h-4 text-emerald-600" />
+                    OmniChat IA
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-slate-900 pt-20 pb-28 lg:pt-32 lg:pb-40">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
-        <div className="absolute left-1/2 top-0 -z-10 -translate-x-1/2 blur-3xl xl:-top-6">
-          <div className="aspect-[1155/678] w-[72rem] bg-gradient-to-tr from-blue-600 to-indigo-600 opacity-30" style={{clipPath: "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)"}}></div>
-        </div>
+
+      {/* Ecosistema MAJIA OS - Tabbed Interface (Main Hero) */}
+      <section id="ecosistema" className="pt-24 pb-32 text-slate-50 relative overflow-hidden transition-colors duration-700" style={{ backgroundColor: activeTab === 'facturapro' ? '#f8fafc' : activeTab === 'omnichat' ? '#ffffff' : '#0f172a', color: activeTab === 'internet' || activeTab === 'rentcontrol' ? '#f8fafc' : '#0f172a' }}>
         
-        <div className="container relative mx-auto px-4 text-center md:px-6">
-          <div className="inline-flex items-center rounded-full border-blue-500/30 bg-blue-500/10 px-3 py-1 text-sm text-blue-300 mb-8 backdrop-blur-sm">
-            <span className="flex h-2 w-2 rounded-full bg-blue-500 mr-2 animate-pulse"></span>
-            Líderes en Tecnología SaaS Inmobiliaria
-          </div>
-          <h1 className="mx-auto max-w-4xl text-5xl font-black tracking-tight text-white sm:text-7xl mb-6">
-            Conectamos tu mundo. <br className="hidden md:block"/> <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Administramos tus rentas.</span>
-          </h1>
-          <p className="mx-auto max-w-2xl text-lg text-slate-300 mb-10">
-            RadioTec Pro ofrece Internet de Ultra Velocidad para tu hogar y la plataforma de gestión inmobiliaria más avanzada del mercado para tus locales y departamentos.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="#internet" className="w-full sm:w-auto">
-              <Button size="lg" className="w-full h-14 px-8 text-lg bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-900/50">
-                <Wifi className="mr-2 h-5 w-5" /> Planes de Internet
-              </Button>
-            </Link>
-            <Link href="#gestion" className="w-full sm:w-auto">
-              <Button size="lg" className="w-full h-14 px-8 text-lg bg-white text-slate-900 hover:bg-slate-100">
-                <Building2 className="mr-2 h-5 w-5" /> Gestión Inmobiliaria
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
+        {/* Dynamic Backgrounds */}
+        {activeTab === 'internet' && <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>}
+        {activeTab === 'internet' && <div className="absolute left-1/2 top-0 -z-10 -translate-x-1/2 blur-3xl xl:-top-6 transition-opacity duration-1000"><div className="aspect-[1155/678] w-[72rem] bg-gradient-to-tr from-blue-600 to-indigo-600 opacity-30" style={{clipPath: "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)"}}></div></div>}
+        
+        {activeTab === 'rentcontrol' && <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/20 to-blue-900/20 opacity-50 transition-opacity duration-1000"></div>}
+        {activeTab === 'facturapro' && (
+          <>
+            <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full bg-violet-500/10 blur-3xl transition-opacity duration-1000"></div>
+            <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 rounded-full bg-fuchsia-500/10 blur-3xl transition-opacity duration-1000"></div>
+          </>
+        )}
+        {activeTab === 'omnichat' && <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 blur-3xl opacity-50 rounded-full transition-opacity duration-1000"></div>}
 
-      {/* Propuesta de Valor Internet */}
-      <section id="internet" className="py-24 bg-white">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-black text-slate-900 sm:text-4xl">Internet de Otra Galaxia</h2>
-            <p className="mt-4 text-lg text-slate-600">Alta velocidad, estabilidad para el trabajo y soporte local inigualable.</p>
-          </div>
-          <div className="grid gap-12 md:grid-cols-3">
-            <div className="flex flex-col items-center text-center p-6 rounded-2xl bg-slate-50 border border-slate-100 transition-transform hover:-translate-y-2">
-              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-100 text-blue-600">
-                <Zap className="h-8 w-8" />
-              </div>
-              <h3 className="mb-3 text-xl font-bold text-slate-900">Velocidad Extrema</h3>
-              <p className="text-slate-600">Diseñado para Gaming, Streaming HD y Trabajo Híbrido sin interrupciones.</p>
-            </div>
-            <div className="flex flex-col items-center text-center p-6 rounded-2xl bg-slate-50 border border-slate-100 transition-transform hover:-translate-y-2">
-              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-600">
-                <Shield className="h-8 w-8" />
-              </div>
-              <h3 className="mb-3 text-xl font-bold text-slate-900">Estabilidad Asegurada</h3>
-              <p className="text-slate-600">Red Mikrotik de grado empresarial que garantiza 99.9% de Uptime sin cortes.</p>
-            </div>
-            <div className="flex flex-col items-center text-center p-6 rounded-2xl bg-slate-50 border border-slate-100 transition-transform hover:-translate-y-2">
-              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-100 text-teal-600">
-                <Target className="h-8 w-8" />
-              </div>
-              <h3 className="mb-3 text-xl font-bold text-slate-900">Instalación Rápida</h3>
-              <p className="text-slate-600">Agenda tu instalación el mismo día. Instalamos, probamos y empiezas a navegar.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing WISP Dinamyc */}
-      <section className="py-20 bg-slate-50 border-t border-slate-200">
-        <div className="container mx-auto px-4 md:px-6 text-center">
-          <h2 className="text-3xl font-black text-slate-900 mb-12">Nuestros Planes Residenciales</h2>
+        <div className="container mx-auto px-4 md:px-6 relative z-10">
           
-          {loading ? (
-             <div className="flex justify-center p-12">
-               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-             </div>
-          ) : wispPlans.length === 0 ? (
-             <div className="text-slate-500 bg-white p-8 rounded-2xl shadow-sm max-w-lg mx-auto border border-slate-200">
-               Por el momento estamos actualizando nuestros paquetes. ¡Contacta por WhatsApp!
-             </div>
-          ) : (
-             <div className="grid gap-8 md:grid-cols-3 lg:gap-12 max-w-6xl mx-auto items-center">
-               {wispPlans.map((plan, index) => {
-                 const isPopular = index === 1 || wispPlans.length === 1; // Highlight the middle one if 3 exist
-                 
-                 return (
-                   <div key={plan.id} className={`flex flex-col text-left rounded-3xl ${isPopular ? 'border-2 border-blue-600 bg-white p-8 shadow-xl relative scale-105 z-10' : 'border border-slate-200 bg-white p-8 shadow-sm transition-all hover:shadow-lg'}`}>
-                     {isPopular && (
-                       <div className="absolute -top-5 left-1/2 -translate-x-1/2 rounded-full bg-blue-600 px-4 py-1 text-sm font-bold text-white uppercase tracking-wider">
-                         Más Popular
-                       </div>
-                     )}
-                     <h3 className={`text-xl font-bold mb-4 ${isPopular ? 'text-blue-600' : 'text-slate-900'}`}>
-                       {index === 0 ? '🏠 ' : index === 1 ? '🚀 ' : '🎮 '} {plan.name}
-                     </h3>
-                     <div className="flex items-baseline text-5xl font-black text-slate-900">
-                       ${plan.price} <span className="ml-1 text-xl font-medium text-slate-500">/mes</span>
-                     </div>
-                     <ul className="mt-8 space-y-4 text-slate-600 flex-1">
-                       <li className="flex items-center gap-3"><Check className="h-5 w-5 text-blue-600" /> <strong className="text-slate-900">{plan.downloadSpeed} Megas</strong> de Bajada</li>
-                       <li className="flex items-center gap-3"><Check className="h-5 w-5 text-blue-600" /> <strong className="text-slate-900">{plan.uploadSpeed} Megas</strong> de Subida</li>
-                       <li className="flex items-center gap-3"><Check className="h-5 w-5 text-blue-600" /> Dispositivos recomendados: {plan.downloadSpeed > 30 ? 'Ilimitados' : '1 a 3'}</li>
-                     </ul>
-                     <Button 
-                       onClick={() => openLeadModal(`Plan Internet WISP: ${plan.name}`)}
-                       className={`mt-8 w-full h-10 rounded-lg font-bold ${isPopular ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md shadow-blue-600/25' : 'bg-slate-900 text-white hover:bg-slate-800'}`}
-                     >
-                       Me Interesa
-                     </Button>
-                   </div>
-                 );
-               })}
-             </div>
-          )}
-        </div>
-      </section>
-
-      {/* Propuesta de Valor RentControl */}
-      <section id="gestion" className="py-24 bg-slate-900 text-slate-50">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <div className="inline-flex items-center rounded-full border border-indigo-500/30 bg-indigo-500/10 px-3 py-1 text-sm text-indigo-300 mb-6">
-                Para Administradores e Inversionistas
-              </div>
-              <h2 className="text-3xl md:text-5xl font-black tracking-tight mb-6">El fin de los cobros en Excel.</h2>
-              <p className="text-lg text-slate-400 mb-8 max-w-xl">
-                RentControl es la plataforma en la nube que automatiza la cobranza, facturación y gestión operativa de tus locales, departamentos y plazas comerciales.
-              </p>
-              
-              <div className="space-y-6">
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0 mt-1"><CandlestickChart className="h-6 w-6 text-indigo-400" /></div>
-                  <div>
-                    <h4 className="text-xl font-bold text-white">Transparencia Financiera</h4>
-                    <p className="text-slate-400 mt-1">Dashboards en tiempo real con Utilidad Neta, Cartera Vencida y Retorno de Inversión por cada una de tus propiedades.</p>
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0 mt-1"><Building2 className="h-6 w-6 text-orange-400" /></div>
-                  <div>
-                    <h4 className="text-xl font-bold text-white">Sistema de Gestión Delegada (Agencia)</h4>
-                    <p className="text-slate-400 mt-1">¿No tienes tiempo? Asignamos un Gestor Operativo a tu cartera inmobiliaria. Tú solo revisas las métricas mientras nosotros reparamos, cobramos y depositamos a tu cuenta.</p>
-                  </div>
-                </div>
-              </div>
+          <div className="text-center mb-12">
+            <div className={`inline-flex items-center rounded-full px-4 py-1.5 text-sm font-bold mb-6 transition-colors ${activeTab === 'internet' ? 'border border-blue-500/30 bg-blue-500/10 text-blue-300' : activeTab === 'rentcontrol' ? 'border border-indigo-500/30 bg-indigo-500/10 text-indigo-300' : activeTab === 'facturapro' ? 'border border-violet-500/30 bg-violet-500/10 text-violet-700' : 'border border-emerald-500/30 bg-emerald-500/10 text-emerald-700'}`}>
+               Ecosistema MAJIA OS
             </div>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-6">
+              {activeTab === 'internet' ? 'Conectamos tu mundo.' : 'Un sistema para dominarlos a todos.'}
+            </h2>
+            <p className={`text-lg max-w-2xl mx-auto ${activeTab === 'internet' || activeTab === 'rentcontrol' ? 'text-slate-400' : 'text-slate-600'}`}>
+              {activeTab === 'internet' ? 'RadioTec Pro ofrece Internet de Ultra Velocidad para tu hogar y el software más avanzado para tu empresa.' : 'Elige el módulo que necesitas hoy. Todos están interconectados bajo tu misma cuenta maestra.'}
+            </p>
+          </div>
+
+          {/* Tabs Navigation (Segmented Control) */}
+          <div className="max-w-5xl mx-auto mb-16">
+            <div className={`p-1.5 sm:p-2 rounded-2xl sm:rounded-full flex flex-col sm:flex-row gap-2 sm:gap-0 transition-colors duration-700 shadow-xl ${activeTab === 'internet' || activeTab === 'rentcontrol' ? 'bg-slate-800/60 backdrop-blur-md border border-slate-700/50' : 'bg-slate-200/60 backdrop-blur-md border border-slate-300/50'}`}>
+              
+              <button 
+                onClick={() => setActiveTab('internet')}
+                className={`flex-1 px-4 py-3 sm:py-4 rounded-xl sm:rounded-full font-bold transition-all flex justify-center items-center gap-2 text-sm sm:text-base ${activeTab === 'internet' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30 scale-100 sm:scale-105' : activeTab === 'rentcontrol' ? 'text-slate-400 hover:text-white hover:bg-slate-700/50' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-300/50'}`}
+              >
+                <Wifi className="w-5 h-5" /> Internet WISP
+              </button>
+              
+              <button 
+                onClick={() => setActiveTab('rentcontrol')}
+                className={`flex-1 px-4 py-3 sm:py-4 rounded-xl sm:rounded-full font-bold transition-all flex justify-center items-center gap-2 text-sm sm:text-base ${activeTab === 'rentcontrol' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30 scale-100 sm:scale-105' : activeTab === 'internet' ? 'text-slate-400 hover:text-white hover:bg-slate-700/50' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-300/50'}`}
+              >
+                <Building2 className="w-5 h-5" /> RentControl
+              </button>
+
+              <button 
+                onClick={() => setActiveTab('facturapro')}
+                className={`flex-1 px-4 py-3 sm:py-4 rounded-xl sm:rounded-full font-bold transition-all flex justify-center items-center gap-2 text-sm sm:text-base ${activeTab === 'facturapro' ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/30 scale-100 sm:scale-105' : activeTab === 'internet' || activeTab === 'rentcontrol' ? 'text-slate-400 hover:text-white hover:bg-slate-700/50' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-300/50'}`}
+              >
+                <Receipt className="w-5 h-5" /> FacturaPro
+              </button>
+
+              <button 
+                onClick={() => setActiveTab('omnichat')}
+                className={`flex-1 px-4 py-3 sm:py-4 rounded-xl sm:rounded-full font-bold transition-all flex justify-center items-center gap-2 text-sm sm:text-base ${activeTab === 'omnichat' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 scale-100 sm:scale-105' : activeTab === 'internet' || activeTab === 'rentcontrol' ? 'text-slate-400 hover:text-white hover:bg-slate-700/50' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-300/50'}`}
+              >
+                <Bot className="w-5 h-5" /> OmniChat
+              </button>
+            </div>
+          </div>
+
+          <div className="min-h-[600px] relative">
             
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-blue-500 blur-3xl opacity-20 rounded-full"></div>
-              <div className="relative rounded-2xl bg-slate-800 border border-slate-700 p-8 shadow-2xl">
-                <h3 className="text-2xl font-bold mb-6 text-center">Planes RentControl SaaS</h3>
-                
-                <div className="space-y-4 mb-8">
+            {/* Internet WISP Content */}
+            {activeTab === 'internet' && (
+              <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
+                <div className="text-center mb-16">
+                  <h3 className="text-3xl md:text-4xl font-black text-white sm:text-4xl">Internet de Otra Galaxia</h3>
+                  <p className="mt-4 text-lg text-slate-400">Alta velocidad, estabilidad para el trabajo y soporte local inigualable.</p>
+                </div>
+                <div className="grid gap-12 md:grid-cols-3 mb-24">
+                  <div className="flex flex-col items-center text-center p-6 rounded-3xl bg-slate-800/50 backdrop-blur-md border border-slate-700 transition-transform hover:-translate-y-2">
+                    <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-500/20 text-blue-400">
+                      <Zap className="h-8 w-8" />
+                    </div>
+                    <h3 className="mb-3 text-xl font-bold text-white">Velocidad Extrema</h3>
+                    <p className="text-slate-400">Diseñado para Gaming, Streaming HD y Trabajo Híbrido sin interrupciones.</p>
+                  </div>
+                  <div className="flex flex-col items-center text-center p-6 rounded-3xl bg-slate-800/50 backdrop-blur-md border border-slate-700 transition-transform hover:-translate-y-2">
+                    <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-500/20 text-indigo-400">
+                      <Shield className="h-8 w-8" />
+                    </div>
+                    <h3 className="mb-3 text-xl font-bold text-white">Estabilidad Asegurada</h3>
+                    <p className="text-slate-400">Red Mikrotik de grado empresarial que garantiza 99.9% de Uptime sin cortes.</p>
+                  </div>
+                  <div className="flex flex-col items-center text-center p-6 rounded-3xl bg-slate-800/50 backdrop-blur-md border border-slate-700 transition-transform hover:-translate-y-2">
+                    <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-500/20 text-teal-400">
+                      <Target className="h-8 w-8" />
+                    </div>
+                    <h3 className="mb-3 text-xl font-bold text-white">Instalación Rápida</h3>
+                    <p className="text-slate-400">Agenda tu instalación el mismo día. Instalamos, probamos y empiezas a navegar.</p>
+                  </div>
+                </div>
+
+                <div className="text-center">
+                  <h3 className="text-3xl font-black text-white mb-12">Planes Residenciales</h3>
                   {loading ? (
-                    <div className="p-8 text-center text-slate-500">Cargando planes...</div>
-                  ) : saasPlans.length === 0 ? (
-                    <div className="p-8 text-center text-slate-500 border border-slate-700 rounded-xl">Próximamente...</div>
+                    <div className="flex justify-center p-12">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                    </div>
+                  ) : wispPlans.length === 0 ? (
+                    <div className="text-slate-400 bg-slate-800/50 p-8 rounded-2xl shadow-sm max-w-lg mx-auto border border-slate-700">
+                      Por el momento estamos actualizando nuestros paquetes. ¡Contacta por WhatsApp!
+                    </div>
                   ) : (
-                    saasPlans.slice(0, 3).map((plan, i) => (
-                      <div key={plan.id} className={i % 2 === 0 ? "bg-slate-900 border border-slate-700 p-5 rounded-xl" : "bg-gradient-to-br from-indigo-900/50 to-blue-900/50 border border-indigo-500/50 p-5 rounded-xl"}>
-                        <div className="flex justify-between items-center mb-2">
-                          <span className={`font-bold text-lg ${i % 2 !== 0 ? 'text-white' : ''}`}>{plan.name}</span>
-                          <span className={`font-black text-xl ${i % 2 !== 0 ? 'text-indigo-400' : 'text-blue-400'}`}>
-                            {plan.fixedFee > 0 ? `$${plan.fixedFee}` : `${plan.commission}%`}
-                            <span className={`text-sm font-normal ${i % 2 !== 0 ? 'text-slate-400' : 'text-slate-500'}`}>
-                              {plan.fixedFee > 0 ? '/mo' : ' comisión'}
-                            </span>
-                          </span>
-                        </div>
-                        <p className="text-sm text-slate-400 mb-3">{plan.description}</p>
-                        <ul className="text-sm text-slate-300 space-y-1">
-                          <li className="flex items-center gap-2">
-                            <Check className={`h-4 w-4 ${i % 2 !== 0 ? 'text-indigo-400' : 'text-emerald-400'}`}/> 
-                            Hasta {plan.maxProperties} Propiedad{plan.maxProperties > 1 ? 'es' : ''}
-                          </li>
-                        </ul>
-                      </div>
-                    ))
+                    <div className="grid gap-8 md:grid-cols-3 lg:gap-12 max-w-6xl mx-auto items-center">
+                      {wispPlans.map((plan, index) => {
+                        const isPopular = index === 1 || wispPlans.length === 1;
+                        
+                        return (
+                          <div key={plan.id} className={`flex flex-col text-left rounded-3xl ${isPopular ? 'border-2 border-blue-500 bg-slate-800 shadow-2xl relative scale-105 z-10' : 'border border-slate-700 bg-slate-800/50 shadow-lg transition-all hover:shadow-xl'}`}>
+                            {isPopular && (
+                              <div className="absolute -top-5 left-1/2 -translate-x-1/2 rounded-full bg-blue-600 px-4 py-1 text-sm font-bold text-white uppercase tracking-wider">
+                                Más Popular
+                              </div>
+                            )}
+                            <h3 className={`text-xl font-bold mb-4 ${isPopular ? 'text-blue-400' : 'text-white'}`}>
+                              {index === 0 ? '🏠 ' : index === 1 ? '🚀 ' : '🎮 '} {plan.name}
+                            </h3>
+                            <div className="flex items-baseline text-5xl font-black text-white">
+                              ${plan.price} <span className="ml-1 text-xl font-medium text-slate-400">/mes</span>
+                            </div>
+                            <ul className="mt-8 space-y-4 text-slate-300 flex-1">
+                              <li className="flex items-center gap-3"><Check className="h-5 w-5 text-blue-500" /> <strong className="text-white">{plan.downloadSpeed} Megas</strong> de Bajada</li>
+                              <li className="flex items-center gap-3"><Check className="h-5 w-5 text-blue-500" /> <strong className="text-white">{plan.uploadSpeed} Megas</strong> de Subida</li>
+                              <li className="flex items-center gap-3"><Check className="h-5 w-5 text-blue-500" /> Dispositivos recomendados: {plan.downloadSpeed > 30 ? 'Ilimitados' : '1 a 3'}</li>
+                            </ul>
+                            <Button 
+                              onClick={() => openLeadModal(`Plan Internet WISP: ${plan.name}`)}
+                              className={`mt-8 w-full h-12 rounded-xl font-bold text-lg ${isPopular ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-600/30' : 'bg-slate-700 text-white hover:bg-slate-600'}`}
+                            >
+                              Me Interesa
+                            </Button>
+                          </div>
+                        );
+                      })}
+                    </div>
                   )}
                 </div>
-                <Button 
-                  onClick={() => openLeadModal("Afiliación Software RentControl SaaS")}
-                  className="w-full bg-white text-slate-900 hover:bg-slate-200 h-10 text-sm font-bold rounded-lg"
-                >
-                  Solicitar Afiliación / Cotización
-                </Button>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
+            )}
 
-      {/* Propuesta de Valor OmniChat */}
-      <section id="omnichat" className="py-24 bg-white relative overflow-hidden">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-             <div className="order-2 lg:order-1 relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 blur-3xl opacity-20 rounded-full"></div>
-                <div className="relative rounded-3xl bg-slate-50 border border-slate-200 p-8 shadow-2xl flex flex-col items-center justify-center min-h-[400px]">
-                   <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mb-6 shadow-inner relative">
-                      <div className="absolute inset-0 bg-emerald-400 rounded-full animate-ping opacity-20"></div>
-                      <MessageSquare className="h-10 w-10 text-emerald-600" />
-                   </div>
-                   <h3 className="text-2xl font-black text-slate-900 mb-2">IA Entrenada para tus Clientes</h3>
-                   <p className="text-center text-slate-600 max-w-sm mb-6 font-medium">OmniChat lee tus cuartos, inquilinos y facturas en tiempo real y responde a prospectos por WhatsApp de forma 100% autónoma y humana.</p>
-                   <Button onClick={() => openLeadModal("Demostración OmniChat AI")} className="bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg shadow-emerald-600/30 font-bold px-8 h-12 rounded-xl text-md">Solicitar Acceso a OmniChat</Button>
+            {/* RentControl Content */}
+            {activeTab === 'rentcontrol' && (
+              <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
+                <div className="grid lg:grid-cols-2 gap-16 items-center">
+                  <div>
+                    <h3 className="text-3xl md:text-4xl font-black tracking-tight mb-6 text-white">El fin de los cobros en Excel.</h3>
+                    <p className="text-lg text-slate-400 mb-8 max-w-xl">
+                      RentControl es la plataforma en la nube que automatiza la cobranza, facturación y gestión operativa de tus locales, departamentos y plazas comerciales.
+                    </p>
+                    <div className="space-y-6 mb-12">
+                      <div className="flex gap-4">
+                        <div className="flex-shrink-0 mt-1"><CandlestickChart className="h-6 w-6 text-indigo-400" /></div>
+                        <div>
+                          <h4 className="text-xl font-bold text-white">Transparencia Financiera</h4>
+                          <p className="text-slate-400 mt-1">Dashboards en tiempo real con Utilidad Neta, Cartera Vencida y Retorno de Inversión por cada una de tus propiedades.</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-4">
+                        <div className="flex-shrink-0 mt-1"><Building2 className="h-6 w-6 text-orange-400" /></div>
+                        <div>
+                          <h4 className="text-xl font-bold text-white">Sistema de Gestión Delegada (Agencia)</h4>
+                          <p className="text-slate-400 mt-1">¿No tienes tiempo? Asignamos un Gestor Operativo a tu cartera inmobiliaria. Tú solo revisas las métricas mientras nosotros reparamos, cobramos y depositamos a tu cuenta.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="relative">
+                    <div className="rounded-xl overflow-hidden shadow-2xl border border-slate-700/50 bg-slate-900 ring-4 ring-indigo-500/10 mb-8">
+                      <div className="bg-slate-800 px-4 py-3 border-b border-slate-700 flex items-center gap-2 relative z-10">
+                        <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                        <span className="text-xs text-slate-400 ml-2 font-medium">RentControl Dashboard</span>
+                      </div>
+                      <ScreenshotCarousel images={rentControlImages} title="RentControl" />
+                    </div>
+                    <Button onClick={() => openLeadModal("Afiliación Software RentControl SaaS")} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-12 rounded-xl shadow-lg shadow-indigo-600/30">
+                      Solicitar Afiliación / Cotización
+                    </Button>
+                  </div>
                 </div>
-             </div>
-             
-             <div className="order-1 lg:order-2">
-                 <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 text-sm text-emerald-700 mb-6 font-bold">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Sistema Inteligente WhatsApp
-                 </div>
-                 <h2 className="text-3xl md:text-5xl font-black tracking-tight mb-6 text-slate-900">Vende, cobra y soporta mientras duermes.</h2>
-                 <p className="text-lg text-slate-600 mb-8 max-w-xl">
-                    Olvídate de responder el mismo mensaje "Info" 100 veces al día. OmniChat integra la cobranza de inquilinos de RentControl en un solo cerebro automatizado por IA que trabaja 24/7.
-                 </p>
-                 
-                 <div className="space-y-6">
-                 <div className="flex gap-4">
-                   <div className="flex-shrink-0 mt-1"><Target className="h-6 w-6 text-emerald-500" /></div>
-                   <div>
-                     <h4 className="text-xl font-bold text-slate-900">Lectura de Intención Exacta</h4>
-                     <p className="text-slate-600 mt-1">El motor detecta si el usuario quiere rentar un local comercial o reportar un lavabo roto, aplicando flujos de inteligencia artificial nativos.</p>
-                   </div>
-                 </div>
-                 <div className="flex gap-4">
-                   <div className="flex-shrink-0 mt-1"><Building2 className="h-6 w-6 text-indigo-500" /></div>
-                   <div>
-                     <h4 className="text-xl font-bold text-slate-900">Catálogo M2M Extendido</h4>
-                     <p className="text-slate-600 mt-1">Sincronización Machine-to-Machine directa con la BBDD de RentControl. Informa precios y unidades disponibles sin que abras tu laptop.</p>
-                   </div>
-                 </div>
-                 </div>
-             </div>
+
+                {/* CTA Técnicos (Only visible in RentControl) */}
+                <div className="mt-24 relative overflow-hidden rounded-3xl bg-indigo-600/20 border border-indigo-500/30 backdrop-blur-md shadow-2xl">
+                  <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-repeat"></div>
+                  <div className="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div className="flex-1 text-center md:text-left">
+                      <div className="inline-flex items-center rounded-full bg-indigo-500/40 px-3 py-1 text-sm text-indigo-100 mb-6 font-semibold">
+                        Bolsa de Trabajo & Red de Aliados
+                      </div>
+                      <h2 className="text-3xl md:text-4xl font-black text-white mb-4">
+                        ¿Eres Técnico, Plomero o Electricista?
+                      </h2>
+                      <p className="text-indigo-100 text-lg max-w-xl mx-auto md:mx-0">
+                        Únete a la red oficial de proveedores de RentControl. Nuestros Gestores generan <strong>decenas de tickets de servicio mensuales</strong> en múltiples propiedades, y estamos buscando equipos de primer nivel para cubrirlos.
+                      </p>
+                      <ul className="mt-6 flex flex-col md:flex-row gap-4 md:gap-8 justify-center md:justify-start text-indigo-50 font-medium">
+                        <li className="flex items-center justify-center md:justify-start gap-2">
+                          <Wrench className="h-5 w-5 text-indigo-300" />
+                          Trabajo constante garantizado
+                        </li>
+                        <li className="flex items-center justify-center md:justify-start gap-2">
+                          <Shield className="h-5 w-5 text-indigo-300" />
+                          Pagos directos por RentControl
+                        </li>
+                      </ul>
+                    </div>
+                    <div className="shrink-0 w-full md:w-auto mt-6 md:mt-0">
+                      <Button 
+                        onClick={() => openLeadModal("Vacante Red de Técnicos RentControl")}
+                        className="w-full md:w-auto h-12 px-8 rounded-xl bg-white text-indigo-900 hover:bg-slate-100 font-bold text-sm shadow-lg shadow-indigo-900/20 active:scale-95 transition-transform"
+                      >
+                        Postularme como Proveedor
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            )}
+
+
+            {/* FacturaPro Content */}
+            {activeTab === 'facturapro' && (
+              <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 text-slate-900">
+                <div className="grid lg:grid-cols-2 gap-16 items-center">
+                  <div className="order-2 lg:order-1">
+                    <div className="rounded-2xl overflow-hidden shadow-2xl border border-slate-200 bg-white ring-4 ring-violet-500/10 mb-8">
+                      <div className="bg-slate-100 px-4 py-3 border-b border-slate-200 flex items-center gap-2 relative z-10">
+                        <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                        <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                        <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                        <span className="text-xs text-slate-500 ml-2 font-medium">FacturaPro ERP</span>
+                      </div>
+                      <ScreenshotCarousel images={facturaProImages} title="FacturaPro" />
+                    </div>
+                  </div>
+                  
+                  <div className="order-1 lg:order-2">
+                    <h3 className="text-3xl md:text-4xl font-black mb-6">El monstruo financiero para tu empresa.</h3>
+                    <p className="text-lg text-slate-600 mb-8">
+                      FacturaPro es un ERP de clase mundial diseñado para automatizar tu nómina, timbrado SAT CFDI 4.0, inventarios y finanzas en una sola plataforma en la nube.
+                    </p>
+                    
+                    <div className="grid grid-cols-2 gap-6 mb-10">
+                      <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+                        <div className="w-10 h-10 bg-violet-100 text-violet-600 rounded-xl flex items-center justify-center mb-3">
+                          <FileText className="h-5 w-5" />
+                        </div>
+                        <h4 className="font-bold mb-1">Timbrado CFDI 4.0</h4>
+                        <p className="text-slate-500 text-xs">Emite facturas y complementos en regla con el SAT.</p>
+                      </div>
+                      <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+                        <div className="w-10 h-10 bg-fuchsia-100 text-fuchsia-600 rounded-xl flex items-center justify-center mb-3">
+                          <Users className="h-5 w-5" />
+                        </div>
+                        <h4 className="font-bold mb-1">Motor de Nómina</h4>
+                        <p className="text-slate-500 text-xs">Calcula sueldos y dispersa pagos a empleados.</p>
+                      </div>
+                    </div>
+                    
+                    <Button onClick={() => openLeadModal("Demostración FacturaPro ERP")} className="w-full bg-violet-600 hover:bg-violet-700 text-white shadow-lg shadow-violet-600/30 font-bold h-12 rounded-xl text-md">
+                      Agendar Demostración ERP
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+
+
+            {/* OmniChat Content */}
+            {activeTab === 'omnichat' && (
+              <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 text-slate-900">
+                <div className="grid lg:grid-cols-2 gap-16 items-center">
+                  <div>
+                    <h3 className="text-3xl md:text-4xl font-black tracking-tight mb-6 text-slate-900">Vende, cobra y soporta mientras duermes.</h3>
+                    <p className="text-lg text-slate-600 mb-8 max-w-xl">
+                      Olvídate de responder el mismo mensaje "Info" 100 veces al día. OmniChat integra la cobranza de RentControl en un cerebro automatizado por IA que trabaja 24/7.
+                    </p>
+                    
+                    <div className="space-y-6 mb-12">
+                      <div className="flex gap-4">
+                        <div className="flex-shrink-0 mt-1"><Target className="h-6 w-6 text-emerald-500" /></div>
+                        <div>
+                          <h4 className="text-xl font-bold text-slate-900">Lectura de Intención Exacta</h4>
+                          <p className="text-slate-600 mt-1">El motor detecta si el usuario quiere rentar o reportar un lavabo roto, aplicando flujos de IA nativos.</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-4">
+                        <div className="flex-shrink-0 mt-1"><Building2 className="h-6 w-6 text-indigo-500" /></div>
+                        <div>
+                          <h4 className="text-xl font-bold text-slate-900">Catálogo M2M Extendido</h4>
+                          <p className="text-slate-600 mt-1">Sincronización directa con RentControl. Informa precios y unidades disponibles sin que abras tu laptop.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="relative">
+                     <div className="w-full rounded-2xl overflow-hidden shadow-2xl border border-slate-200 bg-white ring-4 ring-emerald-500/10 mb-8">
+                        <div className="bg-slate-100 px-4 py-3 border-b border-slate-200 flex items-center gap-2 relative z-10">
+                          <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                          <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                          <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                          <span className="text-xs text-slate-500 ml-2 font-medium">Consola OmniChat</span>
+                        </div>
+                        <ScreenshotCarousel images={omniChatImages} title="OmniChat" />
+                     </div>
+                     <Button onClick={() => openLeadModal("Demostración OmniChat AI")} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/30 font-bold h-12 rounded-xl text-md">
+                        Solicitar Acceso a OmniChat
+                     </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+            
           </div>
         </div>
       </section>
 
-      {/* CTA Técnicos */}
-      <section id="proveedores" className="py-20 bg-indigo-600 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-repeat"></div>
-        <div className="container mx-auto px-4 md:px-6 relative z-10">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8 bg-indigo-900/30 p-8 md:p-12 rounded-3xl border border-indigo-500/30 backdrop-blur-md shadow-2xl">
-            <div className="flex-1 text-center md:text-left">
-              <div className="inline-flex items-center rounded-full bg-indigo-500/40 px-3 py-1 text-sm text-indigo-100 mb-6 font-semibold">
-                Bolsa de Trabajo & Red de Aliados
-              </div>
-              <h2 className="text-3xl md:text-4xl font-black text-white mb-4">
-                ¿Eres Técnico, Plomero o Electricista?
-              </h2>
-              <p className="text-indigo-100 text-lg max-w-xl mx-auto md:mx-0">
-                Únete a la red oficial de proveedores de RentControl. Nuestros Gestores generan <strong>decenas de tickets de servicio mensuales</strong> en múltiples propiedades, y estamos buscando equipos de primer nivel para cubrirlos.
-              </p>
-              <ul className="mt-6 flex flex-col md:flex-row gap-4 md:gap-8 justify-center md:justify-start text-indigo-50 font-medium">
-                <li className="flex items-center justify-center md:justify-start gap-2">
-                  <Wrench className="h-5 w-5 text-indigo-300" />
-                  Trabajo constante garantizado
-                </li>
-                <li className="flex items-center justify-center md:justify-start gap-2">
-                  <Shield className="h-5 w-5 text-indigo-300" />
-                  Pagos directos por RentControl
-                </li>
-              </ul>
-            </div>
-            <div className="shrink-0 w-full md:w-auto mt-6 md:mt-0">
-              <Button 
-                onClick={() => openLeadModal("Vacante Red de Técnicos RentControl")}
-                className="w-full md:w-auto h-12 px-8 rounded-xl bg-white text-indigo-900 hover:bg-slate-100 font-bold text-sm shadow-lg shadow-indigo-900/20 active:scale-95 transition-transform"
-              >
-                Postularme como Proveedor
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
+
 
       {/* Testimonials */}
       <section id="testimonios" className="py-24 bg-slate-50">
@@ -464,6 +588,7 @@ export default function Home() {
                 <li><Link href="#internet" className="hover:text-blue-400 transition-colors">Enlaces Dedicados</Link></li>
                 <li><Link href="#gestion" className="hover:text-blue-400 transition-colors">Agencia de Gestión</Link></li>
                 <li><Link href="#gestion" className="hover:text-blue-400 transition-colors">SaaS RentControl</Link></li>
+                <li><Link href="#facturapro" className="hover:text-violet-400 transition-colors font-bold">FacturaPro ERP</Link></li>
               </ul>
             </div>
             <div>
@@ -471,6 +596,7 @@ export default function Home() {
               <ul className="space-y-3">
                 <li><a href="https://clientes.portalinternet.net/accounts/login/?next=/panel/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors">Portal de Clientes WISP</a></li>
                 <li><Link href="/login" className="hover:text-blue-400 transition-colors">Acceso RentControl Nube</Link></li>
+                <li><a href="https://facturapro.radiotecpro.com/login" target="_blank" rel="noopener noreferrer" className="hover:text-violet-400 transition-colors">Consola FacturaPro ERP</a></li>
                 <li><a href="https://omnichat.radiotecpro.com/login" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors font-bold">Consola OmniChat IA</a></li>
               </ul>
             </div>
@@ -563,6 +689,28 @@ export default function Home() {
                 </div>
               </form>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Video Lightbox Modal (Now used for Images) */}
+      {activeImage && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/90 p-4 transition-all backdrop-blur-md" onClick={() => setActiveImage(null)}>
+          <div className="relative w-full max-w-6xl animate-in zoom-in duration-300" onClick={e => e.stopPropagation()}>
+            <button 
+              onClick={() => setActiveImage(null)}
+              className="absolute -top-12 right-0 text-white hover:text-slate-300 font-bold flex items-center gap-2"
+            >
+              Cerrar <span className="text-2xl">&times;</span>
+            </button>
+            <div className="rounded-xl overflow-hidden shadow-2xl border border-slate-700 bg-slate-900">
+              <div className="bg-slate-800 px-4 py-3 border-b border-slate-700 flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              </div>
+              <img src={activeImage} alt="Fullscreen View" className="w-full object-contain max-h-[85vh] mx-auto" />
+            </div>
           </div>
         </div>
       )}

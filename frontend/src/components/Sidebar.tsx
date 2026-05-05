@@ -24,7 +24,8 @@ import {
   Laptop,
   RadioTower,
   Home,
-  Database
+  Database,
+  Activity
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { useState } from "react";
@@ -53,6 +54,10 @@ export function Sidebar() {
       <Link href="/admin/apps" className="flex items-center rounded-md px-3 py-2 text-sm font-medium mt-4 mx-2 hover:bg-indigo-100 bg-indigo-50/50 border border-indigo-100">
         <Layers className="mr-3 h-5 w-5 flex-shrink-0 text-indigo-600" />
         {!isCollapsed && <span className="text-indigo-700 font-bold tracking-tight">App Store Integrations</span>}
+      </Link>
+      <Link href="/admin/infrastructure" className="flex items-center rounded-md px-3 py-2 text-sm font-medium mt-2 mx-2 hover:bg-slate-800 bg-slate-900 border border-slate-700 shadow-lg text-white">
+        <Activity className="mr-3 h-5 w-5 flex-shrink-0 text-emerald-400" />
+        {!isCollapsed && <span className="font-bold tracking-wide">Telemetry NOC</span>}
       </Link>
       <a href="https://omnichat.radiotecpro.com/login" target="_blank" rel="noopener noreferrer" className="flex items-center rounded-md px-3 py-2 text-sm font-medium mt-2 mx-2 hover:bg-purple-100 bg-purple-50 border border-purple-200 shadow-sm transition-all hover:-translate-y-0.5">
         <MessageSquare className="mr-3 h-5 w-5 flex-shrink-0 text-purple-600" />
@@ -118,9 +123,21 @@ export function Sidebar() {
         <Briefcase className="mr-3 h-5 w-5 flex-shrink-0 text-slate-500" />
         {!isCollapsed && <span>Gestores Internos</span>}
       </Link>
-      <Link href="/admin/payroll" className="flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-slate-200 mx-2">
+      <Link href="/admin/hr/employees" className="flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-slate-200 mx-2">
+        <Users className="mr-3 h-5 w-5 flex-shrink-0 text-slate-500" />
+        {!isCollapsed && <span>Directorio Empleados</span>}
+      </Link>
+      <Link href="/admin/hr/attendance" className="flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-slate-200 mx-2">
+        <Activity className="mr-3 h-5 w-5 flex-shrink-0 text-orange-500" />
+        {!isCollapsed && <span>Asistencias / Faltas</span>}
+      </Link>
+      <Link href="/admin/hr/time-off" className="flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-slate-200 mx-2">
+        <Layers className="mr-3 h-5 w-5 flex-shrink-0 text-teal-500" />
+        {!isCollapsed && <span>Bandeja Vacaciones</span>}
+      </Link>
+      <Link href="/admin/hr/payroll" className="flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-slate-200 mx-2">
         <Receipt className="mr-3 h-5 w-5 flex-shrink-0 text-indigo-500" />
-        {!isCollapsed && <span>Nóminas (Gestores)</span>}
+        {!isCollapsed && <span>Motor de Nómina ERP</span>}
       </Link>
       <Link href="/admin/payouts" className="flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-slate-200 mx-2">
         <DollarSign className="mr-3 h-5 w-5 flex-shrink-0 text-emerald-500" />

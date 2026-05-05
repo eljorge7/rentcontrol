@@ -261,4 +261,107 @@ export class FacturaProService {
      return true;
   }
 
+  /**
+   * Timbrado M2M SAT para Nómina (Payslip CFDI)
+   */
+  async issuePayrollSlip(payslipId: string) {
+    try {
+      const payslip = await this.prisma.payslip.findUnique({
+        where: { id: payslipId },
+        include: { 
+          employee: { include: { employeeProfile: true } }, 
+          payrollRun: { include: { manager: true } } 
+        }
+      });
+      if (!payslip || !payslip.employee?.employeeProfile) return null;
+
+      const employee = payslip.employee;
+      const profile = employee.employeeProfile!;
+      const rfc = profile.curp ? profile.curp.substring(0, 10).toUpperCase() + 'XXX' : 'XAXX010101000'; // Fake/Fallback RFC
+      
+      const config = await this.getConfig();
+      const m2mHeaders = { 
+        'Content-Type': 'application/json',
+        ...(config.token ? { 'Authorization': `Bearer ${config.token}` } : {})
+      };
+
+      // Create or Sync Employee to FacturaPro Customer as "Empleado"
+      const customerRes = await fetch(`${config.baseUrl}/customers`, {
+        method: 'POST',
+        headers: m2mHeaders,
+        body: JSON.stringify({
+          legalName: employee.name,
+          rfc: rfc,
+          taxRegime: '605', // Sueldos y Salarios
+          zipCode: '00000',
+          email: employee.email
+        })
+      });
+      
+      let customerFpId = null;
+      if (customerRes.ok) {
+         const cr = await customerRes.json();
+         customerFpId = cr.id || cr[0]?.id;
+      }
+
+      const payload = {
+        customerId: customerFpId,
+        paymentMethod: 'PUE',
+        cfdiUse: 'CN01', // Nómina
+        tipoDeComprobante: 'N', // N para Nómina
+        items: [
+          {
+            description: `Pago de Nómina - ${payslip.payrollRun.name}`,
+            quantity: 1,
+            unitPrice: payslip.baseSalary,
+            taxRate: 0,
+            discount: payslip.deductions || 0
+          }
+        ],
+        // Mapeos requeridos extra en CFDI de Nominas
+        complementoNomina: {
+            tipoContrato: '01', // Indeterminado
+            tipoJornada: '01', // Diurna
+            periodicidadPago: '04', // Quincenal
+            salarioBaseCotApor: payslip.baseSalary,
+            nss: profile.nss || '00000000000'
+        }
+      };
+
+      const res = await fetch(`${config.baseUrl}/invoices`, {
+        method: 'POST',
+        headers: m2mHeaders,
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        this.logger.error("FacturaPro returned err for Payroll: " + await res.text());
+        return null;
+      }
+      const data = await res.json();
+      
+      // Auto stamp
+      const stampRes = await fetch(`${config.baseUrl}/invoices/${data.id}/stamp`, {
+         method: 'PATCH',
+         headers: m2mHeaders
+      });
+      
+      let finalSat = data.satUuid;
+      if (stampRes.ok) {
+          const stamped = await stampRes.json();
+          finalSat = stamped.satUuid;
+      }
+
+      await this.prisma.payslip.update({
+         where: { id: payslipId },
+         data: { uuidSAT: finalSat, xmlUrl: data.id }
+      });
+      
+      return finalSat;
+    } catch(e) {
+      this.logger.error("Timbrado Nómina Fallo", e);
+      return null;
+    }
+  }
+
 }
