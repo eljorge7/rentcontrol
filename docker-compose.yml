@@ -29,6 +29,7 @@ services:
       - PUBLIC_URL=https://radiotecpro.com/api
       - FACTURAPRO_API_URL=https://facturapro.radiotecpro.com/api
       - FACTURAPRO_FRONTEND_URL=https://facturapro.radiotecpro.com
+      - OMNICHAT_API_URL=https://omnichat.radiotecpro.com/api
       # Las demás variables de entorno se leerán de tu archivo .env local
     env_file:
       - ./backend/.env

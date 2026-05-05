@@ -204,7 +204,7 @@ export default function InfrastructureDashboard() {
                         </div>
                         <div>
                             <h4 className="font-bold text-sm text-slate-800">{data.services.rentControl.label}</h4>
-                            <p className="text-[10px] text-slate-500 font-mono mt-0.5">localhost:3000</p>
+                            <p className="text-[10px] text-slate-500 font-mono mt-0.5">radiotecpro.com</p>
                         </div>
                     </div>
                     <div className="text-right flex flex-col items-end">
@@ -224,7 +224,7 @@ export default function InfrastructureDashboard() {
                         </div>
                         <div>
                             <h4 className="font-bold text-sm text-slate-800">{data.services.facturaPro.label}</h4>
-                            <p className="text-[10px] text-slate-500 font-mono mt-0.5">localhost:3004</p>
+                            <p className="text-[10px] text-slate-500 font-mono mt-0.5">facturapro.radiotecpro.com</p>
                         </div>
                     </div>
                     <div className="text-right flex flex-col items-end">
@@ -244,7 +244,7 @@ export default function InfrastructureDashboard() {
                         </div>
                         <div>
                             <h4 className="font-bold text-sm text-slate-800">{data.services.omniChat.label}</h4>
-                            <p className="text-[10px] text-slate-500 font-mono mt-0.5">localhost:3003</p>
+                            <p className="text-[10px] text-slate-500 font-mono mt-0.5">omnichat.radiotecpro.com</p>
                         </div>
                     </div>
                     <div className="text-right flex flex-col items-end">

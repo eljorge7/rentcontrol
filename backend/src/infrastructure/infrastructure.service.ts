@@ -58,8 +58,9 @@ export class InfrastructureService {
       let facStatus = 'OFFLINE';
       let facLatency = 0;
       const startFac = Date.now();
+      const facUrl = process.env.FACTURAPRO_API_URL || 'https://facturapro.radiotecpro.com/api';
       try {
-          const res = await fetch('http://localhost:3004/api/health', { signal: AbortSignal.timeout(2000) });
+          const res = await fetch(`${facUrl}`, { signal: AbortSignal.timeout(2000) });
           facStatus = 'ONLINE'; // As long as it responds, even if 404
       } catch(e) { }
       finally {
@@ -70,8 +71,9 @@ export class InfrastructureService {
       let omniStatus = 'OFFLINE';
       let omniLatency = 0;
       const startOmni = Date.now();
+      const omniUrl = process.env.OMNICHAT_API_URL || 'https://omnichat.radiotecpro.com/api';
       try {
-          const res = await fetch('http://localhost:3003/api/health', { signal: AbortSignal.timeout(2000) });
+          const res = await fetch(`${omniUrl}`, { signal: AbortSignal.timeout(2000) });
           omniStatus = 'ONLINE';
       } catch(e) { }
       finally {
