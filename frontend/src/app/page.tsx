@@ -7,7 +7,7 @@ import { Wifi, Zap, Shield, PhoneCall, ChevronRight, Check, Building2, Star, Tar
 import axios from "axios";
 
 // Using native fetch or axios to the public endpoints.
-const API_URL = "https://radiotecpro.com/api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export default function Home() {
   const [wispPlans, setWispPlans] = useState<any[]>([]);
