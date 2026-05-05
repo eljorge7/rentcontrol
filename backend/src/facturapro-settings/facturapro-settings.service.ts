@@ -94,7 +94,7 @@ export class FacturaproSettingsService {
        legalName: user.ownerProfile?.legalName || user.name
     };
 
-    const facturaproBaseUrl = process.env.FACTURAPRO_API_URL || 'http://localhost:3005';
+    const facturaproBaseUrl = process.env.FACTURAPRO_API_URL || 'https://facturapro.radiotecpro.com/api';
     
     // Server-to-Server API Call
     const res = await fetch(`${facturaproBaseUrl}/auth/sso`, {
@@ -117,8 +117,8 @@ export class FacturaproSettingsService {
         });
     }
 
-    // Retornamos la URL de frontend local de FacturaPro con el token listo para consumirse
-    const fpFrontendUrl = process.env.FACTURAPRO_FRONTEND_URL || 'http://localhost:3004';
+    // Retornamos la URL de frontend de FacturaPro con el token listo para consumirse
+    const fpFrontendUrl = process.env.FACTURAPRO_FRONTEND_URL || 'https://facturapro.radiotecpro.com';
     return { url: `${fpFrontendUrl}/sso?token=${data.token}` };
   }
 }
