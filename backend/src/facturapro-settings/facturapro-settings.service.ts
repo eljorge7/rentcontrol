@@ -118,7 +118,7 @@ export class FacturaproSettingsService {
     }
 
     // Retornamos la URL de frontend local de FacturaPro con el token listo para consumirse
-    const fpFrontendUrl = 'http://localhost:3004';
+    const fpFrontendUrl = process.env.FACTURAPRO_FRONTEND_URL || 'http://localhost:3004';
     return { url: `${fpFrontendUrl}/sso?token=${data.token}` };
   }
 }
