@@ -12,6 +12,7 @@ const availablePlans = [
    { id: "plan_3", name: "ISP Master", price: 899, features: { omnichat: true, facturapro: true, facturaproTier: "pyme_1000", rentcontrol: false, wisphq: true } }
 ];
 
+export default function SaasClientsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isProvisioning, setIsProvisioning] = useState(false);
   const [clients, setClients] = useState<any[]>([]);
