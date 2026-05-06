@@ -17,7 +17,7 @@ interface StatCardProps {
 
 export function StatCard({ title, value, icon, trend, subtitle, sparklineData }: StatCardProps) {
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-[24px] p-6 shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col hover:shadow-lg transition-all duration-300 relative overflow-hidden group">
+    <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-[24px] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/80 dark:border-slate-700/50 flex flex-col hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
       
       {/* Sparkline Background */}
       {sparklineData && sparklineData.length > 0 && (

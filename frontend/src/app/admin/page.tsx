@@ -136,15 +136,17 @@ export default function AdminDashboardPage() {
       
       {/* GLOBAL KPIs */}
       <div className="grid gap-4 md:grid-cols-4">
-        {/* KPI Cards con aspecto refinado */}
-        <div className="bg-gradient-to-br from-indigo-900 via-slate-900 to-black rounded-2xl p-1 shadow-lg shadow-indigo-900/10">
-          <StatCard
-            title="Ingreso Bruto (Real)"
-            value={`$${financials.collectedRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
-            icon={<Wallet size={20} className="text-emerald-400" />}
-            trend={calcGrowth(financials.collectedRevenue, financials.prevCollectedRevenue)}
-            sparklineData={[{val: 10}, {val: 25}, {val: 15}, {val: 45}, {val: 30}, {val: financials.collectedRevenue}]}
-          />
+        {/* KPI Cards con aspecto refinado y borde brillante (Glow Border) */}
+        <div className="relative rounded-[26px] p-[2px] bg-gradient-to-br from-indigo-500 via-purple-500 to-emerald-400 shadow-[0_0_40px_rgba(99,102,241,0.2)]">
+          <div className="h-full w-full rounded-[24px] bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl">
+            <StatCard
+              title="Ingreso Bruto (Real)"
+              value={`$${financials.collectedRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
+              icon={<Wallet size={20} className="text-indigo-600" />}
+              trend={calcGrowth(financials.collectedRevenue, financials.prevCollectedRevenue)}
+              sparklineData={[{val: 10}, {val: 25}, {val: 15}, {val: 45}, {val: 30}, {val: financials.collectedRevenue}]}
+            />
+          </div>
         </div>
         <StatCard
           title="MRR Inmobiliario"
@@ -171,8 +173,8 @@ export default function AdminDashboardPage() {
 
       {/* DASHBOARD CHARTS */}
       <div className="grid gap-6 md:grid-cols-3 mt-8">
-        <Card className="md:col-span-2 border-0 shadow-xl bg-white/70 backdrop-blur-xl dark:bg-slate-900/80 rounded-[2rem] overflow-hidden group">
-          <CardHeader className="border-b border-slate-100/50 pb-6">
+        <Card className="md:col-span-2 border border-white/80 dark:border-slate-700/50 shadow-[0_8px_30px_rgb(0,0,0,0.06)] bg-white/40 backdrop-blur-3xl dark:bg-slate-900/50 rounded-[2rem] overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.1)] transition-all duration-500">
+          <CardHeader className="border-b border-white/50 dark:border-slate-800/50 pb-6 bg-white/20 dark:bg-slate-800/20">
             <div className="flex justify-between items-center">
               <div>
                 <CardTitle className="text-xl font-bold text-slate-900">Histórico de Flujo de Cajas</CardTitle>
@@ -198,8 +200,8 @@ export default function AdminDashboardPage() {
 
         {/* METRICS & LEADERBOARD BLOCK */}
         <div className="space-y-6">
-          <Card className="border-0 shadow-lg bg-white/70 backdrop-blur-xl dark:bg-slate-900/80 rounded-[2rem] overflow-hidden">
-            <CardHeader className="pb-3 border-b border-slate-100/50">
+          <Card className="border border-white/80 dark:border-slate-700/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white/50 backdrop-blur-2xl dark:bg-slate-900/50 rounded-[2rem] overflow-hidden hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300">
+            <CardHeader className="pb-3 border-b border-white/50 dark:border-slate-800/50 bg-white/20 dark:bg-slate-800/20">
               <CardTitle className="text-lg font-bold flex items-center gap-2">
                 <Globe className="text-indigo-500" size={18} /> 
                 Salud de Infraestructura
@@ -221,8 +223,8 @@ export default function AdminDashboardPage() {
             </CardContent>
           </Card>
           
-          <Card className="border-0 shadow-lg bg-white/70 backdrop-blur-xl dark:bg-slate-900/80 rounded-[2rem] overflow-hidden">
-            <CardHeader className="pb-3 border-b border-slate-100/50 flex flex-row items-center justify-between">
+          <Card className="border border-white/80 dark:border-slate-700/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white/50 backdrop-blur-2xl dark:bg-slate-900/50 rounded-[2rem] overflow-hidden hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300 flex flex-col h-full">
+            <CardHeader className="pb-3 border-b border-white/50 dark:border-slate-800/50 bg-white/20 dark:bg-slate-800/20 flex flex-row items-center justify-between">
               <CardTitle className="text-lg font-bold flex items-center gap-2 text-slate-900">
                 <Users className="text-indigo-500" size={18} /> 
                 Top Gestores
