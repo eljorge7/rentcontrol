@@ -42,6 +42,13 @@ export class ChargesController {
     return this.chargesService.findOne(id, req.user);
   }
 
+  @Post(':id/remind')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN', 'OWNER', 'MANAGER')
+  sendMagicReminder(@Request() req: any, @Param('id') id: string) {
+    return this.chargesService.sendMagicReminder(id, req.user);
+  }
+
   @Post(':id/report')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN', 'OWNER', 'MANAGER', 'TENANT')

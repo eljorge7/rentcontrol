@@ -11,6 +11,7 @@ import { AddPaymentDialog } from "@/components/AddPaymentDialog";
 import { AddChargeDialog } from "@/components/AddChargeDialog";
 import { EditChargeDialog } from "@/components/EditChargeDialog";
 import { DeleteChargeDialog } from "@/components/DeleteChargeDialog";
+import { MagicRemindButton } from "@/components/MagicRemindButton";
 
 type Charge = {
   id: string;
@@ -170,6 +171,7 @@ export default function PaymentsListPage() {
                           <>
                             <AddPaymentDialog charge={charge} onPaymentAdded={fetchCharges} />
                             <EditChargeDialog charge={{...charge, type: charge.type || "RENT", description: cleanDesc}} onChargeUpdated={fetchCharges} />
+                            <MagicRemindButton chargeId={charge.id} tenantName={charge.lease?.tenant?.name} />
                             <DeleteChargeDialog chargeId={charge.id} amount={charge.amount} description={cleanDesc} onChargeDeleted={fetchCharges} />
                           </>
                         )}

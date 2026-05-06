@@ -234,6 +234,31 @@ export class ChargesService {
     return newCharge;
   }
 
+  async sendMagicReminder(id: string, user: any) {
+    const charge = await this.findOne(id, user);
+    if (charge.status === 'PAID') {
+      throw new BadRequestException('El cargo ya está pagado. No es necesario enviar recordatorio.');
+    }
+
+    if (!charge.lease?.tenant?.phone) {
+      throw new BadRequestException('El inquilino no tiene un número telefónico registrado para enviar WhatsApp.');
+    }
+
+    const tenantName = charge.lease.tenant.name;
+    const amount = charge.amount.toLocaleString('en-US', { minimumFractionDigits: 2 });
+    const description = charge.description || 'Arrendamiento';
+    const portalUrl = process.env.FRONTEND_URL || 'https://rentcontrol.radiotecpro.com/login';
+    
+    const message = `🪄 *RentControl - Recordatorio Mágico*\n\nHola *${tenantName}*, le recordamos amablemente que tiene un cargo en estado PENDIENTE por *${description}* con un saldo de *$${amount} MXN*.\n\nPuede realizar su pago o reportar su comprobante bancario ingresando a su portal de inquilino seguro aquí:\n🔗 ${portalUrl}\n\nAgradecemos su puntualidad para evitar suspensión de servicios.\n\n_Administración de RentControl_`;
+
+    const success = await this.notifications.sendWhatsAppMessage(charge.lease.tenant.phone, message);
+    if (!success) {
+      throw new BadRequestException('El motor OmniChat falló al encolar el WhatsApp. Revisa los logs.');
+    }
+
+    return { success: true, message: 'Recordatorio mágico enviado por WhatsApp al inquilino.' };
+  }
+
   findAll(user: any, leaseId?: string) {
     let whereClause: any = {};
     if (leaseId) {
