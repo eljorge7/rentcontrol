@@ -7,23 +7,23 @@ import { useState } from "react";
 const initialPlans = [
    {
       id: "plan_1",
-      name: "Básico Conversacional",
-      price: 299,
-      features: { omnichat: true, facturapro: false, facturaproTier: 'none', rentcontrol: false, wisphq: false },
+      name: "FacturaPro Base",
+      price: 399,
+      features: { omnichat: false, facturapro: true, facturaproTier: 'emprendedor_250', rentcontrol: false, wisphq: false },
       isActive: true
    },
    {
       id: "plan_2",
-      name: "Negocio Pro (Recomendado)",
-      price: 599,
-      features: { omnichat: true, facturapro: true, facturaproTier: 'emprendedor_250', rentcontrol: false, wisphq: false },
+      name: "IA Bandeja Inteligente",
+      price: 2499,
+      features: { omnichat: true, facturapro: false, facturaproTier: 'none', rentcontrol: false, wisphq: false },
       isActive: true
    },
    {
       id: "plan_3",
-      name: "ISP Master",
-      price: 899,
-      features: { omnichat: true, facturapro: true, facturaproTier: 'pyme_1000', rentcontrol: false, wisphq: true },
+      name: "MAJIA OS Enterprise",
+      price: 3999,
+      features: { omnichat: true, facturapro: true, facturaproTier: 'profesional_2000', rentcontrol: true, wisphq: true },
       isActive: true
    }
 ];
@@ -104,15 +104,15 @@ export default function SaasPlansPage() {
             </button>
          </div>
 
-         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
             {plans.map(plan => (
-               <div key={plan.id} className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow relative">
+               <div key={plan.id} className={`bg-white/40 dark:bg-slate-900/50 backdrop-blur-2xl rounded-3xl border ${plan.name.includes("Enterprise") ? 'border-indigo-400 shadow-[0_8px_30px_rgba(99,102,241,0.2)]' : 'border-white/80 dark:border-slate-700/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)]'} overflow-hidden flex flex-col hover:shadow-[0_8px_30px_rgb(0,0,0,0.1)] hover:-translate-y-1 transition-all duration-300 relative`}>
                   
-                  {plan.name.includes("Pro") && (
-                     <div className="bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest text-center py-1 absolute top-0 w-full">Más Popular</div>
+                  {plan.name.includes("Enterprise") && (
+                     <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white text-[10px] font-black uppercase tracking-widest text-center py-1.5 absolute top-0 w-full z-20">La Suite Completa</div>
                   )}
 
-                  <div className={`p-6 border-b border-slate-100 ${plan.name.includes("Pro") ? "pt-8" : ""}`}>
+                  <div className={`p-6 border-b border-white/50 dark:border-slate-700/50 relative z-10 ${plan.name.includes("Enterprise") ? "pt-10" : ""}`}>
                      <div className="flex justify-between items-start mb-4">
                         <h2 className="text-lg font-black text-slate-800">{plan.name}</h2>
                         <button className="text-slate-400 hover:bg-slate-100 p-1.5 rounded-lg transition-colors">
@@ -125,17 +125,17 @@ export default function SaasPlansPage() {
                      </div>
                   </div>
 
-                  <div className="p-6 flex-1 bg-slate-50/50">
-                     <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Módulos Incluidos:</p>
+                  <div className="p-6 flex-1 bg-white/20 dark:bg-slate-800/20 backdrop-blur-md relative z-10">
+                     <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Módulos Incluidos:</p>
                      <ul className="space-y-3">
-                        <li className={`flex items-center gap-3 text-sm font-semibold ${plan.features.omnichat ? 'text-slate-700' : 'text-slate-300 opacity-50'}`}>
+                        <li className={`flex items-center gap-3 text-sm font-semibold ${plan.features.omnichat ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400 opacity-50'}`}>
                            <CheckCircle2 className={`w-5 h-5 ${plan.features.omnichat ? 'text-indigo-500' : 'text-slate-300'}`} />
-                           OmniChat CRM Multiagente
+                           OmniChat CRM IA
                         </li>
-                        <li className={`flex flex-col gap-0.5 text-sm font-semibold ${plan.features.facturapro ? 'text-slate-700' : 'text-slate-300 opacity-50'}`}>
+                        <li className={`flex flex-col gap-0.5 text-sm font-semibold ${plan.features.facturapro ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400 opacity-50'}`}>
                            <div className="flex items-center gap-3">
                               <CheckCircle2 className={`w-5 h-5 ${plan.features.facturapro ? 'text-emerald-500' : 'text-slate-300'}`} />
-                              FacturaPro M2M (Timbrado)
+                              FacturaPro ERP
                            </div>
                            {plan.features.facturapro && (
                               <span className="text-[10px] uppercase font-bold tracking-widest text-emerald-600 block pl-8">
@@ -146,23 +146,23 @@ export default function SaasPlansPage() {
                               </span>
                            )}
                         </li>
-                        <li className={`flex items-center gap-3 text-sm font-semibold ${plan.features.wisphq ? 'text-slate-700' : 'text-slate-300 opacity-50'}`}>
+                        <li className={`flex items-center gap-3 text-sm font-semibold ${plan.features.wisphq ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400 opacity-50'}`}>
                            <CheckCircle2 className={`w-5 h-5 ${plan.features.wisphq ? 'text-blue-500' : 'text-slate-300'}`} />
                            WispHQ Integrator
                         </li>
-                        <li className={`flex items-center gap-3 text-sm font-semibold ${plan.features.rentcontrol ? 'text-slate-700' : 'text-slate-300 opacity-50'}`}>
+                        <li className={`flex items-center gap-3 text-sm font-semibold ${plan.features.rentcontrol ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400 opacity-50'}`}>
                            <CheckCircle2 className={`w-5 h-5 ${plan.features.rentcontrol ? 'text-amber-500' : 'text-slate-300'}`} />
                            RentControl Inmobiliarias
                         </li>
                      </ul>
                   </div>
 
-                  <div className="p-4 bg-slate-50 border-t border-slate-100 flex gap-2">
+                  <div className="p-4 bg-white/30 dark:bg-slate-800/30 border-t border-white/50 dark:border-slate-700/50 flex gap-2 relative z-10 backdrop-blur-md">
                      <button 
                         onClick={() => openModal(plan.id)}
-                        className="flex-1 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 text-sm font-bold py-2 rounded-lg flex items-center justify-center gap-2"
+                        className="flex-1 bg-white/70 dark:bg-slate-800/70 border border-white/50 dark:border-slate-700/50 hover:bg-white text-slate-800 dark:text-slate-200 text-sm font-bold py-2 rounded-lg flex items-center justify-center gap-2 shadow-sm transition-all"
                      >
-                        <Edit className="w-4 h-4" /> Editar Plan
+                        <Edit className="w-4 h-4" /> Configurar
                      </button>
                   </div>
                </div>
