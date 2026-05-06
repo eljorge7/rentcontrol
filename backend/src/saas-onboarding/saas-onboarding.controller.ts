@@ -1,10 +1,16 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Body, UseGuards } from '@nestjs/common';
 import { SaasOnboardingService } from './saas-onboarding.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard'; // Protegido por JWT
 
 @Controller('saas-onboarding')
 export class SaasOnboardingController {
   constructor(private readonly onboardingService: SaasOnboardingService) {}
+
+  @UseGuards(JwtAuthGuard)
+  @Get('clients')
+  async getClients() {
+    return await this.onboardingService.getClients();
+  }
 
   @UseGuards(JwtAuthGuard) // Solo superadmins logueados pueden inscribir empresas
   @Post('provision')

@@ -12,9 +12,10 @@ const availablePlans = [
    { id: "plan_3", name: "ISP Master", price: 899, features: { omnichat: true, facturapro: true, facturaproTier: "pyme_1000", rentcontrol: false, wisphq: true } }
 ];
 
-export default function SaasClientsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isProvisioning, setIsProvisioning] = useState(false);
+  const [clients, setClients] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Form State
   const [selectedPlanId, setSelectedPlanId] = useState("custom");
@@ -32,6 +33,32 @@ export default function SaasClientsPage() {
      monthlyFee: "",
      billingDay: "1"
   });
+
+  const fetchClients = async () => {
+     setIsLoading(true);
+     try {
+        const token = localStorage.getItem('token');
+        // Usar variables de entorno en Prod, local para pruebas
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+        const res = await fetch(`${API_URL}/api/v1/saas-onboarding/clients`, {
+           headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+           const data = await res.json();
+           setClients(data);
+        }
+     } catch (e) {
+        console.error("Failed to fetch clients", e);
+     } finally {
+        setIsLoading(false);
+     }
+  };
+
+  // Cargar clientes al inicio
+  import { useEffect } from "react";
+  useEffect(() => {
+     fetchClients();
+  }, []);
 
   const handlePlanChange = (e: any) => {
      const planId = e.target.value;
@@ -69,6 +96,55 @@ export default function SaasClientsPage() {
      setFormData({ ...formData, companyDomain: e.target.value });
   };
 
+  const openEditModal = (client: any) => {
+     // Pre-llenar para edición
+     const omniSub = client.subscriptions?.find((s:any) => s.appSlug === 'omnichat');
+     const facSub = client.subscriptions?.find((s:any) => s.appSlug === 'facturapro');
+     
+     let fTier = "emprendedor_250";
+     if(facSub) {
+         if(facSub.tierName === 'Base / ERP Only') fTier = 'trial_5';
+         else if(facSub.tierName === 'PyME') fTier = 'pyme_1000';
+         else if(facSub.tierName === 'Corporativo') fTier = 'profesional_2000';
+     }
+
+     setFormData({
+        companyName: client.name || "",
+        companyDomain: client.slug || "",
+        contactEmail: client.email || "",
+        contactPhone: client.phone || "",
+        planOmnichat: !!omniSub,
+        planFacturapro: !!facSub,
+        facturaproTier: fTier,
+        planRentcontrol: false,
+        planWisphq: false,
+        monthlyFee: client.monthlyFee?.toString() || "0",
+        billingDay: "1"
+     });
+     setHasManuallyEditedDomain(true);
+     setSelectedPlanId("custom");
+     setIsModalOpen(true);
+  };
+
+  const openNewModal = () => {
+     setFormData({
+        companyName: "",
+        companyDomain: "",
+        contactEmail: "",
+        contactPhone: "",
+        planOmnichat: false,
+        planFacturapro: false,
+        facturaproTier: "emprendedor_250",
+        planRentcontrol: false,
+        planWisphq: false,
+        monthlyFee: "",
+        billingDay: "1"
+     });
+     setHasManuallyEditedDomain(false);
+     setSelectedPlanId("custom");
+     setIsModalOpen(true);
+  };
+
   const handleProvision = async () => {
      if (!formData.companyName || !formData.companyDomain || !formData.contactEmail || !formData.contactPhone) {
         alert("Por favor completa los campos de Empresa, ID, Correo y WhatsApp para continuar.");
@@ -77,9 +153,9 @@ export default function SaasClientsPage() {
 
      setIsProvisioning(true);
      try {
-        // En desarrollo local usamos el puerto 3001 para el backend de RentControl
         const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:3001/api/v1/saas-onboarding/provision', {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+        const res = await fetch(`${API_URL}/api/v1/saas-onboarding/provision`, {
            method: 'POST',
            headers: {
               'Content-Type': 'application/json',
@@ -92,8 +168,9 @@ export default function SaasClientsPage() {
         
         if (!res.ok) throw new Error(data.message || 'Error en aprovisionamiento');
 
-        alert(`¡Pum! 🚀 Instancia SaaS creada exitosamente.\n\nEl Magic Link y API KEY maestras han sido enviadas al WhatsApp: ${formData.contactPhone}`);
+        alert(`¡Pum! 🚀 Instancia SaaS procesada exitosamente.\n\nEl Magic Link y API KEY maestras han sido enviadas al WhatsApp: ${formData.contactPhone}`);
         setIsModalOpen(false);
+        fetchClients(); // Recargar la lista
      } catch (error: any) {
         alert(error.message);
      } finally {
@@ -113,7 +190,7 @@ export default function SaasClientsPage() {
           <p className="text-slate-500 mt-1">Gestión corporativa de cuentas alquiladas (FacturaPro, OmniChat).</p>
         </div>
         <button 
-           onClick={() => setIsModalOpen(true)}
+           onClick={openNewModal}
            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-6 rounded-xl flex items-center gap-2 shadow-md transition-all"
         >
           <Plus className="w-5 h-5" /> Inscribir Empresa
@@ -121,60 +198,54 @@ export default function SaasClientsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Placeholder para Nidia */}
-        <Card className="hover:border-indigo-200 transition-colors cursor-pointer shadow-sm">
-          <CardHeader className="bg-indigo-50/50 pb-4 border-b">
-            <div className="flex justify-between items-start">
-               <div>
-                  <CardTitle className="text-lg">Tienda de Nidia (Ejemplo)</CardTitle>
-                  <p className="text-sm text-slate-500 font-medium">SaaS-OmniChat-01</p>
-               </div>
-               <span className="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wider">Activo</span>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-4 space-y-4">
-             <div>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Plataformas Arrendadas</p>
-                <div className="flex gap-2 mt-2">
-                   <span className="bg-blue-100 text-blue-800 text-xs px-2.5 py-1 rounded-md font-semibold">OmniChat Base</span>
-                   <span className="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-md font-semibold flex items-center gap-1"><AlertCircle className="w-3 h-3" /> FacturaPro API</span>
-                </div>
-             </div>
-             <div className="flex justify-between items-center border-t pt-4">
-                <span className="text-sm font-bold text-slate-600">Mensualidad: $499.00</span>
-                <button className="text-indigo-600 hover:text-indigo-800 p-1.5 bg-indigo-50 rounded-lg" title="Suspender Servicio">
-                   <Power className="w-4 h-4" />
-                </button>
-             </div>
-          </CardContent>
-        </Card>
-
-        {/* Placeholder para ISOTEC */}
-        <Card className="hover:border-indigo-200 transition-colors cursor-pointer shadow-sm">
-          <CardHeader className="bg-slate-50 pb-4 border-b">
-            <div className="flex justify-between items-start">
-               <div>
-                  <CardTitle className="text-lg text-slate-700">ISOTEC Internet</CardTitle>
-                  <p className="text-sm text-slate-500 font-medium">SaaS-Wisp-02</p>
-               </div>
-               <span className="bg-slate-200 text-slate-600 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wider">Borrador</span>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-4 space-y-4">
-             <div>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Plataformas Arrendadas</p>
-                <div className="flex gap-2 mt-2">
-                   <span className="bg-blue-50 text-blue-800 border border-blue-200 text-xs px-2.5 py-1 rounded-md font-semibold">OmniChat Wisp Addon</span>
-                </div>
-             </div>
-             <div className="flex justify-between items-center border-t pt-4">
-                <span className="text-sm font-bold text-slate-600">Mensualidad: $199.00</span>
-                <button className="text-indigo-600 hover:text-indigo-800 p-1.5 bg-indigo-50 rounded-lg">
-                   <Power className="w-4 h-4" />
-                </button>
-             </div>
-          </CardContent>
-        </Card>
+        {isLoading ? (
+           <div className="col-span-3 py-12 text-center text-slate-400 font-medium">
+              <Database className="w-8 h-8 animate-spin mx-auto mb-3" />
+              Cargando corporativos...
+           </div>
+        ) : clients.length === 0 ? (
+           <div className="col-span-3 py-12 text-center text-slate-500 bg-slate-50 rounded-2xl border border-dashed border-slate-300">
+              <p>Aún no hay clientes SaaS en tu base de datos.</p>
+              <p className="text-sm mt-1">Haz clic en Inscribir Empresa para empezar.</p>
+           </div>
+        ) : (
+           clients.map(client => (
+              <Card key={client.id} onClick={() => openEditModal(client)} className="hover:border-indigo-200 hover:shadow-md transition-all cursor-pointer shadow-sm relative group">
+                <CardHeader className="bg-slate-50 pb-4 border-b rounded-t-xl group-hover:bg-indigo-50/30 transition-colors">
+                  <div className="flex justify-between items-start">
+                     <div>
+                        <CardTitle className="text-lg text-slate-800">{client.name}</CardTitle>
+                        <p className="text-sm text-slate-500 font-medium">{client.slug}</p>
+                     </div>
+                     <span className={`text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wider ${client.status === 'ACTIVO' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}`}>
+                        {client.status}
+                     </span>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-4 space-y-4">
+                   <div>
+                      <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Plataformas Arrendadas</p>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                         {client.subscriptions.map((sub:any, i:number) => (
+                             <span key={i} className={`text-xs px-2.5 py-1 rounded-md font-semibold flex items-center gap-1 ${sub.appSlug === 'omnichat' ? 'bg-blue-100 text-blue-800' : 'bg-emerald-100 text-emerald-800'}`}>
+                                {sub.appSlug === 'facturapro' ? <AlertCircle className="w-3 h-3" /> : null}
+                                {sub.appName}
+                                <span className="opacity-60 text-[10px] ml-1">({sub.tierName})</span>
+                             </span>
+                         ))}
+                         {client.subscriptions.length === 0 && <span className="text-xs text-slate-400 italic">Ninguna activa</span>}
+                      </div>
+                   </div>
+                   <div className="flex justify-between items-center border-t pt-4">
+                      <span className="text-sm font-bold text-slate-600">Mensualidad: ${client.monthlyFee}</span>
+                      <button className="text-slate-400 hover:text-red-600 p-1.5 rounded-lg transition-colors" title="Suspender Servicio" onClick={(e) => e.stopPropagation()}>
+                         <Power className="w-4 h-4" />
+                      </button>
+                   </div>
+                </CardContent>
+              </Card>
+           ))
+        )}
       </div>
 
       {/* Modal / Dialog de Inscripción */}

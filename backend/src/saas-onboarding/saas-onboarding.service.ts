@@ -12,6 +12,35 @@ export class SaasOnboardingService {
     private readonly notificationsService: NotificationsService
   ) {}
 
+  async getClients() {
+    const clients = await this.prisma.user.findMany({
+      where: { facturaproTenantId: { not: null } },
+      include: {
+        subscriptions: {
+          include: { tier: { include: { app: true } } }
+        }
+      }
+    });
+
+    return clients.map(client => {
+      return {
+        id: client.id,
+        name: client.name,
+        slug: client.facturaproTenantId,
+        email: client.email,
+        phone: client.phone,
+        status: client.isActive ? 'ACTIVO' : 'SUSPENDIDO',
+        subscriptions: client.subscriptions.map(sub => ({
+          appSlug: sub.tier.app.slug,
+          appName: sub.tier.app.name,
+          tierName: sub.tier.name,
+          monthlyPrice: sub.tier.monthlyPrice
+        })),
+        monthlyFee: client.subscriptions.reduce((acc, sub) => acc + sub.tier.monthlyPrice, 0)
+      };
+    });
+  }
+
   async provisionSaaSClient(payload: any) {
     this.logger.log(`Iniciando aprovisionamiento M2M para Tenant: ${payload.slug}`);
 
@@ -29,10 +58,21 @@ export class SaasOnboardingService {
                 email: payload.contactEmail,
                 password: crypto.randomBytes(16).toString('hex'), 
                 role: 'ADMIN',
-                phone: payload.contactPhone
+                phone: payload.contactPhone,
+                facturaproTenantId: payload.slug
              }
           });
           this.logger.log(`Usuario corporativo creado: ${user.email}`);
+       } else {
+          // Actualizar si ya existe para upsert
+          user = await this.prisma.user.update({
+             where: { id: user.id },
+             data: {
+                name: payload.businessName,
+                phone: payload.contactPhone,
+                facturaproTenantId: payload.slug
+             }
+          });
        }
 
        // 2. Generar el API KEY para FacturaPro / OmniChat
@@ -47,17 +87,57 @@ export class SaasOnboardingService {
           }
        });
 
-       // 3. (Mock Arquitectónico)
-       // Aquí se inyectarían los UserSubscription() para FacturaPro hacia la tabla de Tiers.
-       // Ej: if (payload.features?.facturapro) { this.prisma.userSubscription.create({... tierId: payload.features?.facturaproTier}) }
+       // 3. Limpiar suscripciones anteriores y crear las nuevas
+       await this.prisma.userSubscription.deleteMany({ where: { userId: user.id } });
+
+       // Buscar las apps en la base de datos
+       const facturaproApp = await this.prisma.softwareApp.findUnique({ where: { slug: 'facturapro' }, include: { tiers: true } });
+       const omnichatApp = await this.prisma.softwareApp.findUnique({ where: { slug: 'omnichat' }, include: { tiers: true } });
+
+       const newSubscriptions = [];
+
+       if (payload.features?.facturapro && facturaproApp) {
+          // Mapear el tier del payload al id real de la BD
+          let tierName = payload.features.facturaproTier === 'trial_5' ? 'Base / ERP Only' : 
+                         payload.features.facturaproTier === 'emprendedor_250' ? 'Emprendedor' : 
+                         payload.features.facturaproTier === 'pyme_1000' ? 'PyME' : 'Corporativo';
+          
+          let tier = facturaproApp.tiers.find(t => t.name === tierName);
+          if (!tier && facturaproApp.tiers.length > 0) tier = facturaproApp.tiers[0]; // fallback
+          
+          if (tier) {
+             await this.prisma.userSubscription.create({
+                data: {
+                   userId: user.id,
+                   tierId: tier.id,
+                   nextBillingDate: new Date(new Date().setMonth(new Date().getMonth() + 1))
+                }
+             });
+          }
+       }
+
+       if (payload.features?.omnichat && omnichatApp) {
+          let tier = omnichatApp.tiers.find(t => t.name === 'Agencia');
+          if (!tier && omnichatApp.tiers.length > 0) tier = omnichatApp.tiers[0];
+          
+          if (tier) {
+             await this.prisma.userSubscription.create({
+                data: {
+                   userId: user.id,
+                   tierId: tier.id,
+                   nextBillingDate: new Date(new Date().setMonth(new Date().getMonth() + 1))
+                }
+             });
+          }
+       }
+
        this.logger.log(`Licencias M2M inyectadas al Tenant. Facturapro: ${payload.features?.facturaproTier}`);
 
        // 4. Disparo de Bienvenida (WhatsApp Magic Link)
-       // Generamos un enlace de login auto-firmado
        const magicBaseToken = Buffer.from(`${user.email}:${apikey.key}`).toString('base64');
        const magicLink = `https://radiotecpro.com/sso?token=${magicBaseToken}&tenant=${payload.slug}`;
 
-       const waMessage = `* MAJIA OS - Corporativo *\n\nHola! Tu instancia SaaS para *${payload.businessName}* ha sido aprovisionada con xito.\n\n*Servicios Activos:*\n${payload.features?.omnichat ? ' OmniChat CRM\n' : ''}${payload.features?.facturapro ? ' FacturaPro M2M ('+payload.features?.facturaproTier+')\n' : ''}${payload.features?.wisphq ? ' WispHQ Integrator\n' : ''}\nPara iniciar sesin de forma inmediata y acceder a tus herramientas, haz clic en tu Enlace Mgico:\n\n ${magicLink}\n\n*API KEY MAESTRA:* \`${apiKeyStr}\``;
+       const waMessage = `* MAJIA OS - Corporativo *\n\nHola! Tu instancia SaaS para *${payload.businessName}* ha sido aprovisionada con éxito.\n\n*Servicios Activos:*\n${payload.features?.omnichat ? ' OmniChat CRM\n' : ''}${payload.features?.facturapro ? ' FacturaPro M2M ('+payload.features?.facturaproTier+')\n' : ''}${payload.features?.wisphq ? ' WispHQ Integrator\n' : ''}\nPara iniciar sesión de forma inmediata y acceder a tus herramientas, haz clic en tu Enlace Mágico:\n\n ${magicLink}\n\n*API KEY MAESTRA:* \`${apiKeyStr}\``;
 
        await this.notificationsService.sendWhatsAppMessage(payload.contactPhone, waMessage);
 
