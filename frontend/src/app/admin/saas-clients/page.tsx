@@ -42,7 +42,8 @@ export default function SaasClientsPage() {
         // Usar variables de entorno en Prod, local para pruebas
         const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
         const res = await fetch(`${API_URL}/saas-onboarding/clients`, {
-           headers: { 'Authorization': `Bearer ${token}` }
+           headers: { 'Authorization': `Bearer ${token}` },
+           cache: 'no-store'
         });
         if (res.ok) {
            const data = await res.json();
