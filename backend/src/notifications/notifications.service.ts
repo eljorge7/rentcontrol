@@ -42,7 +42,7 @@ export class NotificationsService implements OnModuleInit {
         text: message
       };
       
-      const baseUrl = process.env.OMNICHAT_API_URL || 'https://omnichat.radiotecpro.com/api';
+      const baseUrl = process.env.OMNICHAT_API_URL || 'https://api.omnichat.radiotecpro.com';
       const response = await fetch(`${baseUrl}/api/v1/messages/send`, {
         method: 'POST',
         headers: {
