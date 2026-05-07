@@ -161,7 +161,19 @@ export default function SaasClientsPage() {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${token}`
            },
-           body: JSON.stringify(formData)
+           body: JSON.stringify({
+              slug: formData.companyDomain,
+              businessName: formData.companyName,
+              contactEmail: formData.contactEmail,
+              contactPhone: formData.contactPhone,
+              features: {
+                 facturapro: formData.planFacturapro,
+                 facturaproTier: formData.facturaproTier,
+                 omnichat: formData.planOmnichat,
+                 rentcontrol: formData.planRentcontrol,
+                 wisphq: formData.planWisphq
+              }
+           })
         });
 
         const data = await res.json();
