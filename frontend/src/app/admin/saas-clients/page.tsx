@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Building2, Plus, Database, Power, AlertCircle, Save, X, Calendar, Server, MessagesSquare, CheckCircle2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -56,7 +56,6 @@ export default function SaasClientsPage() {
   };
 
   // Cargar clientes al inicio
-  import { useEffect } from "react";
   useEffect(() => {
      fetchClients();
   }, []);
