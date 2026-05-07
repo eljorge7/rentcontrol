@@ -80,6 +80,7 @@ model User {
 
   // Módulo SaaS (App Store)
   subscriptions UserSubscription[] @relation("UserSubscriptions")
+  customMonthlyFee Float? // Sobrescritura manual de tarifa para descuentos
 
   // FacturaPro Ecosistema & Ajustes
   facturaProSettings FacturaProSettings?

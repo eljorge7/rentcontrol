@@ -36,7 +36,7 @@ export class SaasOnboardingService {
           tierName: sub.tier.name,
           monthlyPrice: sub.tier.monthlyPrice
         })),
-        monthlyFee: client.subscriptions.reduce((acc, sub) => acc + sub.tier.monthlyPrice, 0)
+        monthlyFee: client.customMonthlyFee !== null ? client.customMonthlyFee : client.subscriptions.reduce((acc, sub) => acc + sub.tier.monthlyPrice, 0)
       };
     });
   }
@@ -131,8 +131,24 @@ export class SaasOnboardingService {
              });
           }
        }
-
        this.logger.log(`Licencias M2M inyectadas al Tenant. Facturapro: ${payload.features?.facturaproTier}`);
+
+       // 3.5. Evaluar y guardar descuento personalizado (customMonthlyFee)
+       const allSubs = await this.prisma.userSubscription.findMany({ where: { userId: user.id }, include: { tier: true } });
+       const realTotal = allSubs.reduce((acc, sub) => acc + sub.tier.monthlyPrice, 0);
+
+       let overrideValue = null;
+       if (payload.monthlyFee !== undefined && typeof payload.monthlyFee === 'number') {
+           if (payload.monthlyFee !== realTotal) {
+               overrideValue = payload.monthlyFee;
+               this.logger.log(`Guardando descuento: Oficial ${realTotal} vs Pactado ${overrideValue}`);
+           }
+       }
+
+       await this.prisma.user.update({
+           where: { id: user.id },
+           data: { customMonthlyFee: overrideValue }
+       });
 
        // 4. Disparo de Bienvenida (WhatsApp Magic Link)
        const magicBaseToken = Buffer.from(`${user.email}:${apikey.key}`).toString('base64');

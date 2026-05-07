@@ -168,6 +168,7 @@ export default function SaasClientsPage() {
               businessName: formData.companyName,
               contactEmail: formData.contactEmail,
               contactPhone: formData.contactPhone,
+              monthlyFee: parseFloat(formData.monthlyFee.toString().replace(/[^0-9.]/g, '')),
               features: {
                  facturapro: formData.planFacturapro,
                  facturaproTier: formData.facturaproTier,
