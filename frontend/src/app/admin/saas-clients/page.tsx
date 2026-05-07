@@ -41,7 +41,7 @@ export default function SaasClientsPage() {
         const token = localStorage.getItem('token');
         // Usar variables de entorno en Prod, local para pruebas
         const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-        const res = await fetch(`${API_URL}/api/v1/saas-onboarding/clients`, {
+        const res = await fetch(`${API_URL}/saas-onboarding/clients`, {
            headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) {
@@ -155,7 +155,7 @@ export default function SaasClientsPage() {
      try {
         const token = localStorage.getItem('token');
         const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-        const res = await fetch(`${API_URL}/api/v1/saas-onboarding/provision`, {
+        const res = await fetch(`${API_URL}/saas-onboarding/provision`, {
            method: 'POST',
            headers: {
               'Content-Type': 'application/json',
