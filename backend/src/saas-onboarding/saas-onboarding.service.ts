@@ -90,11 +90,12 @@ export class SaasOnboardingService {
        // 3. Limpiar suscripciones anteriores y crear las nuevas
        await this.prisma.userSubscription.deleteMany({ where: { userId: user.id } });
 
-       // Buscar las apps en la base de datos
-       const facturaproApp = await this.prisma.softwareApp.findUnique({ where: { slug: 'facturapro' }, include: { tiers: true } });
-       const omnichatApp = await this.prisma.softwareApp.findUnique({ where: { slug: 'omnichat' }, include: { tiers: true } });
+       // Buscar las apps en la base de datos por nombre en lugar de slug para evitar discrepancias
+       const facturaproApp = await this.prisma.softwareApp.findFirst({ where: { name: { contains: 'Factura' } }, include: { tiers: true } });
+       const omnichatApp = await this.prisma.softwareApp.findFirst({ where: { name: { contains: 'Omni' } }, include: { tiers: true } });
 
        const newSubscriptions = [];
+       this.logger.log(`Aprovisionando... facturapro: ${payload.features?.facturapro}, facturaproAppEncontrado: ${!!facturaproApp}`);
 
        if (payload.features?.facturapro && facturaproApp) {
           // Mapear el tier del payload al id real de la BD

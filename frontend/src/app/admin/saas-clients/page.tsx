@@ -99,14 +99,15 @@ export default function SaasClientsPage() {
 
   const openEditModal = (client: any) => {
      // Pre-llenar para edición
-     const omniSub = client.subscriptions?.find((s:any) => s.appSlug === 'omnichat');
-     const facSub = client.subscriptions?.find((s:any) => s.appSlug === 'facturapro');
+     const omniSub = client.subscriptions?.find((s:any) => s.appSlug?.toLowerCase().includes('omni'));
+     const facSub = client.subscriptions?.find((s:any) => s.appSlug?.toLowerCase().includes('factura'));
      
      let fTier = "emprendedor_250";
      if(facSub) {
-         if(facSub.tierName === 'Base / ERP Only') fTier = 'trial_5';
-         else if(facSub.tierName === 'PyME') fTier = 'pyme_1000';
-         else if(facSub.tierName === 'Corporativo') fTier = 'profesional_2000';
+         const tName = facSub.tierName?.toLowerCase() || '';
+         if(tName.includes('base') || tName.includes('erp') || tName.includes('trial')) fTier = 'trial_5';
+         else if(tName.includes('pyme')) fTier = 'pyme_1000';
+         else if(tName.includes('corporativo') || tName.includes('profesional')) fTier = 'profesional_2000';
      }
 
      setFormData({
