@@ -91,8 +91,8 @@ export class SaasOnboardingService {
        await this.prisma.userSubscription.deleteMany({ where: { userId: user.id } });
 
        // Buscar las apps en la base de datos por nombre en lugar de slug para evitar discrepancias
-       const facturaproApp = await this.prisma.softwareApp.findFirst({ where: { name: { contains: 'Factura' } }, include: { tiers: true } });
-       const omnichatApp = await this.prisma.softwareApp.findFirst({ where: { name: { contains: 'Omni' } }, include: { tiers: true } });
+       const facturaproApp = await this.prisma.softwareApp.findFirst({ where: { name: { contains: 'factura', mode: 'insensitive' } }, include: { tiers: true } });
+       const omnichatApp = await this.prisma.softwareApp.findFirst({ where: { name: { contains: 'omni', mode: 'insensitive' } }, include: { tiers: true } });
 
        const newSubscriptions = [];
        this.logger.log(`Aprovisionando... facturapro: ${payload.features?.facturapro}, facturaproAppEncontrado: ${!!facturaproApp}`);
