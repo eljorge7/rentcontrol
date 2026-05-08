@@ -54,6 +54,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'uploads'),
