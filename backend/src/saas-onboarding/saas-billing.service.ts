@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { FacturaProService } from '../facturapro/facturapro.service';
 
 @Injectable()
 export class SaasBillingService {
@@ -10,6 +11,7 @@ export class SaasBillingService {
   constructor(
     private prisma: PrismaService,
     private notificationsService: NotificationsService,
+    private facturaProService: FacturaProService
   ) {}
 
   @Cron('0 0 1 * *') // Se ejecuta el día 1 de cada mes a las 00:00 hrs
@@ -32,16 +34,17 @@ export class SaasBillingService {
       const feeToCharge = client.customMonthlyFee !== null ? client.customMonthlyFee : realTotal;
 
       if (feeToCharge > 0) {
-        this.logger.log(`Generando estado de cuenta para ${client.name}: $${feeToCharge}`);
+        this.logger.log(`Generando factura M2M SaaS para ${client.name}: $${feeToCharge}`);
         
-        if (client.phone) {
-          const message = `*MAJIA OS - ESTADO DE CUENTA*\n\nHola ${client.name},\n\nEste es tu recordatorio mensual de servicio para tu ecosistema corporativo en la nube.\n\n*Servicios Activos:*\n${client.subscriptions.map(s => `- ${s.tier.app.name} (${s.tier.name})`).join('\n')}\n\n*Total a Pagar:* $${feeToCharge} MXN\n\nPor favor realiza el pago antes del día 5 para evitar la suspensión del servicio.\n\n_Tu factura automatizada (CFDI) estará disponible en breve._`;
-          
-          try {
-            await this.notificationsService.sendWhatsAppMessage(client.phone, message);
-          } catch (e) {
-             this.logger.error(`Error enviando WhatsApp automatizado a ${client.name}: ${e.message}`);
-          }
+        try {
+           const servicesDesc = client.subscriptions.map(s => `${s.tier.app.name} (${s.tier.name})`).join(', ');
+           const description = `Suscripción Mensual MAJIA OS: ${servicesDesc}`;
+           
+           // Esto crea el CFDI y envía el WhatsApp automáticamente
+           await this.facturaProService.issueSaasInvoice(client, feeToCharge, description);
+           this.logger.log(`Factura SaaS generada y WhatsApp enviado a ${client.name}`);
+        } catch (e) {
+           this.logger.error(`Error generando factura M2M SaaS para ${client.name}: ${e.message}`);
         }
       }
     }

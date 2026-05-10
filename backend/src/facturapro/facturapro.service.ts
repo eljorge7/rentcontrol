@@ -239,6 +239,101 @@ export class FacturaProService {
      return localInvoice;
   }
 
+  /**
+   * Emitir CFDI M2M para Cobranza SaaS (Suscripciones Mensuales)
+   */
+  async issueSaasInvoice(clientUser: any, amount: number, description: string) {
+     const superAdmin = await this.prisma.user.findFirst({ orderBy: { createdAt: 'asc' } });
+     const issuerTenantId = superAdmin?.facturaproTenantId || null;
+     
+     if (!issuerTenantId) {
+         this.logger.warn("SaaS Billing M2M Failed: No SuperAdmin Tenant configured");
+         return;
+     }
+
+     // 1. Sync Customer (The SaaS Client)
+     const customer = await this.syncTenantToCustomer(clientUser.id, issuerTenantId);
+     if (!customer) throw new Error("FacturaPro Customer Sync Failed for SaaS Client");
+
+     // 2. Armar Invoice Payload
+     const total = amount;
+     const taxRate = 0.16;
+     const subtotal = total / (1 + taxRate);
+
+     const payload = {
+        customerId: customer.id,
+        paymentMethod: 'PUE',
+        paymentForm: '04', // Tarjeta/Transferencia
+        cfdiUse: 'G03',
+        items: [
+           {
+              description: description,
+              quantity: 1,
+              unitPrice: subtotal,
+              taxRate: taxRate,
+              discount: 0
+           }
+        ]
+     };
+
+     const config = await this.getConfig();
+     const m2mHeaders = { 
+         'Content-Type': 'application/json',
+         ...(config.token ? { 'Authorization': `Bearer ${config.token}` } : {}),
+         'x-tenant-id': issuerTenantId
+     };
+
+     const res = await fetch(`${config.baseUrl}/invoices`, {
+         method: 'POST',
+         headers: m2mHeaders,
+         body: JSON.stringify(payload)
+     });
+
+     if (!res.ok) throw new Error('Falló la factura SaaS M2M: ' + await res.text());
+     const invoiceFp = await res.json();
+     
+     // 2.5 HACK: Registrar el pago automáticamente en FacturaPro
+     try {
+         await fetch(`${config.baseUrl}/invoices/${invoiceFp.id}/payments`, {
+            method: 'POST',
+            headers: m2mHeaders,
+            body: JSON.stringify({
+               amount: total,
+               paymentDate: new Date().toISOString().split('T')[0],
+               paymentMethod: payload.paymentForm,
+               notes: `Pago automatizado SaaS capturado desde Majia OS`
+            })
+         });
+     } catch (err) {
+         this.logger.error("Error confirmando pago a FacturaPro", err);
+     }
+
+     // 2.6 M2M: Timbrado Automático
+     try {
+         await fetch(`${config.baseUrl}/invoices/${invoiceFp.id}/stamp`, {
+            method: 'PATCH',
+            headers: m2mHeaders
+         });
+     } catch (err) {
+         this.logger.error("Error en timbrado M2M FacturaPro", err);
+     }
+
+     // 2.7 M2M: Enviar Comprobante PDF/XML vía WhatsApp Maestro desde FacturaPro
+     if (clientUser.phone) {
+        try {
+            await fetch(`${config.baseUrl}/invoices/${invoiceFp.id}/send-whatsapp`, {
+                method: 'POST',
+                headers: m2mHeaders,
+                body: JSON.stringify({ phone: clientUser.phone })
+            });
+        } catch (err) {
+            this.logger.error("Error en disparador de WhatsApp M2M SaaS", err);
+        }
+     }
+     
+     return invoiceFp;
+  }
+
   async cancelInvoice(paymentId: string) {
      const inv = await this.prisma.invoice.findUnique({ where: { paymentId } });
      if (!inv || !inv.xmlUrl) throw new Error('Referencia M2M Invalida');

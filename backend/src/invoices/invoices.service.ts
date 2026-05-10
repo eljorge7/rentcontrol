@@ -2,39 +2,20 @@ import { Injectable, Logger } from '@nestjs/common';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { UpdateInvoiceDto } from './dto/update-invoice.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { FacturaProService } from '../facturapro/facturapro.service';
 
 @Injectable()
 export class InvoicesService {
   private readonly logger = new Logger(InvoicesService.name);
 
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private facturaProService: FacturaProService
+  ) {}
 
   async create(createInvoiceDto: CreateInvoiceDto) {
-    // Aquí iría la lógica de integración con un PAC (Facturama, SW Sapien)
-    // 1. Obtener datos del pago y del inquilino asociado
-    const payment = await this.prisma.payment.findUnique({
-        where: { id: createInvoiceDto.paymentId },
-        include: { charge: { include: { lease: { include: { tenant: true } } } } }
-    });
-
-    if(!payment) throw new Error("Payment not found");
-
-    this.logger.log(`Simulando timbrado CFDI 4.0 para pago ${createInvoiceDto.paymentId}`);
-    
-    // Simulamos respuesta del PAC
-    const simulatedResponse = {
-        uuidSAT: `SIM-${Math.random().toString(36).substring(2, 15)}`,
-        xmlUrl: `https://mock-pac.com/xml/${createInvoiceDto.paymentId}`,
-        pdfUrl: `https://mock-pac.com/pdf/${createInvoiceDto.paymentId}`,
-        status: 'ISSUED'
-    };
-
-    return this.prisma.invoice.create({
-      data: {
-        paymentId: createInvoiceDto.paymentId,
-        ...simulatedResponse
-      },
-    });
+    this.logger.log(`Ejecutando timbrado CFDI M2M para pago ${createInvoiceDto.paymentId}`);
+    return this.facturaProService.issueInvoice(createInvoiceDto.paymentId);
   }
 
   findAll() {

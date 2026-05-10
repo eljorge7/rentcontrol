@@ -4,9 +4,10 @@ import { SaasOnboardingService } from './saas-onboarding.service';
 import { SaasBillingService } from './saas-billing.service';
 import { PrismaModule } from '../prisma/prisma.module';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { FacturaproModule } from '../facturapro/facturapro.module';
 
 @Module({
-  imports: [PrismaModule, NotificationsModule],
+  imports: [PrismaModule, NotificationsModule, FacturaproModule],
   controllers: [SaasOnboardingController],
   providers: [SaasOnboardingService, SaasBillingService],
 })
