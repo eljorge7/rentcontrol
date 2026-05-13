@@ -151,8 +151,37 @@ export class SaasOnboardingService {
        });
 
        // 4. Disparo de Bienvenida (WhatsApp Magic Link)
-       const magicBaseToken = Buffer.from(`${user.email}:${apikey.key}`).toString('base64');
-       const magicLink = `https://radiotecpro.com/sso?token=${magicBaseToken}&tenant=${payload.slug}`;
+       let ssoToken = Buffer.from(`${user.email}:${apikey.key}`).toString('base64');
+       
+       if (payload.features?.facturapro) {
+          try {
+             // Solicitar JWT real al backend de FacturaPro
+             const facturaproApiUrl = process.env.FACTURAPRO_API_URL || 'https://facturapro.radiotecpro.com/api';
+             const ssoRes = await fetch(`${facturaproApiUrl}/auth/sso`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                   email: payload.contactEmail,
+                   name: payload.businessName,
+                   phone: payload.contactPhone,
+                   legalName: payload.businessName
+                })
+             });
+             if (ssoRes.ok) {
+                const ssoData = await ssoRes.json();
+                if (ssoData.token) {
+                   ssoToken = ssoData.token;
+                   this.logger.log(`JWT de FacturaPro obtenido exitosamente para ${payload.slug}`);
+                }
+             } else {
+                this.logger.warn(`No se pudo obtener JWT de FacturaPro. Status: ${ssoRes.status}`);
+             }
+          } catch(err: any) {
+             this.logger.error(`Error de red al llamar SSO FacturaPro: ${err.message}`);
+          }
+       }
+
+       const magicLink = `https://facturapro.radiotecpro.com/sso?token=${ssoToken}&tenant=${payload.slug}`;
 
        const waMessage = `* MAJIA OS - Corporativo *\n\nHola! Tu instancia SaaS para *${payload.businessName}* ha sido aprovisionada con éxito.\n\n*Servicios Activos:*\n${payload.features?.omnichat ? ' OmniChat CRM\n' : ''}${payload.features?.facturapro ? ' FacturaPro M2M ('+payload.features?.facturaproTier+')\n' : ''}${payload.features?.wisphq ? ' WispHQ Integrator\n' : ''}\nPara iniciar sesión de forma inmediata y acceder a tus herramientas, haz clic en tu Enlace Mágico:\n\n ${magicLink}\n\n*API KEY MAESTRA:* \`${apiKeyStr}\``;
 
