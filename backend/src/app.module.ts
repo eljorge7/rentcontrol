@@ -50,12 +50,14 @@ import { AttendanceModule } from './attendance/attendance.module';
 import { TimeOffModule } from './time-off/time-off.module';
 
 import { ThrottlerModule } from '@nestjs/throttler';
+import { CryptoModule } from './crypto/crypto.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
+    CryptoModule,
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'uploads'),
       serveRoot: '/uploads',

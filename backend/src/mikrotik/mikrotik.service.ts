@@ -3,34 +3,59 @@ import { CreateMikrotikDto } from './dto/create-mikrotik.dto';
 import { UpdateMikrotikDto } from './dto/update-mikrotik.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { RouterOSAPI } from 'routeros-client';
+import { CryptoService } from '../crypto/crypto.service';
 
 @Injectable()
 export class MikrotikService {
   private readonly logger = new Logger(MikrotikService.name);
 
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private crypto: CryptoService,
+  ) {}
 
-  create(createMikrotikDto: CreateMikrotikDto) {
-    return this.prisma.mikrotikRouter.create({
-      data: createMikrotikDto,
-    });
+  private decryptRouter(router: any) {
+    if (!router) return router;
+    return {
+      ...router,
+      password: this.crypto.decrypt(router.password),
+      vpnPassword: this.crypto.decrypt(router.vpnPassword),
+    };
   }
 
-  findAll() {
-    return this.prisma.mikrotikRouter.findMany({
+  async create(createMikrotikDto: CreateMikrotikDto) {
+    const data = { ...createMikrotikDto } as any;
+    if (data.password) data.password = this.crypto.encrypt(data.password);
+    if (data.vpnPassword) data.vpnPassword = this.crypto.encrypt(data.vpnPassword);
+    
+    const created = await this.prisma.mikrotikRouter.create({
+      data,
+    });
+    return this.decryptRouter(created);
+  }
+
+  async findAll() {
+    const routers = await this.prisma.mikrotikRouter.findMany({
       include: { property: true } as any
     });
+    return routers.map(r => this.decryptRouter(r));
   }
 
-  findOne(id: string) {
-    return this.prisma.mikrotikRouter.findUnique({ where: { id } });
+  async findOne(id: string) {
+    const router = await this.prisma.mikrotikRouter.findUnique({ where: { id } });
+    return this.decryptRouter(router);
   }
 
-  update(id: string, updateMikrotikDto: UpdateMikrotikDto) {
-    return this.prisma.mikrotikRouter.update({
+  async update(id: string, updateMikrotikDto: UpdateMikrotikDto) {
+    const data = { ...updateMikrotikDto } as any;
+    if (data.password) data.password = this.crypto.encrypt(data.password);
+    if (data.vpnPassword) data.vpnPassword = this.crypto.encrypt(data.vpnPassword);
+
+    const updated = await this.prisma.mikrotikRouter.update({
       where: { id },
-      data: updateMikrotikDto,
+      data,
     });
+    return this.decryptRouter(updated);
   }
 
   remove(id: string) {

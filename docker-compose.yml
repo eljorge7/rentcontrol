@@ -25,7 +25,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER:-admin}:${POSTGRES_PASSWORD:-admin123}@db:5432/${POSTGRES_DB:-rentcontrol}?schema=public
       - PUBLIC_URL=https://radiotecpro.com/api
-      - FACTURAPRO_API_URL=https://facturapro.radiotecpro.com/api
+      - FACTURAPRO_API_URL=http://facturapro-backend:4000
       - FACTURAPRO_FRONTEND_URL=https://facturapro.radiotecpro.com
       - OMNICHAT_API_URL=https://api.omnichat.radiotecpro.com
       # Las demás variables de entorno se leerán de tu archivo .env local
@@ -35,6 +35,9 @@ services:
       - ./backend/uploads:/app/uploads
       - ./backend/whatsapp-session:/app/whatsapp-session
       - ./backend/.wwebjs_cache:/app/.wwebjs_cache
+    networks:
+      - default
+      - majia-network
 
   frontend:
     build:
@@ -53,3 +56,9 @@ services:
 
 volumes:
   rentcontrol-pgdata:
+
+networks:
+  default:
+    driver: bridge
+  majia-network:
+    external: true
