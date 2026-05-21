@@ -51,6 +51,7 @@ import { TimeOffModule } from './time-off/time-off.module';
 
 import { ThrottlerModule } from '@nestjs/throttler';
 import { CryptoModule } from './crypto/crypto.module';
+import { StoreModule } from './store/store.module';
 
 @Module({
   imports: [
@@ -63,7 +64,7 @@ import { CryptoModule } from './crypto/crypto.module';
       serveRoot: '/uploads',
       serveStaticOptions: { index: false }
     }),
-    PrismaModule, ScheduleModule.forRoot(), PropertiesModule, UnitsModule, TenantsModule, LeasesModule, ChargesModule, PaymentsModule, MikrotikModule, InvoicesModule, NetworkProfilesModule, LeaseServicesModule, ChatModule, AuthModule, UsersModule, ExpensesModule, IncidentsModule, ManagementPlansModule, CommissionsModule, EventTypesModule, StripeModule, MercadopagoModule, QuotationsModule, MetricsModule, PdfsModule, VouchersModule, SuppliersModule, UploadsModule, TasksModule, ChecklistsModule, PayoutsModule, NotificationsModule, FacturaproModule, AppsModule, FacturaproSettingsModule, SaasOnboardingModule, SettingsModule, InfrastructureModule, EmployeesModule, PayrollRunsModule, AttendanceModule, TimeOffModule
+    PrismaModule, ScheduleModule.forRoot(), PropertiesModule, UnitsModule, TenantsModule, LeasesModule, ChargesModule, PaymentsModule, MikrotikModule, InvoicesModule, NetworkProfilesModule, LeaseServicesModule, ChatModule, AuthModule, UsersModule, ExpensesModule, IncidentsModule, ManagementPlansModule, CommissionsModule, EventTypesModule, StripeModule, MercadopagoModule, QuotationsModule, MetricsModule, PdfsModule, VouchersModule, SuppliersModule, UploadsModule, TasksModule, ChecklistsModule, PayoutsModule, NotificationsModule, FacturaproModule, AppsModule, FacturaproSettingsModule, SaasOnboardingModule, SettingsModule, InfrastructureModule, EmployeesModule, PayrollRunsModule, AttendanceModule, TimeOffModule, StoreModule
   ],
   controllers: [AppController, AnnouncementsController, OmniChatProxyController],
   providers: [AppService],

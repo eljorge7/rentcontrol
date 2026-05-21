@@ -143,6 +143,7 @@ export default function Home() {
           <div className="hidden lg:flex gap-8 text-sm font-medium text-slate-600">
             <a href="#ecosistema" onClick={(e) => handleNavClick(e, 'internet')} className="hover:text-blue-600 transition-colors cursor-pointer">Internet WISP</a>
             <a href="#ecosistema" onClick={(e) => handleNavClick(e, 'rentcontrol')} className="hover:text-blue-600 transition-colors cursor-pointer">RentControl API</a>
+            <Link href="/store" className="hover:text-orange-600 font-bold text-orange-600 transition-colors inline-flex items-center gap-1 cursor-pointer"><Store className="w-4 h-4"/> Tienda de Equipos</Link>
             <a href="#ecosistema" onClick={(e) => handleNavClick(e, 'facturapro')} className="hover:text-violet-600 font-bold text-violet-600 transition-colors inline-flex items-center gap-1 cursor-pointer"><Calculator className="w-4 h-4"/> FacturaPro ERP</a>
             <a href="#ecosistema" onClick={(e) => handleNavClick(e, 'omnichat')} className="hover:text-emerald-600 font-bold text-emerald-600 transition-colors inline-flex items-center gap-1 cursor-pointer"><MessageSquare className="w-4 h-4"/> OmniChat IA</a>
           </div>
@@ -586,6 +587,7 @@ export default function Home() {
               <ul className="space-y-3">
                 <li><Link href="#internet" className="hover:text-blue-400 transition-colors">Internet WISP</Link></li>
                 <li><Link href="#internet" className="hover:text-blue-400 transition-colors">Enlaces Dedicados</Link></li>
+                <li><Link href="/store" className="hover:text-orange-400 transition-colors font-bold">Tienda de Equipos</Link></li>
                 <li><Link href="#gestion" className="hover:text-blue-400 transition-colors">Agencia de Gestión</Link></li>
                 <li><Link href="#gestion" className="hover:text-blue-400 transition-colors">SaaS RentControl</Link></li>
                 <li><Link href="#facturapro" className="hover:text-violet-400 transition-colors font-bold">FacturaPro ERP</Link></li>

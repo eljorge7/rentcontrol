@@ -68,6 +68,10 @@ export function ManagerSidebar() {
             <Users className="mr-3 h-5 w-5 flex-shrink-0 text-blue-400" />
             {!isCollapsed && <span className="font-semibold text-blue-100">Catálogo / Prospectos</span>}
           </Link>
+          <Link href="/manager/inventory" className="flex items-center rounded-md px-4 py-2.5 text-sm font-medium hover:bg-slate-800 text-slate-300 hover:text-white mx-2">
+            <Briefcase className="mr-3 h-5 w-5 flex-shrink-0 text-blue-400" />
+            {!isCollapsed && <span>Inventario (Tienda)</span>}
+          </Link>
           <Link href="/manager/tenants" className="flex items-center rounded-md px-4 py-2.5 text-sm font-medium hover:bg-slate-800 text-slate-300 hover:text-white mx-2">
             <Users className="mr-3 h-5 w-5 flex-shrink-0 text-slate-400" />
             {!isCollapsed && <span>Inquilinos</span>}

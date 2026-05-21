@@ -24,10 +24,10 @@ model ManagementPlan {
   id            String      @id @default(uuid())
   name          String
   description   String?
-  commission    Float // Porcentaje de comisión (Ej. 10 para 10%)
+  commission    Float // Porcentaje de comisiÃ³n (Ej. 10 para 10%)
   fixedFee      Float // Cuota fija mensual (Ej. 500 para $500 MXN)
-  maxProperties Int         @default(5) // Límite de propiedades para dueños bajo este plan
-  owners        User[] // Dueños suscritos a este plan ("clientes" del gestor)
+  maxProperties Int         @default(5) // LÃ­mite de propiedades para dueÃ±os bajo este plan
+  owners        User[] // DueÃ±os suscritos a este plan ("clientes" del gestor)
   quotations    Quotation[] // Cotizaciones usando este plan
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
@@ -41,10 +41,10 @@ model User {
   name          String
   isActive      Boolean  @default(true)
   phone         String?
-  maxProperties Int      @default(2) // Límite de propiedades permitidas (aplicable a OWNER)
+  maxProperties Int      @default(2) // LÃ­mite de propiedades permitidas (aplicable a OWNER)
   planType      PlanType @default(SAAS) // Modelo de servicio aplicable a OWNER
 
-  // Facturación Universal (Admin, Manager, Owner, etc.)
+  // FacturaciÃ³n Universal (Admin, Manager, Owner, etc.)
   rfc             String?
   taxRegimen      String?
   zipCode         String?
@@ -78,7 +78,7 @@ model User {
   vouchers         HotspotVoucher[]     @relation("ManagerVouchers")
   checklists       InventoryChecklist[] @relation("ManagerChecklists")
 
-  // Módulo SaaS (App Store)
+  // MÃ³dulo SaaS (App Store)
   subscriptions UserSubscription[] @relation("UserSubscriptions")
   customMonthlyFee Float? // Sobrescritura manual de tarifa para descuentos
 
@@ -132,7 +132,7 @@ model Property {
   mapUrl           String?
   photos           String           @default("[]")
   amenities        String           @default("[]")
-  maintenanceLimit Float            @default(1500) // Límite pre-autorizado de reparaciones
+  maintenanceLimit Float            @default(1500) // LÃ­mite pre-autorizado de reparaciones
   ownerId          String?
   owner            User?            @relation(fields: [ownerId], references: [id])
   units            Unit[]
@@ -169,7 +169,7 @@ model Tenant {
   name            String
   email           String  @unique
   phone           String?
-  // Facturación
+  // FacturaciÃ³n
   rfc             String?
   taxRegimen      String?
   zipCode         String?
@@ -197,9 +197,9 @@ model Lease {
   startDate           DateTime
   endDate             DateTime?
   rentAmount          Float
-  paymentDay          Int // Ej. pagar los días 5 de cada mes
+  paymentDay          Int // Ej. pagar los dÃ­as 5 de cada mes
   lateFeeAmount       Float                @default(0) // Ej. multa fija de 500 pesos por retraso
-  gracePeriodDays     Int                  @default(3) // Ej. 3 días de tolerancia después del paymentDay
+  gracePeriodDays     Int                  @default(3) // Ej. 3 dÃ­as de tolerancia despuÃ©s del paymentDay
   status              String               @default("ACTIVE") // ACTIVE, TERMINATED
   charges             Charge[]
   services            LeaseService[]
@@ -283,10 +283,10 @@ model Expense {
 
 model Supplier {
   id          String  @id @default(uuid())
-  name        String // Razón Social o Empresa
-  rfc         String? // RFC para facturación
-  taxRegime   String? // Régimen fiscal del emisor
-  contactName String? // Nombre del técnico (ej. Roberto)
+  name        String // RazÃ³n Social o Empresa
+  rfc         String? // RFC para facturaciÃ³n
+  taxRegime   String? // RÃ©gimen fiscal del emisor
+  contactName String? // Nombre del tÃ©cnico (ej. Roberto)
   phone       String?
   email       String?
   category    String // PLUMBING, ELECTRICAL, NETWORK, GENERAL
@@ -295,7 +295,7 @@ model Supplier {
   manager   User?   @relation("ManagerSuppliers", fields: [managerId], references: [id])
 
   incidents Incident[]
-  expenses  Expense[]  // Relación con los gastos registrados
+  expenses  Expense[]  // RelaciÃ³n con los gastos registrados
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 }
@@ -377,7 +377,7 @@ model MikrotikRouter {
   isActive  Boolean @default(true)
 
   // VPN Cloud Config
-  vpnIp       String? // IP Estática interna asiganada por el túnel VPN
+  vpnIp       String? // IP EstÃ¡tica interna asiganada por el tÃºnel VPN
   vpnUser     String? // Usuario SSTP/VPN
   vpnPassword String? // Password SSTP/VPN
   vpnHost     String? // IP/Dominio del Servidor VPN (ej. vpn.radiotecpro.com)
@@ -431,7 +431,7 @@ model Commission {
 
 model EventType {
   id          String       @id @default(uuid())
-  name        String // "Instalación", "Visita Técnica", etc
+  name        String // "InstalaciÃ³n", "Visita TÃ©cnica", etc
   description String?
   basePrice   Float // Default commission price
   commissions Commission[]
@@ -509,7 +509,7 @@ model FacturaProSettings {
 model ApiKey {
   id          String   @id @default(uuid())
   key         String   @unique // Hash o token generado
-  name        String   // Ej. "Conexión OmniChat"
+  name        String   // Ej. "ConexiÃ³n OmniChat"
   isActive    Boolean  @default(true)
   
   userId      String
@@ -596,7 +596,7 @@ model OwnerPayout {
 }
 
 // ----------------------------------------------------
-// Módulo SaaS Premium (App Store / Integraciones)
+// MÃ³dulo SaaS Premium (App Store / Integraciones)
 // ----------------------------------------------------
 
 model SoftwareApp {
@@ -622,11 +622,11 @@ model AppTier {
   monthlyPrice Float // Precio mensual
   annualPrice  Float // Precio anual (ya con desc.)
 
-  // Limites Lógicos (Timbres o features)
+  // Limites LÃ³gicos (Timbres o features)
   monthlyStamps    Int   @default(0) // 50, 300, 2000...  -1 = Ilimitado
   overageMarginPct Float @default(0.1) // "Margen" para sobrepasar, ej. 10%
 
-  featuresJson      Json // Lista de pros. Ej. ["Módulo web", "Sin comisión"]
+  featuresJson      Json // Lista de pros. Ej. ["MÃ³dulo web", "Sin comisiÃ³n"]
   hasExpenseControl Boolean @default(false)
   hasApiAccess      Boolean @default(false)
 
@@ -726,7 +726,7 @@ model Payslip {
   status        String      @default("DRAFT") // DRAFT, ISSUED, PAID
   evidenceUrl   String?
   
-  // SAT CFDI Nómina
+  // SAT CFDI NÃ³mina
   uuidSAT       String?     @unique
   xmlUrl        String?
   
@@ -744,7 +744,7 @@ model TimeOffRequest {
   reason      String?  @db.Text
   status      String   @default("PENDING") // PENDING, APPROVED, REJECTED
   
-  managerId   String?  // Quién autorizó
+  managerId   String?  // QuiÃ©n autorizÃ³
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -758,9 +758,60 @@ model AttendanceRecord {
   type        String   // ABSENCE, LATE
   notes       String?  @db.Text
   
-  recordedById String? // RRHH que lo capturó
+  recordedById String? // RRHH que lo capturÃ³
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
+
+
+// ----------------------------------------------------
+// TIENDA / E-COMMERCE (Catálogo Syscom + Local)
+// ----------------------------------------------------
+model StoreProduct {
+  id          String   @id @default(uuid())
+  syscomId    String?  // Si es un producto que también existe en Syscom
+  title       String
+  brand       String?
+  model       String?
+  description String?  @db.Text
+  price       Float    // Precio público de venta final
+  stock       Int      @default(0)
+  imageUrl    String?
+  category    String?
+  isActive    Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model StoreOrder {
+  id              String   @id @default(uuid())
+  customerName    String
+  customerPhone   String
+  customerAddress String   @db.Text
+  totalAmount     Float
+  status          String   @default("PENDING") // PENDING, PAID, SHIPPED, CANCELLED
+  isFacturado     Boolean  @default(false)
+  facturaId       String?  // Reference to FacturaPro if invoiced
+  
+  items           StoreOrderItem[]
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model StoreOrderItem {
+  id          String   @id @default(uuid())
+  orderId     String
+  order       StoreOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  productId   String?  // Reference to StoreProduct (if local)
+  syscomId    String?  // Reference to Syscom API id (if syscom)
+  
+  title       String
+  price       Float    // Price at the moment of purchase
+  quantity    Int
+  satKey      String   @default("43222609") // Default SAT key for networking equipment
+}

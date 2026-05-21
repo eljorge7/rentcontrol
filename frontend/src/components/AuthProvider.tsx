@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(currentUser);
       setLoading(false);
 
-      const isPublicRoute = pathname.startsWith('/quote') || pathname.startsWith('/ticket') || pathname === '/registro';
+      const isPublicRoute = pathname.startsWith('/quote') || pathname.startsWith('/ticket') || pathname === '/registro' || pathname.startsWith('/store');
 
       if (!currentUser && !pathname.includes('/login') && pathname !== '/' && !isPublicRoute) {
         router.push('/login');
