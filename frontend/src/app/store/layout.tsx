@@ -433,18 +433,28 @@ function StoreLayoutContent({ children }: { children: ReactNode }) {
                        </div>
 
                        <form onSubmit={handleCheckout} className="space-y-4">
-                        <div className="space-y-1">
-                           <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Nombre Completo</label>
-                           <input required type="text" value={checkoutName} onChange={e => setCheckoutName(e.target.value)} 
-                                  placeholder={user ? user.name : "Tu nombre"}
-                                  className="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-3 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                        </div>
-                        <div className="space-y-1">
-                           <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Celular (WhatsApp)</label>
-                           <input required type="tel" value={checkoutPhone} onChange={e => setCheckoutPhone(e.target.value)} 
-                                  placeholder={user?.phone || "10 dgitos"}
-                                  className="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-3 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                        </div>
+                        {!user && (
+                          <>
+                            <div className="space-y-1">
+                               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Nombre Completo</label>
+                               <input required type="text" value={checkoutName} onChange={e => setCheckoutName(e.target.value)} 
+                                      placeholder="Tu nombre"
+                                      className="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-3 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                            </div>
+                            <div className="space-y-1">
+                               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Celular (WhatsApp)</label>
+                               <input required type="tel" value={checkoutPhone} onChange={e => setCheckoutPhone(e.target.value)} 
+                                      placeholder="10 dígitos"
+                                      className="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-3 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                            </div>
+                          </>
+                        )}
+                        {user && (
+                          <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-sm text-blue-800">
+                            <span className="font-bold">Facturación a:</span> {user.name}<br/>
+                            <span className="font-bold">Contacto:</span> {user.phone || user.email}
+                          </div>
+                        )}
                           <div className="space-y-1">
                              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Dirección de Envío</label>
                              <textarea required placeholder="Calle, número, colonia, ciudad, CP" value={checkoutAddress} onChange={e => setCheckoutAddress(e.target.value)} className="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50 hover:bg-white transition-colors h-20 resize-none" />
