@@ -9,8 +9,8 @@ export default function HelpCenterOverlay() {
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const pathname = usePathname();
 
-  // No mostrar en rutas públicas (login, registro, landing page, links publicos de factura)
-  if (pathname.includes('/login') || pathname.includes('/registro') || pathname === '/' || pathname.includes('/quote') || pathname.includes('/ticket')) {
+  // No mostrar en rutas públicas (login, registro, landing page, links publicos de factura, tienda)
+  if (pathname.includes('/login') || pathname.includes('/registro') || pathname === '/' || pathname.includes('/quote') || pathname.includes('/ticket') || pathname.includes('/store')) {
     return null;
   }
 
@@ -64,7 +64,7 @@ export default function HelpCenterOverlay() {
       <div className="relative w-full max-w-md bg-white h-full self-end rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-right-8 duration-300">
         
         {/* Header Elegante */}
-        <div className="bg-slate-900 p-8 text-white relative shrink-0">
+        <div className="bg-slate-900 p-6 text-white relative shrink-0">
           <button 
             onClick={() => setIsOpen(false)}
             className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors bg-slate-800 p-2 rounded-full"
@@ -72,24 +72,22 @@ export default function HelpCenterOverlay() {
             <X className="w-4 h-4" />
           </button>
           
-          <div className="bg-blue-600/20 w-12 h-12 rounded-2xl flex items-center justify-center mb-4 text-blue-400">
-            <Headphones className="w-6 h-6" />
+          <div className="bg-blue-600/20 w-10 h-10 rounded-2xl flex items-center justify-center mb-3 text-blue-400">
+            <Headphones className="w-5 h-5" />
           </div>
-          <h2 className="text-2xl font-black tracking-tight mb-2">Base de Conocimiento</h2>
-          <p className="text-slate-400 text-sm font-medium">Encuentra respuestas rápidas sobre cómo operar el Ecosistema Grupo Hurtado.</p>
-        </div>
-
-        {/* Búsqueda (Visual only) */}
-        <div className="px-6 -mt-5 relative z-10 shrink-0">
-            <div className="bg-white rounded-xl shadow-md border border-slate-200 p-2 flex items-center gap-2">
-                <Search className="w-5 h-5 text-slate-400 ml-2" />
-                <input 
-                  type="text" 
-                  readOnly 
-                  placeholder="¿Cómo cobrar recargos?" 
-                  className="w-full text-sm font-medium focus:outline-none placeholder:text-slate-300 text-slate-700 bg-transparent"
-                />
-            </div>
+          <h2 className="text-xl font-black tracking-tight mb-2">Base de Conocimiento</h2>
+          <p className="text-slate-400 text-xs font-medium mb-5">Encuentra respuestas rápidas sobre cómo operar el Ecosistema Grupo Hurtado.</p>
+          
+          {/* Búsqueda (Visual only) */}
+          <div className="bg-white rounded-xl shadow-md border border-slate-200 p-2 flex items-center gap-2">
+              <Search className="w-5 h-5 text-slate-400 ml-2" />
+              <input 
+                type="text" 
+                readOnly 
+                placeholder="¿Cómo cobrar recargos?" 
+                className="w-full text-sm font-medium focus:outline-none placeholder:text-slate-300 text-slate-700 bg-transparent"
+              />
+          </div>
         </div>
 
         {/* Content (Accordion) */}

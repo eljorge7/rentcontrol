@@ -1,15 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Wifi, Zap, Shield, PhoneCall, ChevronRight, Check, Building2, Star, Target, CandlestickChart, Users, Wrench, MessageSquare, Calculator, Store, FileText, PieChart, PlayCircle, Receipt, Bot, User, ChevronDown } from "lucide-react";
+import { Wifi, Zap, Shield, PhoneCall, ChevronRight, Check, Building2, Star, Target, CandlestickChart, Users, Wrench, MessageSquare, Calculator, Store, FileText, PieChart, PlayCircle, Receipt, Bot, User, ChevronDown, Menu, X } from "lucide-react";
 import axios from "axios";
 
 // Using native fetch or axios to the public endpoints.
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export default function Home() {
+  const router = useRouter();
   const [wispPlans, setWispPlans] = useState<any[]>([]);
   const [saasPlans, setSaasPlans] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -166,6 +168,10 @@ export default function Home() {
                     <Building2 className="w-4 h-4 text-indigo-600" />
                     RentControl
                   </Link>
+                  <Link href="/store" className="flex items-center gap-3 px-4 py-3 hover:bg-orange-50 text-slate-700 hover:text-orange-700 transition-colors font-medium">
+                    <Store className="w-4 h-4 text-orange-600" />
+                    Tienda de Equipos
+                  </Link>
                   <div className="h-px bg-slate-100 my-1 mx-4"></div>
                   <a href="https://facturapro.radiotecpro.com/login" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-4 py-3 hover:bg-violet-50 text-slate-700 hover:text-violet-700 transition-colors font-medium">
                     <Calculator className="w-4 h-4 text-violet-600" />
@@ -229,6 +235,13 @@ export default function Home() {
                 className={`flex-1 px-4 py-3 sm:py-4 rounded-xl sm:rounded-full font-bold transition-all flex justify-center items-center gap-2 text-sm sm:text-base ${activeTab === 'rentcontrol' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30 scale-100 sm:scale-105' : activeTab === 'internet' ? 'text-slate-400 hover:text-white hover:bg-slate-700/50' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-300/50'}`}
               >
                 <Building2 className="w-5 h-5" /> RentControl
+              </button>
+
+              <button 
+                onClick={() => router.push('/store')}
+                className={`flex-1 px-4 py-3 sm:py-4 rounded-xl sm:rounded-full font-bold transition-all flex justify-center items-center gap-2 text-sm sm:text-base ${activeTab === 'internet' || activeTab === 'rentcontrol' ? 'text-slate-400 hover:text-white hover:bg-slate-700/50' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-300/50'}`}
+              >
+                <Store className="w-5 h-5" /> Tienda
               </button>
 
               <button 

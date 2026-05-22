@@ -4,7 +4,7 @@ import { ReactNode, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { StoreProvider, useStore } from "./StoreContext";
-import { Search, ShoppingCart, ArrowLeft, Package, Trash2, Check, X, Send, Menu, Tag, ChevronDown, DollarSign, ArrowUp } from "lucide-react";
+import { Search, ShoppingCart, ArrowLeft, Package, Trash2, Check, X, Send, Menu, Tag, ChevronDown, DollarSign, ArrowUp, Camera, Mic, Bot, Rss } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 
@@ -22,10 +22,38 @@ function StoreLayoutContent({ children }: { children: ReactNode }) {
   const [checkoutPhone, setCheckoutPhone] = useState("");
   const [checkoutAddress, setCheckoutAddress] = useState("");
 
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  const [chatMessage, setChatMessage] = useState("");
   const [showConfigDropdown, setShowConfigDropdown] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // New states for Syscom dropdown
+  const [searchDropdownOpen, setSearchDropdownOpen] = useState(false);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
+  useEffect(() => {
+    if (!globalSearchTerm || globalSearchTerm.length < 2) {
+      setSearchDropdownOpen(false);
+      setSearchResults([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIsSearching(true);
+      setSearchDropdownOpen(true);
+      try {
+        const res = await axios.get(`${API_URL}/store/products?search=${encodeURIComponent(globalSearchTerm)}&page=1`);
+        if (res.data && res.data.products) {
+          setSearchResults(res.data.products.slice(0, 4));
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [globalSearchTerm]);
 
   useEffect(() => {
     const handleScroll = () => setShowScrollTop(window.scrollY > 300);
@@ -36,7 +64,14 @@ function StoreLayoutContent({ children }: { children: ReactNode }) {
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
   const getDisplayPrice = (product: any) => {
-    return product.price; // Already has IVA applied in backend
+    let price = product.price;
+    if (currency === 'USD') {
+      price = price / 17.50;
+    }
+    if (!includeIva) {
+      price = price / 1.16;
+    }
+    return price;
   };
 
   const handleCheckout = async (e: React.FormEvent) => {
@@ -72,22 +107,6 @@ function StoreLayoutContent({ children }: { children: ReactNode }) {
     }
   };
 
-  const handleSendOmniChat = async (e: React.FormEvent) => {
-     e.preventDefault();
-     if (!chatMessage.trim()) return;
-     try {
-       await axios.post(`${API_URL}/omnichat/whatsapp/send`, {
-          phone: "5215555555555", // Replace with actual business WhatsApp or dynamically handle
-          message: `*Nueva Consulta Tienda Web*\nMensaje: ${chatMessage}`
-       });
-       setChatMessage("");
-       alert("Mensaje enviado a asesores.");
-       setIsChatOpen(false);
-     } catch (err) {
-       console.error("Error sending chat:", err);
-     }
-  };
-
   return (
     <div className="min-h-screen bg-slate-50 font-sans selection:bg-blue-200">
       {/* Navbar (Header) */}
@@ -98,17 +117,87 @@ function StoreLayoutContent({ children }: { children: ReactNode }) {
               <img src="/logo-transparent.png" alt="RadioTec Pro" className="h-[32px] md:h-[40px] object-contain" />
             </Link>
 
-            <form onSubmit={(e) => { e.preventDefault(); router.push('/store'); }} className="flex-1 max-w-2xl relative hidden md:block">
-              <div className="relative group">
+            <form onSubmit={(e) => { e.preventDefault(); setSearchDropdownOpen(false); router.push('/store'); }} className="flex-1 max-w-4xl relative hidden md:flex items-center gap-4">
+              <div className="relative flex-1 flex items-center">
+                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                  <input 
                    type="text" 
                    value={globalSearchTerm}
                    onChange={e => setGlobalSearchTerm(e.target.value)}
+                   onFocus={() => { if(globalSearchTerm.length >= 2) setSearchDropdownOpen(true); }}
                    placeholder="Buscar modelo, marca o categoría..." 
-                   className="w-full h-12 bg-slate-100 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-2xl pl-12 pr-4 text-sm font-medium transition-all outline-none group-hover:bg-slate-200/50 focus:group-hover:bg-white shadow-inner"
+                   className="w-full h-11 bg-white border-2 border-blue-600 rounded-lg pl-10 pr-20 text-sm font-medium transition-all outline-none focus:ring-4 focus:ring-blue-100 shadow-sm"
                  />
-                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                 <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2 text-slate-400">
+                    <button type="button" className="hover:text-blue-600 transition-colors"><Camera className="w-4 h-4" /></button>
+                    <button type="button" className="hover:text-blue-600 transition-colors"><Mic className="w-4 h-4" /></button>
+                 </div>
+
+                 {/* Syscom Dropdown Overlay */}
+                 {searchDropdownOpen && (
+                   <>
+                   <div className="fixed inset-0 z-40" onClick={() => setSearchDropdownOpen(false)}></div>
+                   <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-slate-200 z-50 overflow-hidden flex min-h-[300px]">
+                     {/* Right Panel: Results (Now takes full width) */}
+                     <div className="flex-1 p-4 bg-white">
+                        <div className="flex items-center gap-2 mb-4 border-b border-slate-100 pb-2">
+                           <button className="text-xs font-bold text-blue-600 border border-blue-200 bg-blue-50 px-3 py-1 rounded-full">Productos Sugeridos</button>
+                        </div>
+                        
+                        {isSearching ? (
+                           <div className="flex justify-center items-center h-32">
+                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                           </div>
+                        ) : searchResults.length > 0 ? (
+                           <div className="space-y-3 relative z-50">
+                              {searchResults.map((product) => (
+                                 <div key={product.id} className="flex gap-4 p-3 hover:bg-slate-50 rounded-xl border border-transparent hover:border-slate-100 transition-colors group cursor-pointer" onClick={() => { setSearchDropdownOpen(false); router.push('/store'); }}>
+                                    <div className="w-16 h-16 bg-white border border-slate-100 rounded-lg p-1 shrink-0 flex items-center justify-center">
+                                       {product.imageUrl ? <img src={product.imageUrl} alt={product.model} className="max-w-full max-h-full object-contain" /> : <Package className="w-8 h-8 text-slate-300"/>}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                       <h5 className="text-xs font-medium text-slate-800 line-clamp-2 leading-snug group-hover:text-blue-600 transition-colors">{product.title}</h5>
+                                       <div className="flex items-center gap-2 mt-1">
+                                          <span className="text-[10px] font-bold text-slate-400">{product.model}</span>
+                                          <span className="text-[10px] bg-slate-100 text-slate-600 px-1.5 rounded">{product.brand}</span>
+                                       </div>
+                                       <div className="flex items-center justify-between mt-2">
+                                          <div className="text-blue-700 font-bold text-sm">
+                                             {currency === 'MXN' ? 'MXN' : 'USD'} ${getDisplayPrice(product).toLocaleString('es-MX', {minimumFractionDigits:2, maximumFractionDigits:2})}
+                                             <span className="text-[9px] font-normal text-slate-400 ml-1 block leading-none">IVA incluido</span>
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                             <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded flex items-center gap-1">
+                                                {product.stock > 0 ? '✓ ' + product.stock : 'Agotado'}
+                                             </span>
+                                             {product.stock > 0 && (
+                                                <button 
+                                                   onClick={(e) => { e.stopPropagation(); addToCart(product); setSearchDropdownOpen(false); }}
+                                                   className="bg-amber-400 hover:bg-amber-500 text-slate-900 text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 shadow-sm"
+                                                >
+                                                   Agregar <ShoppingCart className="w-3 h-3"/>
+                                                </button>
+                                             )}
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </div>
+                              ))}
+                           </div>
+                        ) : (
+                           <div className="flex flex-col items-center justify-center h-48 text-slate-400">
+                              <Package className="w-8 h-8 mb-2 opacity-50" />
+                              <p className="text-sm font-medium">No se encontraron productos</p>
+                           </div>
+                        )}
+                     </div>
+                   </div>
+                   </>
+                 )}
               </div>
+              <button type="button" className="h-11 px-5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg flex items-center gap-2 shadow-sm transition-colors text-sm shrink-0">
+                 AI
+              </button>
             </form>
 
             <div className="flex items-center gap-3 md:gap-6 shrink-0 relative">
@@ -336,19 +425,19 @@ function StoreLayoutContent({ children }: { children: ReactNode }) {
                    <div>
                       <h4 className="text-white font-bold mb-6 flex items-center gap-2">Contacto</h4>
                       <ul className="space-y-4 text-sm text-slate-400">
-                         <li className="flex items-center gap-3"><img src="https://flagcdn.com/w20/mx.png" alt="MX" className="w-4 h-3 rounded-sm" /> +52 (55) 5555-5555</li>
-                         <li className="flex items-center gap-3">✉ ventas@radiotecpro.com</li>
-                         <li className="flex items-center gap-3">📍 Ciudad de México, CDMX</li>
+                         <li className="flex items-center gap-3"><img src="https://flagcdn.com/w20/mx.png" alt="MX" className="w-4 h-3 rounded-sm" /> +52 (642) 164-4126</li>
+                         <li className="flex items-center gap-3">✉️ ventas@radiotecpro.com</li>
+                         <li className="flex items-center gap-3">📍 Navojoa, Sonora</li>
                       </ul>
                    </div>
 
                    <div>
                       <h4 className="text-white font-bold mb-6">Herramientas</h4>
                       <ul className="space-y-3 text-sm text-slate-400">
-                         <li><a href="#" className="hover:text-blue-400 transition-colors">Cotizador Rápido</a></li>
-                         <li><a href="#" className="hover:text-blue-400 transition-colors">Facturación Electrónica</a></li>
-                         <li><a href="#" className="hover:text-blue-400 transition-colors">Garantías y Soporte</a></li>
-                         <li><a href="#" className="hover:text-blue-400 transition-colors">Guías Técnicas</a></li>
+                         <li><Link href="/store" className="hover:text-blue-400 transition-colors">Cotizador Rápido</Link></li>
+                         <li><a href="https://facturapro.radiotecpro.com" target="_blank" className="hover:text-blue-400 transition-colors">Facturación Electrónica</a></li>
+                         <li><Link href="/store" className="hover:text-blue-400 transition-colors">Garantías y Soporte</Link></li>
+                         <li><Link href="/store" className="hover:text-blue-400 transition-colors">Guías Técnicas</Link></li>
                       </ul>
                    </div>
 
@@ -358,9 +447,11 @@ function StoreLayoutContent({ children }: { children: ReactNode }) {
                          <p className="text-xs text-slate-400 leading-relaxed mb-4">
                             Esta tienda está potenciada por <strong>MAGIA OS</strong>, el ecosistema inteligente de Grupo Hurtado para la gestión de negocios de alto rendimiento.
                          </p>
-                         <button className="text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors w-full">
-                            Conocer más sobre MAGIA OS
-                         </button>
+                         <Link href="/">
+                           <button className="text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors w-full">
+                              Conocer más sobre MAGIA OS
+                           </button>
+                         </Link>
                       </div>
                    </div>
                 </div>
@@ -468,32 +559,8 @@ function StoreLayoutContent({ children }: { children: ReactNode }) {
         </>
       )}
 
-      {/* OmniChat Floating Widget */}
+      {/* Floating Buttons */}
       <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
-         {isChatOpen && (
-            <div className="bg-white w-80 rounded-2xl shadow-2xl mb-2 overflow-hidden border border-slate-200 animate-in slide-in-from-bottom-5">
-               <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 text-white flex justify-between items-center">
-                  <div>
-                     <h4 className="font-bold text-sm">Asesor de Ventas</h4>
-                     <p className="text-[10px] text-blue-100">En lnea, respuestas rpidas.</p>
-                  </div>
-                  <button onClick={() => setIsChatOpen(false)} className="text-white hover:bg-white/20 p-1.5 rounded-full"><X className="w-4 h-4"/></button>
-               </div>
-               <div className="p-4 bg-slate-50 h-64 overflow-y-auto flex flex-col gap-3">
-                  <div className="bg-white p-3 rounded-xl rounded-tl-none border border-slate-100 shadow-sm self-start max-w-[85%]">
-                     <p className="text-xs text-slate-700">Hola! Soy tu asesor tcnico y de ventas. Qu proyecto tienes en mente? Podemos armar la mejor solucin para ti.</p>
-                  </div>
-               </div>
-               <div className="p-3 bg-white border-t border-slate-100">
-                  <form onSubmit={handleSendOmniChat} className="flex items-center gap-2">
-                     <input type="text" value={chatMessage} onChange={e=>setChatMessage(e.target.value)} placeholder="Escribe un mensaje..." className="flex-1 bg-slate-100 border-none rounded-full h-10 px-4 text-xs focus:ring-2 focus:ring-blue-500 outline-none" />
-                     <button type="submit" className="w-10 h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center shadow-md transition-colors">
-                        <Send className="w-4 h-4" />
-                     </button>
-                  </form>
-               </div>
-            </div>
-         )}
          <div className="flex gap-3 items-end">
             {showScrollTop && (
                <button 
@@ -504,9 +571,6 @@ function StoreLayoutContent({ children }: { children: ReactNode }) {
                   <ArrowUp className="w-6 h-6" />
                </button>
             )}
-            <button onClick={() => setIsChatOpen(!isChatOpen)} className="w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-105 transition-transform">
-               {isChatOpen ? <X className="w-6 h-6" /> : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-7 h-7"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>}
-            </button>
          </div>
       </div>
     </div>

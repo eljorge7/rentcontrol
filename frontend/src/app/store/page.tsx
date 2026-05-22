@@ -157,21 +157,11 @@ export default function StorePage() {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Controls Bar */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-4 mb-6 flex flex-col sm:flex-row gap-4 justify-between items-center shadow-sm">
-          <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-            <input 
-              type="text" 
-              placeholder="Buscar en el catálogo (ej. Camara IP, Switch Gigabit...)"
-              value={globalSearchTerm}
-              onChange={(e) => setGlobalSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 h-12 bg-slate-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-            />
-          </div>
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <Button onClick={() => setShowMobileFilters(true)} variant="outline" className="lg:hidden flex-1 sm:flex-none h-12 rounded-xl border-slate-200 text-slate-600 font-bold">
-               <Menu className="w-5 h-5 mr-2" /> Filtros
+        {/* Controls Bar (Mobile Only) */}
+        <div className="lg:hidden bg-white rounded-2xl border border-slate-200 p-4 mb-6 flex flex-col sm:flex-row gap-4 justify-between items-center shadow-sm">
+          <div className="flex items-center gap-3 w-full">
+            <Button onClick={() => setShowMobileFilters(true)} variant="outline" className="flex-1 h-12 rounded-xl border-slate-200 text-slate-600 font-bold">
+               <Menu className="w-5 h-5 mr-2" /> Mostrar Filtros y Categorías
             </Button>
           </div>
         </div>
