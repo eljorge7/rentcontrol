@@ -13,6 +13,7 @@ enum Role {
   MANAGER
   TENANT
   EMPLOYEE
+  CUSTOMER
 }
 
 enum PlanType {
@@ -77,6 +78,8 @@ model User {
   suppliers        Supplier[]           @relation("ManagerSuppliers")
   vouchers         HotspotVoucher[]     @relation("ManagerVouchers")
   checklists       InventoryChecklist[] @relation("ManagerChecklists")
+
+  storeOrders      StoreOrder[]
 
   // MÃ³dulo SaaS (App Store)
   subscriptions UserSubscription[] @relation("UserSubscriptions")
@@ -788,6 +791,8 @@ model StoreProduct {
 
 model StoreOrder {
   id              String   @id @default(uuid())
+  userId          String?
+  user            User?    @relation(fields: [userId], references: [id])
   customerName    String
   customerPhone   String
   customerAddress String   @db.Text

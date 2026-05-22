@@ -331,6 +331,14 @@ export class StoreService {
     }
   }
 
+  async getMyOrders(userId: string) {
+    return this.prisma.storeOrder.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      include: { items: true }
+    });
+  }
+
   async getOrders() {
     return this.prisma.storeOrder.findMany({
       orderBy: { createdAt: 'desc' },

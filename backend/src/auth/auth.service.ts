@@ -13,6 +13,9 @@ export class AuthService {
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.usersService.findOne(email);
     if (user && (await bcrypt.compare(pass, user.password))) {
+      if (!user.isActive) {
+        throw new UnauthorizedException('Tu cuenta está pendiente de revisión o inactiva.');
+      }
       const { password, ...result } = user;
       return result;
     }

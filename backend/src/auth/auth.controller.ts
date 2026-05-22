@@ -66,4 +66,26 @@ export class AuthController {
       }
     }; 
   }
+
+  @Post('store/register')
+  async storeRegister(@Body() body: any) {
+    const { name, email, password, phone } = body;
+    if (!email || !password || !name) {
+      throw new UnauthorizedException('Faltan datos obligatorios');
+    }
+    const existing = await this.usersService.findOne(email);
+    if (existing) {
+      throw new UnauthorizedException('El correo ya está registrado');
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await this.usersService.create({
+      name,
+      email,
+      password: hashedPassword,
+      phone,
+      role: 'CUSTOMER',
+      isActive: false
+    });
+    return { success: true, message: 'Solicitud enviada. Tu cuenta está en revisión.' };
+  }
 }

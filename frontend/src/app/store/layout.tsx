@@ -4,7 +4,8 @@ import { ReactNode, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { StoreProvider, useStore } from "./StoreContext";
-import { Search, ShoppingCart, ArrowLeft, Package, Trash2, Check, X, Send, Menu, Tag, ChevronDown, DollarSign, ArrowUp, Camera, Mic, Bot, Rss } from "lucide-react";
+import { useAuth } from "@/components/AuthProvider";
+import { Search, ShoppingCart, ArrowLeft, Package, Trash2, Check, X, Send, Menu, Tag, ChevronDown, DollarSign, ArrowUp, Camera, Mic, Bot, Rss, UserCircle, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 
@@ -18,11 +19,14 @@ function StoreLayoutContent({ children }: { children: ReactNode }) {
      globalSearchTerm, setGlobalSearchTerm, currency, setCurrency, includeIva, setIncludeIva
   } = useStore();
 
+  const { user, logout } = useAuth();
+
   const [checkoutName, setCheckoutName] = useState("");
   const [checkoutPhone, setCheckoutPhone] = useState("");
   const [checkoutAddress, setCheckoutAddress] = useState("");
 
   const [showConfigDropdown, setShowConfigDropdown] = useState(false);
+  const [showAuthDropdown, setShowAuthDropdown] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   // New states for Syscom dropdown
@@ -81,9 +85,10 @@ function StoreLayoutContent({ children }: { children: ReactNode }) {
     
     try {
       const orderData = {
-        customerName: checkoutName,
-        customerPhone: checkoutPhone,
-        customerAddress: checkoutAddress,
+        userId: user?.id,
+        customerName: checkoutName || user?.name || "Cliente Invitado",
+        customerPhone: checkoutPhone || user?.phone || "0000000000",
+        customerAddress: checkoutAddress || "Dirección pendiente",
         totalAmount: cart.reduce((sum, item) => sum + (getDisplayPrice(item.product) * item.quantity), 0),
         items: cart.map(item => ({
           productId: item.product.source === 'local' ? item.product.id : null,
@@ -265,6 +270,39 @@ function StoreLayoutContent({ children }: { children: ReactNode }) {
                  )}
                </div>
 
+               {/* Auth Dropdown */}
+               <div className="relative">
+                 {user && user.role === 'CUSTOMER' ? (
+                   <>
+                     <button type="button" onClick={() => setShowAuthDropdown(!showAuthDropdown)} className="flex items-center gap-2 px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors shrink-0">
+                       <UserCircle className="w-5 h-5 text-blue-600" />
+                       <span className="text-sm font-bold text-slate-700 hidden md:block line-clamp-1 max-w-[100px]">{user.name.split(' ')[0]}</span>
+                     </button>
+                     {showAuthDropdown && (
+                       <>
+                         <div className="fixed inset-0 z-40" onClick={() => setShowAuthDropdown(false)}></div>
+                         <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50 animate-in fade-in slide-in-from-top-2">
+                           <div className="px-4 py-2 border-b border-slate-100 mb-2">
+                             <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Mi Cuenta</p>
+                             <p className="text-sm font-medium text-slate-900 truncate mt-1">{user.email}</p>
+                           </div>
+                           <Link href="/store/account" onClick={() => setShowAuthDropdown(false)} className="flex items-center gap-3 px-4 py-2 hover:bg-slate-50 text-sm font-medium text-slate-700">
+                             <Package className="w-4 h-4 text-blue-500" /> Mis Compras
+                           </Link>
+                           <button onClick={() => { logout(); setShowAuthDropdown(false); router.push('/store'); }} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-red-50 text-sm font-medium text-red-600 mt-2 border-t border-slate-100 pt-3">
+                             <LogOut className="w-4 h-4" /> Cerrar Sesión
+                           </button>
+                         </div>
+                       </>
+                     )}
+                   </>
+                 ) : (
+                   <Link href="/store/login" className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors shrink-0 text-sm font-bold text-slate-700">
+                     <UserCircle className="w-5 h-5 text-blue-600" /> <span className="hidden md:inline">Entrar</span>
+                   </Link>
+                 )}
+               </div>
+
                <Button variant="ghost" onClick={() => { setIsCartOpen(!isCartOpen); window.scrollTo(0,0); }} className="relative p-2 md:p-3 hover:bg-slate-100 rounded-xl h-auto">
                  <ShoppingCart className="w-6 h-6 md:w-7 md:h-7 text-slate-700" />
                  {cart.length > 0 && (
@@ -394,11 +432,23 @@ function StoreLayoutContent({ children }: { children: ReactNode }) {
                           </div>
                        </div>
 
-                       <form onSubmit={handleCheckout} className="space-y-3">
-                          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2"><Tag className="w-3 h-3"/> Completar Datos</div>
-                          <input required type="text" placeholder="Tu Nombre Completo" value={checkoutName} onChange={e => setCheckoutName(e.target.value)} className="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50 hover:bg-white transition-colors" />
-                          <input required type="tel" placeholder="Celular (WhatsApp)" value={checkoutPhone} onChange={e => setCheckoutPhone(e.target.value)} className="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50 hover:bg-white transition-colors" />
-                          <textarea required placeholder="Direccin de Envo" value={checkoutAddress} onChange={e => setCheckoutAddress(e.target.value)} className="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50 hover:bg-white transition-colors h-20 resize-none" />
+                       <form onSubmit={handleCheckout} className="space-y-4">
+                        <div className="space-y-1">
+                           <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Nombre Completo</label>
+                           <input required type="text" value={checkoutName} onChange={e => setCheckoutName(e.target.value)} 
+                                  placeholder={user ? user.name : "Tu nombre"}
+                                  className="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-3 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        </div>
+                        <div className="space-y-1">
+                           <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Celular (WhatsApp)</label>
+                           <input required type="tel" value={checkoutPhone} onChange={e => setCheckoutPhone(e.target.value)} 
+                                  placeholder={user?.phone || "10 dgitos"}
+                                  className="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-3 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        </div>
+                          <div className="space-y-1">
+                             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Dirección de Envío</label>
+                             <textarea required placeholder="Calle, número, colonia, ciudad, CP" value={checkoutAddress} onChange={e => setCheckoutAddress(e.target.value)} className="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50 hover:bg-white transition-colors h-20 resize-none" />
+                          </div>
                           
                           <Button type="submit" className="w-full h-14 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl mt-4 flex items-center justify-center gap-2 shadow-lg hover:shadow-amber-500/30 transition-all text-base">
                              Finalizar Pedido

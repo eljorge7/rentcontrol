@@ -158,6 +158,10 @@ export function Sidebar() {
         <ShoppingBag className="mr-3 h-5 w-5 flex-shrink-0 text-purple-500" />
         {!isCollapsed && <span className="font-bold text-purple-700">Órdenes y Facturación 1 Clic</span>}
       </Link>
+      <Link href="/admin/store-customers" className="flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-slate-200 mx-2 mt-1">
+        <Users className="mr-3 h-5 w-5 flex-shrink-0 text-blue-500" />
+        {!isCollapsed && <span className="font-bold text-blue-700">Clientes de Tienda</span>}
+      </Link>
     </>
   );
 

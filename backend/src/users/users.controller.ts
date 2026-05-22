@@ -255,6 +255,13 @@ export class UsersController {
     return this.usersService.update(req.user.userId, updateData);
   }
 
+  @Get('store-customers')
+  @Roles('ADMIN', 'OWNER')
+  async getStoreCustomers() {
+    const allUsers = await this.usersService.findAll();
+    return allUsers.filter(u => u.role === 'CUSTOMER');
+  }
+
   @Get(':id')
   @Roles('ADMIN', 'MANAGER')
   findOne(@Param('id') id: string) {
@@ -296,5 +303,11 @@ export class UsersController {
   @Roles('ADMIN')
   remove(@Param('id') id: string) {
     return this.usersService.delete(id);
+  }
+
+  @Patch(':id/activate')
+  @Roles('ADMIN', 'OWNER')
+  async activateCustomer(@Param('id') id: string, @Body('isActive') isActive: boolean) {
+    return this.usersService.update(id, { isActive });
   }
 }

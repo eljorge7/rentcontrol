@@ -1,5 +1,6 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, Request } from '@nestjs/common';
 import { StoreService } from './store.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('store')
 export class StoreController {
@@ -44,6 +45,12 @@ export class StoreController {
   @Post('order')
   async createOrder(@Body() data: any) {
     return this.storeService.createOrder(data);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('my-orders')
+  async getMyOrders(@Request() req: any) {
+    return this.storeService.getMyOrders(req.user.sub);
   }
 
   @Get('orders')
