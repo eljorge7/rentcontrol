@@ -338,6 +338,13 @@ export class StoreService {
     });
   }
 
+  async updateOrderStatus(id: string, status: string) {
+    return this.prisma.storeOrder.update({
+      where: { id },
+      data: { status }
+    });
+  }
+
   async invoiceOrder(id: string) {
     const order = await this.prisma.storeOrder.findUnique({ where: { id } });
     if (!order) throw new Error('Order not found');

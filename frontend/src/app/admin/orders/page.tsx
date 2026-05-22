@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import api from "@/lib/api";
-import { ShoppingBag, FileText, CheckCircle2, Clock, User, Phone, MapPin, Receipt, X } from "lucide-react";
+import { ShoppingBag, FileText, CheckCircle2, Clock, User, Phone, MapPin, Receipt, X, Package, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface OrderItem {
@@ -73,6 +73,25 @@ export default function StoreOrdersPage() {
     }
   };
 
+  const handleUpdateStatus = async (id: string, newStatus: string) => {
+    try {
+      await api.put(`/store/orders/${id}/status`, { status: newStatus });
+      fetchOrders();
+    } catch (error) {
+      alert("Error al actualizar el estado de la orden.");
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch(status) {
+      case 'PENDING': return <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-xs font-bold border border-slate-200">Pendiente de Pago</span>;
+      case 'PAID': return <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold border border-blue-200 flex items-center gap-1"><CheckCircle2 className="w-3 h-3"/> Pagado (Preparar)</span>;
+      case 'SHIPPED': return <span className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold border border-amber-200 flex items-center gap-1"><Package className="w-3 h-3"/> Enviado</span>;
+      case 'DELIVERED': return <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold border border-emerald-200 flex items-center gap-1"><Truck className="w-3 h-3"/> Entregado</span>;
+      default: return <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-xs font-bold">{status}</span>;
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto space-y-6 pb-20">
       <div>
@@ -102,6 +121,7 @@ export default function StoreOrdersPage() {
                     <span className="font-mono text-sm font-bold text-indigo-600 bg-indigo-100 px-3 py-1 rounded-full">
                       ORD-{order.id.substring(0, 8).toUpperCase()}
                     </span>
+                    {getStatusBadge(order.status)}
                     <span className="text-xs text-slate-400">{new Date(order.createdAt).toLocaleString('es-MX')}</span>
                     {order.isFacturado ? (
                       <span className="flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-1 rounded-md">
@@ -124,14 +144,26 @@ export default function StoreOrdersPage() {
                   <div className="text-2xl font-black text-slate-900 mb-4">
                     ${order.totalAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                   </div>
-                  {!order.isFacturado && (
-                    <Button onClick={() => {
-                      setSelectedOrderForInvoice(order);
-                      setInvoiceForm({...invoiceForm, razonSocial: order.customerName});
-                    }} className="bg-purple-600 hover:bg-purple-700 text-white font-bold w-full md:w-auto shadow-md gap-2 rounded-xl">
-                      <FileText className="w-4 h-4" /> Timbrar con FacturaPro
-                    </Button>
-                  )}
+                  <div className="flex flex-col gap-2 w-full md:w-auto">
+                    {order.status === 'PAID' && (
+                      <Button onClick={() => handleUpdateStatus(order.id, 'SHIPPED')} className="bg-amber-500 hover:bg-amber-600 text-white font-bold w-full shadow-md gap-2 rounded-xl text-xs h-9">
+                        <Package className="w-4 h-4" /> Marcar como Enviado
+                      </Button>
+                    )}
+                    {order.status === 'SHIPPED' && (
+                      <Button onClick={() => handleUpdateStatus(order.id, 'DELIVERED')} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold w-full shadow-md gap-2 rounded-xl text-xs h-9">
+                        <Truck className="w-4 h-4" /> Marcar como Entregado
+                      </Button>
+                    )}
+                    {!order.isFacturado && (
+                      <Button onClick={() => {
+                        setSelectedOrderForInvoice(order);
+                        setInvoiceForm({...invoiceForm, razonSocial: order.customerName});
+                      }} variant="outline" className="border-purple-200 text-purple-700 hover:bg-purple-50 hover:border-purple-300 font-bold w-full gap-2 rounded-xl text-xs h-9">
+                        <FileText className="w-4 h-4" /> Timbrar
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
               

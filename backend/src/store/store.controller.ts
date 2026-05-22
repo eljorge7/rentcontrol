@@ -51,6 +51,11 @@ export class StoreController {
     return this.storeService.getOrders();
   }
 
+  @Put('orders/:id/status')
+  async updateOrderStatus(@Param('id') id: string, @Body('status') status: string) {
+    return this.storeService.updateOrderStatus(id, status);
+  }
+
   @Post('invoice/:id')
   async invoiceOrder(@Param('id') id: string) {
     return this.storeService.invoiceOrder(id);
