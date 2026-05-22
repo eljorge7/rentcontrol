@@ -10,5 +10,6 @@ import { SettingsModule } from '../settings/settings.module';
   imports: [PrismaModule, MikrotikModule, SettingsModule],
   controllers: [MercadopagoController],
   providers: [MercadopagoService],
+  exports: [MercadopagoService],
 })
 export class MercadopagoModule {}

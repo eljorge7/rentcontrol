@@ -94,13 +94,18 @@ function StoreLayoutContent({ children }: { children: ReactNode }) {
         }))
       };
 
-      await axios.post(`${API_URL}/store/orders`, orderData);
-      clearCart();
-      setIsCartOpen(false);
-      setCheckoutName("");
-      setCheckoutPhone("");
-      setCheckoutAddress("");
-      alert("¡Pedido realizado con éxito! Nos pondremos en contacto contigo pronto.");
+      const res = await axios.post(`${API_URL}/store/order`, orderData);
+        
+      if (res.data.checkoutUrl) {
+         window.location.href = res.data.checkoutUrl;
+      } else {
+         clearCart();
+         setIsCartOpen(false);
+         setCheckoutName("");
+         setCheckoutPhone("");
+         setCheckoutAddress("");
+         alert("¡Pedido guardado! (Hubo un problema generando el enlace de pago, te contactaremos pronto).");
+      }
       router.push('/store');
     } catch (error) {
       console.error(error);

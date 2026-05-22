@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
 import { PrismaService } from '../prisma/prisma.service'; // Assuming PrismaService is in ../prisma/prisma.service
+import { MercadopagoService } from '../mercadopago/mercadopago.service';
 
 @Injectable()
 export class StoreService {
@@ -9,7 +10,10 @@ export class StoreService {
   private tokenExpiresAt: number = 0;
   private productsCache: Map<string, { data: any, expiresAt: number }> = new Map();
 
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private mercadopagoService: MercadopagoService
+  ) {}
 
   private async getSyscomToken(): Promise<string> {
     const now = Date.now();
@@ -296,7 +300,7 @@ export class StoreService {
   async createOrder(data: any) {
     const { customerName, customerPhone, customerAddress, totalAmount, items } = data;
     
-    return this.prisma.storeOrder.create({
+    const order = await this.prisma.storeOrder.create({
       data: {
         customerName,
         customerPhone,
@@ -315,6 +319,16 @@ export class StoreService {
       },
       include: { items: true }
     });
+
+    try {
+      // Create MercadoPago checkout link
+      const paymentPref = await this.mercadopagoService.createStorePreference(order);
+      return { order, checkoutUrl: paymentPref.url };
+    } catch (e) {
+      this.logger.error("Error creating MercadoPago preference for StoreOrder", e);
+      // Even if MercadoPago fails, we return the order so it is saved
+      return { order, checkoutUrl: null };
+    }
   }
 
   async getOrders() {

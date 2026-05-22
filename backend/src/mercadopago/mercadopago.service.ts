@@ -75,6 +75,42 @@ export class MercadopagoService {
     }
   }
 
+  async createStorePreference(order: any) {
+    const domain = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
+    const backendUrl = this.configService.get<string>('BACKEND_URL') || 'http://localhost:3001';
+
+    const client = await this.getClient();
+    const preference = new Preference(client);
+    
+    try {
+      const response = await preference.create({
+        body: {
+          items: order.items.map((item: any) => ({
+            id: item.productId || item.syscomId || item.id,
+            title: item.title,
+            description: `Compra en Tienda: ${item.title}`,
+            quantity: item.quantity,
+            unit_price: item.price,
+            currency_id: 'MXN',
+          })),
+          back_urls: {
+            success: `${domain}/store/success`,
+            failure: `${domain}/store`,
+            pending: `${domain}/store`
+          },
+          auto_return: 'approved',
+          notification_url: `${backendUrl}/mercadopago/webhook`,
+          external_reference: `STORE_${order.id}`,
+        }
+      });
+
+      return { url: response.init_point };
+    } catch (error) {
+      this.logger.error('Error creating MercadoPago Store preference', error);
+      throw error;
+    }
+  }
+
   async handleWebhook(query: any, body: any) {
     // Mercado Pago sends topic and id or just type and data.id
     let paymentId: string;
@@ -93,12 +129,18 @@ export class MercadopagoService {
       const mpPayment = await paymentClient.get({ id: paymentId });
 
       if (mpPayment && mpPayment.status === 'approved') {
-        const chargeId = mpPayment.external_reference;
+        const externalReference = mpPayment.external_reference;
         const amount = mpPayment.transaction_amount;
 
-        if (chargeId) {
-          this.logger.log(`MercadoPago payment successful for charge ${chargeId}`);
-          await this.processSuccessfulPayment(chargeId, paymentId.toString(), amount || 0);
+        if (externalReference) {
+          if (externalReference.startsWith('STORE_')) {
+             const orderId = externalReference.replace('STORE_', '');
+             this.logger.log(`MercadoPago payment successful for StoreOrder ${orderId}`);
+             await this.processStorePayment(orderId, paymentId.toString(), amount || 0);
+          } else {
+             this.logger.log(`MercadoPago payment successful for charge ${externalReference}`);
+             await this.processSuccessfulPayment(externalReference, paymentId.toString(), amount || 0);
+          }
         }
       }
     } catch (error) {
@@ -207,5 +249,24 @@ export class MercadopagoService {
         data: { status: 'PARTIAL' }
       });
     }
+  }
+
+  private async processStorePayment(orderId: string, transactionId: string, amount: number) {
+    // Verificar que la orden exista
+    const order = await this.prisma.storeOrder.findUnique({
+      where: { id: orderId }
+    });
+
+    if (!order) {
+      this.logger.error(`StoreOrder not found for webhook payment: ${orderId}`);
+      return;
+    }
+
+    // Actualizar estado a PAID
+    await this.prisma.storeOrder.update({
+      where: { id: orderId },
+      data: { status: 'PAID' }
+    });
+    this.logger.log(`StoreOrder ${orderId} marked as PAID`);
   }
 }
