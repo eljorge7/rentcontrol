@@ -66,7 +66,8 @@ function StoreLayoutContent({ children }: { children: ReactNode }) {
   const getDisplayPrice = (product: any) => {
     let price = product.price;
     if (currency === 'USD') {
-      price = price / 17.50;
+      const exRate = product.exchangeRate || 18.0;
+      price = price / exRate;
     }
     if (!includeIva) {
       price = price / 1.16;

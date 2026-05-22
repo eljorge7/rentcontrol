@@ -42,7 +42,15 @@ export default function ProductDetailPage() {
   }, [productId]);
 
   const getDisplayPrice = (product: any) => {
-    return product.price; 
+    let price = product.price;
+    if (currency === 'USD') {
+      const exRate = product.exchangeRate || 18.0;
+      price = price / exRate;
+    }
+    if (!includeIva) {
+      price = price / 1.16;
+    }
+    return price;
   };
 
   const handleConsultAvailability = (p: any) => {

@@ -14,6 +14,7 @@ export interface Product {
   category: string;
   imageUrl?: string;
   model?: string;
+  exchangeRate?: number;
   source: "syscom" | "local";
 }
 

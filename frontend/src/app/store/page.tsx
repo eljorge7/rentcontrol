@@ -70,11 +70,12 @@ export default function StorePage() {
     window.scrollTo(0,0);
   };
 
-  const getDisplayPrice = (product: Product) => {
+  const getDisplayPrice = (product: any) => {
     let price = product.price;
-    // If currency is USD, divide by 17.50 (rough exchange rate for demo)
+    // If currency is USD, divide by the actual exchange rate from the API, default to 18.0
     if (currency === 'USD') {
-      price = price / 17.50;
+      const exRate = product.exchangeRate || 18.0;
+      price = price / exRate;
     }
     // Backend returns price WITH IVA. If includeIva is false, remove it.
     if (!includeIva) {
