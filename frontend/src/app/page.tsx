@@ -145,7 +145,7 @@ export default function Home() {
           <div className="hidden lg:flex gap-8 text-sm font-medium text-slate-600">
             <a href="#ecosistema" onClick={(e) => handleNavClick(e, 'internet')} className="hover:text-blue-600 transition-colors cursor-pointer">Internet WISP</a>
             <a href="#ecosistema" onClick={(e) => handleNavClick(e, 'rentcontrol')} className="hover:text-blue-600 transition-colors cursor-pointer">RentControl API</a>
-            <Link href="/store" className="hover:text-orange-600 font-bold text-orange-600 transition-colors inline-flex items-center gap-1 cursor-pointer"><Store className="w-4 h-4"/> Tienda de Equipos</Link>
+            <a href="https://facturapro.radiotecpro.com/store/radiotec" target="_blank" rel="noopener noreferrer" className="hover:text-orange-600 font-bold text-orange-600 transition-colors inline-flex items-center gap-1 cursor-pointer"><Store className="w-4 h-4"/> Tienda de Equipos</a>
             <a href="#ecosistema" onClick={(e) => handleNavClick(e, 'facturapro')} className="hover:text-violet-600 font-bold text-violet-600 transition-colors inline-flex items-center gap-1 cursor-pointer"><Calculator className="w-4 h-4"/> FacturaPro ERP</a>
             <a href="#ecosistema" onClick={(e) => handleNavClick(e, 'omnichat')} className="hover:text-emerald-600 font-bold text-emerald-600 transition-colors inline-flex items-center gap-1 cursor-pointer"><MessageSquare className="w-4 h-4"/> OmniChat IA</a>
           </div>
@@ -168,10 +168,10 @@ export default function Home() {
                     <Building2 className="w-4 h-4 text-indigo-600" />
                     RentControl
                   </Link>
-                  <Link href="/store" className="flex items-center gap-3 px-4 py-3 hover:bg-orange-50 text-slate-700 hover:text-orange-700 transition-colors font-medium">
+                  <a href="https://facturapro.radiotecpro.com/store/radiotec" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-4 py-3 hover:bg-orange-50 text-slate-700 hover:text-orange-700 transition-colors font-medium">
                     <Store className="w-4 h-4 text-orange-600" />
                     Tienda de Equipos
-                  </Link>
+                  </a>
                   <div className="h-px bg-slate-100 my-1 mx-4"></div>
                   <a href="https://facturapro.radiotecpro.com/login" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-4 py-3 hover:bg-violet-50 text-slate-700 hover:text-violet-700 transition-colors font-medium">
                     <Calculator className="w-4 h-4 text-violet-600" />
@@ -238,7 +238,7 @@ export default function Home() {
               </button>
 
               <button 
-                onClick={() => router.push('/store')}
+                onClick={() => window.open('https://facturapro.radiotecpro.com/store/radiotec', '_blank')}
                 className={`flex-1 px-4 py-3 sm:py-4 rounded-xl sm:rounded-full font-bold transition-all flex justify-center items-center gap-2 text-sm sm:text-base ${activeTab === 'internet' || activeTab === 'rentcontrol' ? 'text-slate-400 hover:text-white hover:bg-slate-700/50' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-300/50'}`}
               >
                 <Store className="w-5 h-5" /> Tienda
@@ -600,7 +600,7 @@ export default function Home() {
               <ul className="space-y-3">
                 <li><Link href="#internet" className="hover:text-blue-400 transition-colors">Internet WISP</Link></li>
                 <li><Link href="#internet" className="hover:text-blue-400 transition-colors">Enlaces Dedicados</Link></li>
-                <li><Link href="/store" className="hover:text-orange-400 transition-colors font-bold">Tienda de Equipos</Link></li>
+                <li><a href="https://facturapro.radiotecpro.com/store/radiotec" target="_blank" rel="noopener noreferrer" className="hover:text-orange-400 transition-colors font-bold">Tienda de Equipos</a></li>
                 <li><Link href="#gestion" className="hover:text-blue-400 transition-colors">Agencia de Gestión</Link></li>
                 <li><Link href="#gestion" className="hover:text-blue-400 transition-colors">SaaS RentControl</Link></li>
                 <li><Link href="#facturapro" className="hover:text-violet-400 transition-colors font-bold">FacturaPro ERP</Link></li>
