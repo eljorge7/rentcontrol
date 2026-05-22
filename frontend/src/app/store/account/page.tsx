@@ -43,6 +43,19 @@ export default function StoreAccountPage() {
     }
   };
 
+  const handlePayNow = async (orderId: string) => {
+    try {
+      const res = await api.post(`/store/order/${orderId}/pay`);
+      if (res.data.checkoutUrl) {
+        window.location.href = res.data.checkoutUrl;
+      } else {
+        alert("No se pudo generar el link de pago.");
+      }
+    } catch (e) {
+      alert("Error al intentar generar el pago.");
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     switch(status) {
       case 'PENDING': return <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-xs font-bold border border-slate-200 flex items-center gap-1 w-fit"><Clock className="w-3 h-3"/> Pendiente de Pago</span>;
@@ -148,6 +161,12 @@ export default function StoreAccountPage() {
                       <span className="flex items-center gap-2 text-xs font-bold text-slate-400">
                         <FileText className="w-4 h-4 opacity-50" /> Factura Pendiente
                       </span>
+                    )}
+
+                    {order.status === 'PENDING' && (
+                      <button onClick={() => handlePayNow(order.id)} className="bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs px-4 py-2 rounded-lg transition-colors flex items-center gap-2 shadow-sm">
+                        Pagar Ahora <ChevronRight className="w-3 h-3" />
+                      </button>
                     )}
                   </div>
                 </div>

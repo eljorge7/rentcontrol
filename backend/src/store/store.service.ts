@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
 import axios from 'axios';
 import { PrismaService } from '../prisma/prisma.service'; // Assuming PrismaService is in ../prisma/prisma.service
 import { MercadopagoService } from '../mercadopago/mercadopago.service';
@@ -328,6 +328,23 @@ export class StoreService {
       this.logger.error("Error creating MercadoPago preference for StoreOrder", e);
       // Even if MercadoPago fails, we return the order so it is saved
       return { order, checkoutUrl: null };
+    }
+  }
+
+  async generatePaymentLink(id: string) {
+    const order = await this.prisma.storeOrder.findUnique({
+      where: { id },
+      include: { items: true }
+    });
+    if (!order) throw new NotFoundException('Order not found');
+    if (order.status !== 'PENDING') throw new BadRequestException('Order is already paid or processed');
+
+    try {
+      const paymentPref = await this.mercadopagoService.createStorePreference(order);
+      return { checkoutUrl: paymentPref.url };
+    } catch (e) {
+      this.logger.error("Error generating MercadoPago link", e);
+      throw new BadRequestException('No se pudo generar el link de pago');
     }
   }
 

@@ -47,6 +47,11 @@ export class StoreController {
     return this.storeService.createOrder(data);
   }
 
+  @Post('order/:id/pay')
+  async generatePaymentLink(@Param('id') id: string) {
+    return this.storeService.generatePaymentLink(id);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get('my-orders')
   async getMyOrders(@Request() req: any) {

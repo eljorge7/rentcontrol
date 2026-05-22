@@ -86,11 +86,11 @@ export class MercadopagoService {
       const response = await preference.create({
         body: {
           items: order.items.map((item: any) => ({
-            id: item.productId || item.syscomId || item.id,
-            title: item.title,
-            description: `Compra en Tienda: ${item.title}`,
-            quantity: item.quantity,
-            unit_price: item.price,
+            id: String(item.productId || item.syscomId || item.id).substring(0, 250),
+            title: String(item.title).substring(0, 250),
+            description: `Compra en Tienda: ${String(item.title).substring(0, 230)}`,
+            quantity: Number(item.quantity),
+            unit_price: Number(item.price),
             currency_id: 'MXN',
           })),
           back_urls: {
