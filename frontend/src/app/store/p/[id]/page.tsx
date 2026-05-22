@@ -54,7 +54,7 @@ export default function ProductDetailPage() {
   };
 
   const handleConsultAvailability = (p: any) => {
-     window.open(`https://wa.me/5215555555555?text=Hola, me interesa saber la disponibilidad del modelo ${p.model}`, '_blank');
+     window.open(`https://wa.me/526421644126?text=Hola, me interesa saber la disponibilidad del modelo ${p.model}`, '_blank');
   };
 
   if (loading || !productData) {
