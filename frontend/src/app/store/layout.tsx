@@ -23,7 +23,12 @@ function StoreLayoutContent({ children }: { children: ReactNode }) {
 
   const [checkoutName, setCheckoutName] = useState("");
   const [checkoutPhone, setCheckoutPhone] = useState("");
-  const [checkoutAddress, setCheckoutAddress] = useState("");
+  const [checkoutStreet, setCheckoutStreet] = useState("");
+  const [checkoutColonia, setCheckoutColonia] = useState("");
+  const [checkoutCity, setCheckoutCity] = useState("");
+  const [checkoutState, setCheckoutState] = useState("");
+  const [checkoutZip, setCheckoutZip] = useState("");
+  const [saveAddress, setSaveAddress] = useState(false);
 
   const [showConfigDropdown, setShowConfigDropdown] = useState(false);
   const [showAuthDropdown, setShowAuthDropdown] = useState(false);
@@ -65,6 +70,27 @@ function StoreLayoutContent({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (user && user.role === 'CUSTOMER') {
+      const fetchProfile = async () => {
+        try {
+          const res = await axios.get(`${API_URL}/users/my-profile`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+          });
+          if (res.data) {
+            if (res.data.address) setCheckoutStreet(res.data.address);
+            if (res.data.city) setCheckoutCity(res.data.city);
+            if (res.data.state) setCheckoutState(res.data.state);
+            if (res.data.zipCode) setCheckoutZip(res.data.zipCode);
+          }
+        } catch (e) {
+          console.error("Error fetching profile", e);
+        }
+      };
+      fetchProfile();
+    }
+  }, [user]);
+
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
   const getDisplayPrice = (product: any) => {
@@ -84,11 +110,12 @@ function StoreLayoutContent({ children }: { children: ReactNode }) {
     if (cart.length === 0) return;
     
     try {
+      const fullAddress = `${checkoutStreet}, Col. ${checkoutColonia}, ${checkoutCity}, ${checkoutState}, CP: ${checkoutZip}`;
       const orderData = {
         userId: user?.id,
         customerName: checkoutName || user?.name || "Cliente Invitado",
         customerPhone: checkoutPhone || user?.phone || "0000000000",
-        customerAddress: checkoutAddress || "Dirección pendiente",
+        customerAddress: fullAddress,
         totalAmount: cart.reduce((sum, item) => sum + (getDisplayPrice(item.product) * item.quantity), 0),
         items: cart.map(item => ({
           productId: item.product.source === 'local' ? item.product.id : null,
@@ -99,6 +126,21 @@ function StoreLayoutContent({ children }: { children: ReactNode }) {
         }))
       };
 
+      if (user && saveAddress) {
+        try {
+          await axios.patch(`${API_URL}/users/my-profile/address`, {
+            address: checkoutStreet,
+            city: checkoutCity,
+            state: checkoutState,
+            zipCode: checkoutZip
+          }, {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+          });
+        } catch (e) {
+          console.error("Error saving address", e);
+        }
+      }
+
       const res = await axios.post(`${API_URL}/store/order`, orderData);
         
       if (res.data.checkoutUrl) {
@@ -108,7 +150,11 @@ function StoreLayoutContent({ children }: { children: ReactNode }) {
          setIsCartOpen(false);
          setCheckoutName("");
          setCheckoutPhone("");
-         setCheckoutAddress("");
+         setCheckoutStreet("");
+         setCheckoutColonia("");
+         setCheckoutCity("");
+         setCheckoutState("");
+         setCheckoutZip("");
          alert("¡Pedido guardado! (Hubo un problema generando el enlace de pago, te contactaremos pronto).");
       }
       router.push('/store');
@@ -455,9 +501,41 @@ function StoreLayoutContent({ children }: { children: ReactNode }) {
                             <span className="font-bold">Contacto:</span> {user.phone || user.email}
                           </div>
                         )}
-                          <div className="space-y-1">
-                             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Dirección de Envío</label>
-                             <textarea required placeholder="Calle, número, colonia, ciudad, CP" value={checkoutAddress} onChange={e => setCheckoutAddress(e.target.value)} className="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50 hover:bg-white transition-colors h-20 resize-none" />
+                          <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm space-y-4">
+                             <h4 className="font-bold text-sm text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-2"><Tag className="w-4 h-4 text-slate-400" /> Dirección de Envío</h4>
+                             
+                             <div className="space-y-1">
+                               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider ml-1">Calle y Número</label>
+                               <input required type="text" placeholder="Ej. Av. Reforma 123" value={checkoutStreet} onChange={e => setCheckoutStreet(e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50 hover:bg-white transition-colors" />
+                             </div>
+                             
+                             <div className="space-y-1">
+                               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider ml-1">Colonia</label>
+                               <input required type="text" placeholder="Ej. Centro" value={checkoutColonia} onChange={e => setCheckoutColonia(e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50 hover:bg-white transition-colors" />
+                             </div>
+
+                             <div className="grid grid-cols-2 gap-3">
+                               <div className="space-y-1">
+                                 <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider ml-1">Ciudad</label>
+                                 <input required type="text" placeholder="Ciudad" value={checkoutCity} onChange={e => setCheckoutCity(e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50 hover:bg-white transition-colors" />
+                               </div>
+                               <div className="space-y-1">
+                                 <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider ml-1">Estado</label>
+                                 <input required type="text" placeholder="Estado" value={checkoutState} onChange={e => setCheckoutState(e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50 hover:bg-white transition-colors" />
+                               </div>
+                             </div>
+
+                             <div className="space-y-1">
+                               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider ml-1">Código Postal</label>
+                               <input required type="text" placeholder="Ej. 85860" value={checkoutZip} onChange={e => setCheckoutZip(e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50 hover:bg-white transition-colors" />
+                             </div>
+                             
+                             {user && user.role === 'CUSTOMER' && (
+                               <label className="flex items-center gap-2 mt-2 pt-2 border-t border-slate-100 cursor-pointer">
+                                 <input type="checkbox" checked={saveAddress} onChange={e => setSaveAddress(e.target.checked)} className="w-4 h-4 text-blue-600 rounded border-slate-300" />
+                                 <span className="text-xs font-medium text-slate-600">Guardar como dirección predeterminada</span>
+                               </label>
+                             )}
                           </div>
                           
                           <Button type="submit" className="w-full h-14 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl mt-4 flex items-center justify-center gap-2 shadow-lg hover:shadow-amber-500/30 transition-all text-base">

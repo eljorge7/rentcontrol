@@ -236,13 +236,13 @@ export class UsersController {
   }
 
   @Get('my-profile')
-  @Roles('ADMIN', 'MANAGER', 'OWNER')
+  @Roles('ADMIN', 'MANAGER', 'OWNER', 'CUSTOMER')
   async getMyProfile(@Request() req: any) {
     return this.usersService.findById(req.user.userId);
   }
 
   @Patch('my-profile/tax')
-  @Roles('ADMIN', 'MANAGER', 'OWNER')
+  @Roles('ADMIN', 'MANAGER', 'OWNER', 'CUSTOMER')
   async updateMyTaxProfile(@Request() req: any, @Body() updateTaxDto: any) {
     const updateData: any = {
       requiresInvoice: updateTaxDto.requiresInvoice === true || updateTaxDto.requiresInvoice === 'true',
@@ -251,6 +251,18 @@ export class UsersController {
     if (updateTaxDto.taxRegimen !== undefined) updateData.taxRegimen = updateTaxDto.taxRegimen;
     if (updateTaxDto.zipCode !== undefined) updateData.zipCode = updateTaxDto.zipCode;
     if (updateTaxDto.taxDocumentUrl !== undefined) updateData.taxDocumentUrl = updateTaxDto.taxDocumentUrl;
+
+    return this.usersService.update(req.user.userId, updateData);
+  }
+
+  @Patch('my-profile/address')
+  @Roles('ADMIN', 'MANAGER', 'OWNER', 'CUSTOMER')
+  async updateMyAddress(@Request() req: any, @Body() body: any) {
+    const updateData: any = {};
+    if (body.address !== undefined) updateData.address = body.address;
+    if (body.city !== undefined) updateData.city = body.city;
+    if (body.state !== undefined) updateData.state = body.state;
+    if (body.zipCode !== undefined) updateData.zipCode = body.zipCode;
 
     return this.usersService.update(req.user.userId, updateData);
   }

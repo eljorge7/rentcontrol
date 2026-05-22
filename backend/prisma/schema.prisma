@@ -49,6 +49,9 @@ model User {
   rfc             String?
   taxRegimen      String?
   zipCode         String?
+  address         String?
+  city            String?
+  state           String?
   requiresInvoice Boolean @default(false)
   taxDocumentUrl  String?
 
