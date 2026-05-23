@@ -116,10 +116,7 @@ export function Sidebar() {
         <MessageSquare className="mr-3 h-5 w-5 flex-shrink-0 text-indigo-500" />
         {!isCollapsed && <span className="font-bold">Avisos a Unidades (Broadcast)</span>}
       </Link>
-      <Link href="/admin/inventory" className="flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-slate-200 mx-2 mt-1">
-        <Briefcase className="mr-3 h-5 w-5 flex-shrink-0 text-orange-500" />
-        {!isCollapsed && <span className="font-bold text-orange-700">Inventario (Tienda Pública)</span>}
-      </Link>
+
       
       <div className="pt-4 pb-2 h-10">
         {!isCollapsed && <p className="px-5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Agencias y Gestores</p>}
@@ -150,18 +147,7 @@ export function Sidebar() {
         <Wifi className="mr-3 h-5 w-5 flex-shrink-0 text-slate-500" />
         {!isCollapsed && <span>Planes de Internet (Venta)</span>}
       </Link>
-      <Link href="/admin/inventory" className="flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-slate-200 mx-2 mt-1">
-        <Briefcase className="mr-3 h-5 w-5 flex-shrink-0 text-orange-500" />
-        {!isCollapsed && <span className="font-bold text-orange-700">Inventario (Tienda Pública)</span>}
-      </Link>
-      <Link href="/admin/orders" className="flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-slate-200 mx-2 mt-1">
-        <ShoppingBag className="mr-3 h-5 w-5 flex-shrink-0 text-purple-500" />
-        {!isCollapsed && <span className="font-bold text-purple-700">Órdenes y Facturación 1 Clic</span>}
-      </Link>
-      <Link href="/admin/store-customers" className="flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-slate-200 mx-2 mt-1">
-        <Users className="mr-3 h-5 w-5 flex-shrink-0 text-blue-500" />
-        {!isCollapsed && <span className="font-bold text-blue-700">Clientes de Tienda</span>}
-      </Link>
+
     </>
   );
 
