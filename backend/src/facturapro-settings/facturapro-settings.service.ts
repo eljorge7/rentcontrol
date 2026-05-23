@@ -119,7 +119,9 @@ export class FacturaproSettingsService {
 
     // Retornamos la URL de frontend de FacturaPro con el token listo para consumirse
     let fpFrontendUrl = process.env.FACTURAPRO_FRONTEND_URL || 'https://facturapro.radiotecpro.com';
-    if (!fpFrontendUrl.startsWith('http')) {
+    if (fpFrontendUrl.startsWith('http://')) {
+       fpFrontendUrl = fpFrontendUrl.replace('http://', 'https://');
+    } else if (!fpFrontendUrl.startsWith('https://')) {
        fpFrontendUrl = `https://${fpFrontendUrl}`;
     }
     return { url: `${fpFrontendUrl}/sso?token=${data.token}` };
