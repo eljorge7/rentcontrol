@@ -7,23 +7,23 @@ import { useState } from "react";
 const initialPlans = [
    {
       id: "plan_1",
-      name: "FacturaPro Base",
-      price: 399,
-      features: { omnichat: false, facturapro: true, facturaproTier: 'emprendedor_250', rentcontrol: false, wisphq: false },
+      name: "FacturaPro LITE (Solo POS)",
+      price: 199,
+      features: { omnichat: false, facturapro: true, facturaproTier: 'lite', rentcontrol: false, wisphq: false },
       isActive: true
    },
    {
       id: "plan_2",
-      name: "IA Bandeja Inteligente",
-      price: 2499,
+      name: "OmniChat Esencial (Rifas)",
+      price: 499,
       features: { omnichat: true, facturapro: false, facturaproTier: 'none', rentcontrol: false, wisphq: false },
       isActive: true
    },
    {
       id: "plan_3",
-      name: "MAJIA OS Enterprise",
-      price: 3999,
-      features: { omnichat: true, facturapro: true, facturaproTier: 'profesional_2000', rentcontrol: true, wisphq: true },
+      name: "MAJIA OS Enterprise (Suite)",
+      price: 2499,
+      features: { omnichat: true, facturapro: true, facturaproTier: 'corporativo', rentcontrol: true, wisphq: true },
       isActive: true
    }
 ];
@@ -139,10 +139,12 @@ export default function SaasPlansPage() {
                            </div>
                            {plan.features.facturapro && (
                               <span className="text-[10px] uppercase font-bold tracking-widest text-emerald-600 block pl-8">
+                                 {plan.features.facturaproTier === 'lite' && 'Tier: LITE (Bloqueado)'}
                                  {plan.features.facturaproTier === 'trial_5' && 'Tier: Trial (5)'}
                                  {plan.features.facturaproTier === 'emprendedor_250' && 'Tier: Emprendedor (250)'}
                                  {plan.features.facturaproTier === 'pyme_1000' && 'Tier: PYME (1000)'}
                                  {plan.features.facturaproTier === 'profesional_2000' && 'Tier: Profesional (2000)'}
+                                 {plan.features.facturaproTier === 'corporativo' && 'Tier: Corporativo (Ilimitado)'}
                               </span>
                            )}
                         </li>
@@ -232,10 +234,12 @@ export default function SaasPlansPage() {
                                     <select className="w-full text-xs font-semibold bg-white border border-emerald-200 rounded p-1.5 outline-none focus:ring-1 focus:ring-emerald-500 text-slate-700"
                                        value={formData.facturaproTier} onChange={e => setFormData({...formData, facturaproTier: e.target.value})}
                                     >
+                                       <option value="lite">LITE - Solo Punto de Venta e Inventario</option>
                                        <option value="trial_5">Trial - 5 Timbres (Gratuito)</option>
                                        <option value="emprendedor_250">Emprendedor - 250 Timbres</option>
                                        <option value="pyme_1000">PYME - 1000 Timbres</option>
                                        <option value="profesional_2000">Profesional - 2000 Timbres</option>
+                                       <option value="corporativo">Corporativo - Timbres Ilimitados</option>
                                     </select>
                                  </div>
                               )}
