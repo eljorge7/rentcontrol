@@ -85,7 +85,7 @@ export default function Home() {
     e.preventDefault();
     setLeadLoading(true);
     try {
-      await axios.post("http://localhost:3002/api/inbox/webhooks/lead", { 
+      await axios.post("https://api.omnichat.radiotecpro.com/api/inbox/webhooks/lead", { 
         name: leadName, 
         phone: leadPhone, 
         interest: leadInterest 
@@ -378,9 +378,14 @@ export default function Home() {
                       </div>
                       <ScreenshotCarousel images={rentControlImages} title="RentControl" />
                     </div>
-                    <Button onClick={() => openLeadModal("Afiliación Software RentControl SaaS")} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-12 rounded-xl shadow-lg shadow-indigo-600/30">
-                      Solicitar Afiliación / Cotización
-                    </Button>
+                    <div className="grid grid-cols-2 gap-4 mt-6">
+                      <Button onClick={() => window.open('/register', '_blank')} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-12 rounded-xl shadow-lg shadow-indigo-600/30">
+                        Probar Gratis (SaaS)
+                      </Button>
+                      <Button onClick={() => openLeadModal("Agencia de Gestión RentControl")} variant="outline" className="w-full border-slate-700 bg-slate-800 hover:bg-slate-700 text-white font-bold h-12 rounded-xl">
+                        Contactar Agencia
+                      </Button>
+                    </div>
                   </div>
                 </div>
 
@@ -463,9 +468,14 @@ export default function Home() {
                       </div>
                     </div>
                     
-                    <Button onClick={() => openLeadModal("Demostración FacturaPro ERP")} className="w-full bg-violet-600 hover:bg-violet-700 text-white shadow-lg shadow-violet-600/30 font-bold h-12 rounded-xl text-md">
-                      Agendar Demostración ERP
-                    </Button>
+                    <div className="grid grid-cols-2 gap-4 mt-6">
+                      <Button onClick={() => window.open('https://facturapro.radiotecpro.com/register', '_blank')} className="w-full bg-violet-600 hover:bg-violet-700 text-white shadow-lg shadow-violet-600/30 font-bold h-12 rounded-xl text-md">
+                        Crear Cuenta Gratis
+                      </Button>
+                      <Button onClick={() => openLeadModal("Demostración FacturaPro ERP")} variant="outline" className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold h-12 rounded-xl text-md">
+                        Agendar Demo
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -511,9 +521,14 @@ export default function Home() {
                         </div>
                         <ScreenshotCarousel images={omniChatImages} title="OmniChat" />
                      </div>
-                     <Button onClick={() => openLeadModal("Demostración OmniChat AI")} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/30 font-bold h-12 rounded-xl text-md">
-                        Solicitar Acceso a OmniChat
-                     </Button>
+                     <div className="grid grid-cols-2 gap-4 mt-6">
+                       <Button onClick={() => window.open('https://omnichat.radiotecpro.com/register', '_blank')} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/30 font-bold h-12 rounded-xl text-md">
+                          Empezar a Vender
+                       </Button>
+                       <Button onClick={() => openLeadModal("Demostración OmniChat AI")} variant="outline" className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold h-12 rounded-xl text-md">
+                          Ver Demo
+                       </Button>
+                     </div>
                   </div>
                 </div>
               </div>
