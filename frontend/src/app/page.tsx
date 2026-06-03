@@ -33,9 +33,9 @@ const HARDCODED_SAAS_PLANS = [
 
 export default function Home() {
   const router = useRouter();
-  const wispPlans = HARDCODED_WISP_PLANS;
-  const saasPlans = HARDCODED_SAAS_PLANS;
-  const loading = false;
+  const [wispPlans, setWispPlans] = useState<any[]>([]);
+  const [saasPlans, setSaasPlans] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // Lead Catch Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -129,7 +129,31 @@ export default function Home() {
     document.getElementById('ecosistema')?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Eliminado el fetch de API para forzar uso de planes hardcodeados.
+  useEffect(() => {
+    const fetchPublicData = async () => {
+      try {
+        const [wispRes, saasRes] = await Promise.all([
+          axios.get(`${API_URL}/network-profiles/public`),
+          axios.get(`${API_URL}/management-plans/public`)
+        ]);
+        
+        // Sort WISP plans by price
+        const sortedWisp = (wispRes.data || []).sort((a: any, b: any) => a.price - b.price);
+        setWispPlans(sortedWisp);
+        
+        // Sort SaaS plans by fixedFee or commission
+        const sortedSaas = (saasRes.data || []).sort((a: any, b: any) => a.fixedFee - b.fixedFee);
+        setSaasPlans(sortedSaas);
+
+      } catch (error) {
+        console.error("Error fetching public plans:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPublicData();
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans selection:bg-blue-600 selection:text-white">
