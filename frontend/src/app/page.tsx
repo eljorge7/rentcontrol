@@ -425,8 +425,6 @@ export default function Home() {
                   </div>
                 </div>
 
-                </div>
-
                 {/* Precios RentControl */}
                 <div className="text-center mt-24 mb-8">
                   <h3 className="text-3xl font-black text-white mb-4">Planes RentControl SaaS</h3>
@@ -508,7 +506,6 @@ export default function Home() {
                       </Button>
                     </div>
                   </div>
-                </div>
 
                 {/* Precios FacturaPro */}
                 <div className="text-center mt-24 mb-8">
