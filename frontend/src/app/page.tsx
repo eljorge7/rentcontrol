@@ -425,6 +425,37 @@ export default function Home() {
                   </div>
                 </div>
 
+                </div>
+
+                {/* Precios RentControl */}
+                <div className="text-center mt-24 mb-8">
+                  <h3 className="text-3xl font-black text-white mb-4">Planes RentControl SaaS</h3>
+                  <p className="text-slate-400 mb-12">Elige el plan ideal para tu modelo de negocio inmobiliario.</p>
+                  <div className="grid gap-8 md:grid-cols-2 lg:gap-12 max-w-4xl mx-auto">
+                    {saasPlans.length > 0 ? saasPlans.slice(0, 2).map((plan: any, index: number) => (
+                      <div key={plan.id} className={`flex flex-col text-left rounded-3xl p-8 ${index === 0 ? 'bg-slate-800/50 border border-slate-700' : 'bg-indigo-900/40 border-2 border-indigo-500 shadow-2xl lg:scale-105'}`}>
+                        {index === 1 && <div className="mx-auto w-fit bg-indigo-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase mb-4">Recomendado</div>}
+                        <h4 className="text-2xl font-bold text-white mb-2">{plan.name}</h4>
+                        <div className="text-4xl font-black text-white mb-6">
+                          ${plan.fixedFee || 0} <span className="text-lg font-medium text-slate-400">/mes</span>
+                        </div>
+                        <ul className="space-y-4 mb-8 flex-1">
+                          {plan.features?.map((f: string, i: number) => (
+                            <li key={i} className="flex items-start gap-3 text-slate-300">
+                              <Check className="h-5 w-5 text-indigo-400 shrink-0 mt-0.5" /> {f}
+                            </li>
+                          ))}
+                        </ul>
+                        <Button onClick={() => window.open('/register', '_blank')} className={`w-full h-12 rounded-xl font-bold ${index === 0 ? 'bg-slate-700 hover:bg-slate-600 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/30'}`}>
+                          Empezar Ahora
+                        </Button>
+                      </div>
+                    )) : (
+                      <div className="col-span-2 text-slate-400">Cargando planes oficiales...</div>
+                    )}
+                  </div>
+                </div>
+
               </div>
             )}
 
@@ -474,6 +505,40 @@ export default function Home() {
                       </Button>
                       <Button onClick={() => openLeadModal("Demostración FacturaPro ERP")} variant="outline" className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold h-12 rounded-xl text-md">
                         Agendar Demo
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Precios FacturaPro */}
+                <div className="text-center mt-24 mb-8">
+                  <h3 className="text-3xl font-black text-slate-900 mb-4">Módulos ERP FacturaPro</h3>
+                  <p className="text-slate-600 mb-12">Escala tu negocio sin pagar de más. Cambia de plan cuando lo necesites.</p>
+                  <div className="grid gap-8 md:grid-cols-2 lg:gap-12 max-w-4xl mx-auto">
+                    <div className="flex flex-col text-left rounded-3xl p-8 bg-white border border-slate-200 shadow-lg">
+                      <h4 className="text-2xl font-bold text-slate-900 mb-2">LITE (Punto de Venta)</h4>
+                      <div className="text-4xl font-black text-slate-900 mb-6">$399 <span className="text-lg font-medium text-slate-500">/mes</span></div>
+                      <ul className="space-y-4 mb-8 flex-1">
+                        <li className="flex items-start gap-3 text-slate-600"><Check className="h-5 w-5 text-violet-500 shrink-0 mt-0.5" /> Punto de Venta y Facturación</li>
+                        <li className="flex items-start gap-3 text-slate-600"><Check className="h-5 w-5 text-violet-500 shrink-0 mt-0.5" /> Control de Inventarios Básicos</li>
+                        <li className="flex items-start gap-3 text-slate-600"><Check className="h-5 w-5 text-violet-500 shrink-0 mt-0.5" /> Compras y Proveedores</li>
+                      </ul>
+                      <Button onClick={() => window.open('https://facturapro.radiotecpro.com/register', '_blank')} className="w-full h-12 rounded-xl font-bold bg-slate-100 hover:bg-slate-200 text-slate-800">
+                        Seleccionar LITE
+                      </Button>
+                    </div>
+                    <div className="flex flex-col text-left rounded-3xl p-8 bg-violet-50 border-2 border-violet-500 shadow-2xl lg:scale-105 relative">
+                      <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-violet-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase">Suite Completa</div>
+                      <h4 className="text-2xl font-bold text-violet-900 mb-2">FacturaPro ERP Full</h4>
+                      <div className="text-4xl font-black text-violet-900 mb-6">$649 <span className="text-lg font-medium text-violet-600/70">/mes</span></div>
+                      <ul className="space-y-4 mb-8 flex-1">
+                        <li className="flex items-start gap-3 text-slate-700"><Check className="h-5 w-5 text-violet-600 shrink-0 mt-0.5" /> Todo lo del plan LITE</li>
+                        <li className="flex items-start gap-3 text-slate-700"><Check className="h-5 w-5 text-violet-600 shrink-0 mt-0.5" /> Recursos Humanos y Nómina</li>
+                        <li className="flex items-start gap-3 text-slate-700"><Check className="h-5 w-5 text-violet-600 shrink-0 mt-0.5" /> Bóveda de Descarga Masiva SAT</li>
+                        <li className="flex items-start gap-3 text-slate-700"><Check className="h-5 w-5 text-violet-600 shrink-0 mt-0.5" /> Integración Syscom / Tienda en línea</li>
+                      </ul>
+                      <Button onClick={() => window.open('https://facturapro.radiotecpro.com/register', '_blank')} className="w-full h-12 rounded-xl font-bold bg-violet-600 hover:bg-violet-700 text-white shadow-lg shadow-violet-600/30">
+                        Seleccionar Full ERP
                       </Button>
                     </div>
                   </div>
@@ -531,6 +596,41 @@ export default function Home() {
                      </div>
                   </div>
                 </div>
+
+                {/* Precios OmniChat */}
+                <div className="text-center mt-24 mb-8">
+                  <h3 className="text-3xl font-black text-slate-900 mb-4">Suscripciones OmniChat AI</h3>
+                  <p className="text-slate-600 mb-12">Desde campañas de marketing hasta un asesor de cobranza automático.</p>
+                  <div className="grid gap-8 md:grid-cols-2 lg:gap-12 max-w-4xl mx-auto">
+                    <div className="flex flex-col text-left rounded-3xl p-8 bg-white border border-slate-200 shadow-lg">
+                      <h4 className="text-2xl font-bold text-slate-900 mb-2">Esencial (Marketing)</h4>
+                      <div className="text-4xl font-black text-slate-900 mb-6">$199 <span className="text-lg font-medium text-slate-500">/mes</span></div>
+                      <ul className="space-y-4 mb-8 flex-1">
+                        <li className="flex items-start gap-3 text-slate-600"><Check className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" /> Gestor de Rifas y Sorteos</li>
+                        <li className="flex items-start gap-3 text-slate-600"><Check className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" /> Difusión Masiva de Mensajes</li>
+                        <li className="flex items-start gap-3 text-slate-600"><Check className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" /> Bandeja Compartida Básica</li>
+                      </ul>
+                      <Button onClick={() => window.open('https://omnichat.radiotecpro.com/register', '_blank')} className="w-full h-12 rounded-xl font-bold bg-slate-100 hover:bg-slate-200 text-slate-800">
+                        Comenzar con Esencial
+                      </Button>
+                    </div>
+                    <div className="flex flex-col text-left rounded-3xl p-8 bg-emerald-50 border-2 border-emerald-500 shadow-2xl lg:scale-105 relative">
+                      <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-emerald-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase">Cerebro IA Activo</div>
+                      <h4 className="text-2xl font-bold text-emerald-900 mb-2">Suite Inteligente IA</h4>
+                      <div className="text-4xl font-black text-emerald-900 mb-6">$599 <span className="text-lg font-medium text-emerald-600/70">/mes</span></div>
+                      <ul className="space-y-4 mb-8 flex-1">
+                        <li className="flex items-start gap-3 text-slate-700"><Check className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" /> Todo lo del plan Esencial</li>
+                        <li className="flex items-start gap-3 text-slate-700"><Check className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" /> Integración RentControl (Cobranza IA)</li>
+                        <li className="flex items-start gap-3 text-slate-700"><Check className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" /> Respuestas entrenadas ChatGPT</li>
+                        <li className="flex items-start gap-3 text-slate-700"><Check className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" /> Soporte WispHub Inteligente</li>
+                      </ul>
+                      <Button onClick={() => window.open('https://omnichat.radiotecpro.com/register', '_blank')} className="w-full h-12 rounded-xl font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/30">
+                        Activar IA Avanzada
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
               </div>
             )}
             
