@@ -10,11 +10,32 @@ import axios from "axios";
 // Using native fetch or axios to the public endpoints.
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
+const HARDCODED_WISP_PLANS = [
+  { id: 1, name: "Plan Básico", price: 350, downloadSpeed: 10, uploadSpeed: 3 },
+  { id: 2, name: "Plan Familiar", price: 450, downloadSpeed: 20, uploadSpeed: 5 },
+  { id: 3, name: "Plan Gamer", price: 550, downloadSpeed: 30, uploadSpeed: 10 },
+];
+
+const HARDCODED_SAAS_PLANS = [
+  { 
+    id: 1, 
+    name: "SaaS Emprendedor", 
+    fixedFee: 649, 
+    features: ["Administra de 1 a 5 propiedades", "Cobranza automatizada WhatsApp", "Cortes Mikrotik automáticos", "Portal de inquilinos"] 
+  },
+  { 
+    id: 2, 
+    name: "SaaS Inmobiliaria", 
+    fixedFee: 849, 
+    features: ["Administra de 5 a 11 propiedades", "Todo lo del plan Emprendedor", "Múltiples administradores", "Soporte prioritario"] 
+  }
+];
+
 export default function Home() {
   const router = useRouter();
-  const [wispPlans, setWispPlans] = useState<any[]>([]);
-  const [saasPlans, setSaasPlans] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const wispPlans = HARDCODED_WISP_PLANS;
+  const saasPlans = HARDCODED_SAAS_PLANS;
+  const loading = false;
 
   // Lead Catch Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -108,31 +129,7 @@ export default function Home() {
     document.getElementById('ecosistema')?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  useEffect(() => {
-    const fetchPublicData = async () => {
-      try {
-        const [wispRes, saasRes] = await Promise.all([
-          axios.get(`${API_URL}/network-profiles/public`),
-          axios.get(`${API_URL}/management-plans/public`)
-        ]);
-        
-        // Sort WISP plans by price
-        const sortedWisp = (wispRes.data || []).sort((a: any, b: any) => a.price - b.price);
-        setWispPlans(sortedWisp);
-        
-        // Sort SaaS plans by fixedFee or commission
-        const sortedSaas = (saasRes.data || []).sort((a: any, b: any) => a.fixedFee - b.fixedFee);
-        setSaasPlans(sortedSaas);
-
-      } catch (error) {
-        console.error("Error fetching public plans:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPublicData();
-  }, []);
+  // Eliminado el fetch de API para forzar uso de planes hardcodeados.
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans selection:bg-blue-600 selection:text-white">
