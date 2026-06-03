@@ -506,6 +506,7 @@ export default function Home() {
                       </Button>
                     </div>
                   </div>
+                </div>
 
                 {/* Precios FacturaPro */}
                 <div className="text-center mt-24 mb-8">
