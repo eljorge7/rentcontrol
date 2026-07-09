@@ -48,6 +48,7 @@ import { EmployeesModule } from './employees/employees.module';
 import { PayrollRunsModule } from './payroll-runs/payroll-runs.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { TimeOffModule } from './time-off/time-off.module';
+import { AutomationsModule } from './automations/automations.module';
 
 import { ThrottlerModule } from '@nestjs/throttler';
 import { CryptoModule } from './crypto/crypto.module';
@@ -62,7 +63,7 @@ import { CryptoModule } from './crypto/crypto.module';
       serveRoot: '/uploads',
       serveStaticOptions: { index: false }
     }),
-    PrismaModule, ScheduleModule.forRoot(), PropertiesModule, UnitsModule, TenantsModule, LeasesModule, ChargesModule, PaymentsModule, MikrotikModule, InvoicesModule, NetworkProfilesModule, LeaseServicesModule, ChatModule, AuthModule, UsersModule, ExpensesModule, IncidentsModule, ManagementPlansModule, CommissionsModule, EventTypesModule, StripeModule, MercadopagoModule, QuotationsModule, MetricsModule, PdfsModule, VouchersModule, SuppliersModule, UploadsModule, TasksModule, ChecklistsModule, PayoutsModule, NotificationsModule, FacturaproModule, AppsModule, FacturaproSettingsModule, SaasOnboardingModule, SettingsModule, InfrastructureModule, EmployeesModule, PayrollRunsModule, AttendanceModule, TimeOffModule
+    PrismaModule, ScheduleModule.forRoot(), PropertiesModule, UnitsModule, TenantsModule, LeasesModule, ChargesModule, PaymentsModule, MikrotikModule, InvoicesModule, NetworkProfilesModule, LeaseServicesModule, ChatModule, AuthModule, UsersModule, ExpensesModule, IncidentsModule, ManagementPlansModule, CommissionsModule, EventTypesModule, StripeModule, MercadopagoModule, QuotationsModule, MetricsModule, PdfsModule, VouchersModule, SuppliersModule, UploadsModule, TasksModule, ChecklistsModule, PayoutsModule, NotificationsModule, FacturaproModule, AppsModule, FacturaproSettingsModule, SaasOnboardingModule, SettingsModule, InfrastructureModule, EmployeesModule, PayrollRunsModule, AttendanceModule, TimeOffModule, AutomationsModule
   ],
   controllers: [AppController, AnnouncementsController, OmniChatProxyController],
   providers: [AppService],

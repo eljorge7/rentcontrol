@@ -771,3 +771,18 @@ model AttendanceRecord {
 
 
 
+
+model AutomationRule {
+  id             String   @id @default(uuid())
+  name           String
+  isActive       Boolean  @default(true)
+  triggerApp     String   // Ej. FACTURAPRO, RENTCONTROL, OMNICHAT
+  triggerEvent   String   // Ej. INVOICE_PAID, TICKET_RESOLVED
+  actionApp      String   // Ej. OMNICHAT, FACTURAPRO
+  actionType     String   // Ej. SEND_WHATSAPP
+  actionTemplate String   @db.Text // Ej. "Hola {{customerName}}..."
+  companyId      String   // ID del cliente en Magia OS
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
