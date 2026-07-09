@@ -26,7 +26,8 @@ import {
   Home,
   Database,
   Activity,
-  ShoppingBag
+  ShoppingBag,
+  Zap
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { useState } from "react";
@@ -59,6 +60,10 @@ export function Sidebar() {
       <Link href="/admin/infrastructure" className="flex items-center rounded-md px-3 py-2 text-sm font-medium mt-2 mx-2 hover:bg-slate-800 bg-slate-900 border border-slate-700 shadow-lg text-white">
         <Activity className="mr-3 h-5 w-5 flex-shrink-0 text-emerald-400" />
         {!isCollapsed && <span className="font-bold tracking-wide">Telemetry NOC</span>}
+      </Link>
+      <Link href="/admin/automations" className="flex items-center rounded-md px-3 py-2 text-sm font-medium mt-2 mx-2 hover:bg-amber-100 bg-amber-50 border border-amber-200 shadow-sm transition-all hover:-translate-y-0.5">
+        <Zap className="mr-3 h-5 w-5 flex-shrink-0 text-amber-500" />
+        {!isCollapsed && <span className="text-amber-700 font-black tracking-tight">Magia OS Automations</span>}
       </Link>
       <a href="https://omnichat.radiotecpro.com/login" target="_blank" rel="noopener noreferrer" className="flex items-center rounded-md px-3 py-2 text-sm font-medium mt-2 mx-2 hover:bg-purple-100 bg-purple-50 border border-purple-200 shadow-sm transition-all hover:-translate-y-0.5">
         <MessageSquare className="mr-3 h-5 w-5 flex-shrink-0 text-purple-600" />
