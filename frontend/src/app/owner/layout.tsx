@@ -2,6 +2,7 @@
 
 import { OwnerSidebar } from "@/components/OwnerSidebar";
 import { useAuth } from "@/components/AuthProvider";
+import { AppLauncher } from "@/components/AppLauncher";
 
 export default function OwnerLayout({
   children,
@@ -27,6 +28,7 @@ export default function OwnerLayout({
         <header className="flex h-16 items-center justify-between border-b bg-white px-6 print:hidden">
           <h1 className="text-xl font-semibold text-slate-800">Panel del Propietario</h1>
           <div className="flex items-center gap-3">
+            <AppLauncher currentApp="RentControl" />
             <span className="text-sm font-medium text-slate-700 hidden sm:block">{user?.name}</span>
             <div className="h-8 w-8 rounded-full bg-emerald-600 flex justify-center items-center text-white font-bold">
               {user?.name ? user.name.charAt(0).toUpperCase() : "P"}

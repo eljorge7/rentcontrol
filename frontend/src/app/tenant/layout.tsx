@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { TenantSidebar } from "@/components/TenantSidebar";
 import { PwaInstallPrompt } from "@/components/PwaInstallPrompt";
 import api from "@/lib/api";
+import { AppLauncher } from "@/components/AppLauncher";
 
 export default function TenantLayout({
   children,
@@ -39,6 +40,7 @@ export default function TenantLayout({
         <header className="flex h-16 items-center justify-between border-b bg-white px-6 shadow-sm">
           <div className="text-lg font-semibold text-slate-800">Portal del Inquilino</div>
           <div className="flex items-center gap-4">
+            <AppLauncher currentApp="RentControl" />
             <span className="text-sm text-slate-500">Bienvenido, {tenantName}</span>
             <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">{initial}</div>
           </div>
