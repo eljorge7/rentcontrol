@@ -160,10 +160,31 @@ export default function AutomationsPage() {
                 <textarea 
                   value={actionTemplate} 
                   onChange={e => setActionTemplate(e.target.value)} 
-                  className="w-full border rounded-lg p-3 text-sm h-24" 
-                  placeholder="Variables permitidas: {{customerName}}, {{amount}}"
+                  className="w-full border border-slate-200 rounded-lg p-3 text-sm h-32 focus:ring-2 focus:ring-indigo-500 outline-none" 
+                  placeholder="Escribe tu mensaje aquí usando variables..."
                 />
-                <p className="text-xs text-slate-400 mt-1">Puedes usar variables entre llaves. Ej: {`{{amount}}`}</p>
+                
+                {/* Available Variables Section */}
+                <div className="mt-3 bg-slate-50 border border-slate-200 rounded-lg p-3">
+                   <p className="text-xs font-bold text-slate-600 mb-2 flex items-center gap-1">
+                     <Zap className="w-3 h-3 text-amber-500"/> Variables Disponibles
+                   </p>
+                   <div className="flex flex-wrap gap-2">
+                     <span className="text-[10px] font-mono bg-indigo-100 text-indigo-700 px-2 py-1 rounded cursor-pointer hover:bg-indigo-200" onClick={() => setActionTemplate(prev => prev + ' {{customerName}}')}>
+                       {`{{customerName}}`}
+                     </span>
+                     <span className="text-[10px] font-mono bg-emerald-100 text-emerald-700 px-2 py-1 rounded cursor-pointer hover:bg-emerald-200" onClick={() => setActionTemplate(prev => prev + ' {{amount}}')}>
+                       {`{{amount}}`}
+                     </span>
+                     <span className="text-[10px] font-mono bg-blue-100 text-blue-700 px-2 py-1 rounded cursor-pointer hover:bg-blue-200" onClick={() => setActionTemplate(prev => prev + ' {{invoiceNumber}}')}>
+                       {`{{invoiceNumber}}`}
+                     </span>
+                     <span className="text-[10px] font-mono bg-purple-100 text-purple-700 px-2 py-1 rounded cursor-pointer hover:bg-purple-200" onClick={() => setActionTemplate(prev => prev + ' {{phone}}')}>
+                       {`{{phone}}`}
+                     </span>
+                   </div>
+                   <p className="text-[10px] text-slate-400 mt-2">Haz clic en una variable para insertarla en tu mensaje. El motor las reemplazará automáticamente con datos reales del evento.</p>
+                </div>
               </div>
             </div>
 
