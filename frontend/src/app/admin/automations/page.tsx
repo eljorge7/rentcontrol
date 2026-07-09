@@ -24,7 +24,7 @@ export default function AutomationsPage() {
   const fetchRules = async () => {
     try {
       const activeCid = localStorage.getItem('activeCompanyId') || "GENERAL";
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/api/automations?companyId=${activeCid}`);
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/automations?companyId=${activeCid}`);
       setRules(res.data);
     } catch (e) {
       console.error(e);
@@ -36,7 +36,7 @@ export default function AutomationsPage() {
   const handleSave = async () => {
     try {
       const activeCid = localStorage.getItem('activeCompanyId') || "GENERAL";
-      await axios.post(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/api/automations`, {
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/automations`, {
         name,
         triggerApp,
         triggerEvent,
@@ -57,7 +57,7 @@ export default function AutomationsPage() {
   const handleDelete = async (id: string) => {
     if(!confirm("¿Borrar esta regla?")) return;
     try {
-      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/api/automations/${id}`);
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/automations/${id}`);
       fetchRules();
     } catch (e) {
       console.error(e);
