@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { useState } from "react";
+import { AppLauncher } from "./AppLauncher";
 
 type AppContext = 'AGENCY' | 'RENTCONTROL' | 'ISP';
 
@@ -166,9 +167,12 @@ export function Sidebar() {
       </button>
 
       <div className="flex flex-col border-b px-4 py-4 space-y-4">
-        {!isCollapsed && (
-           <img src="/logo-transparent.png" alt="RadioTec Pro" className="h-[40px] md:h-[48px] object-contain drop-shadow-sm self-start" />
-        )}
+        <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
+          {!isCollapsed && (
+             <img src="/logo-transparent.png" alt="RadioTec Pro" className="h-[40px] md:h-[48px] object-contain drop-shadow-sm self-start" />
+          )}
+          <AppLauncher currentApp="RentControl" />
+        </div>
         
         {/* Context Switcher */}
         {!isCollapsed ? (
