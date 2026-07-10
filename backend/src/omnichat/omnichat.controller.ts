@@ -123,4 +123,49 @@ export class OmniChatProxyController {
     
     return { success: true, ticketId: shortId, message: "Ticket creado en RentControl." };
   }
+
+  /**
+   * Crea un Inquilino Oficial en RentControl desde una solicitud externa (OmniChat IA)
+   */
+  @Post('tenants/create')
+  async createTenant(@Body() body: any, @Headers('x-api-key') token: string) {
+    this.validateToken(token);
+
+    const { name, email, phone, notes } = body;
+    
+    if (!name || !phone) {
+       return { success: false, message: "Faltan datos obligatorios (nombre y teléfono)" };
+    }
+
+    // Clean phone number
+    const cleanPhone = phone.replace(/\D/g, '').slice(-10);
+
+    // Verificar si ya existe
+    const existing = await this.prisma.tenant.findFirst({
+        where: { phone: { contains: cleanPhone } }
+    });
+
+    if (existing) {
+        return { success: true, tenantId: existing.id, message: "El inquilino ya estaba registrado en RentControl.", isNew: false };
+    }
+
+    // Crear inquilino
+    const newTenant = await this.prisma.tenant.create({
+        data: {
+            name,
+            email: email || `${cleanPhone}@inquilinos.local`,
+            phone: cleanPhone,
+            notes: notes || 'Creado automáticamente vía OmniChat IA'
+        }
+    });
+
+    this.logger.log(`Nuevo inquilino creado vía OmniChat IA: ${name} (${cleanPhone})`);
+
+    return { 
+        success: true, 
+        tenantId: newTenant.id, 
+        message: "Inquilino creado exitosamente en RentControl.",
+        isNew: true
+    };
+  }
 }
