@@ -154,8 +154,7 @@ export class OmniChatProxyController {
         data: {
             name,
             email: email || `${cleanPhone}@inquilinos.local`,
-            phone: cleanPhone,
-            notes: notes || 'Creado automáticamente vía OmniChat IA'
+            phone: cleanPhone
         }
     });
 
