@@ -95,6 +95,8 @@ export class FacturaproSettingsService {
     };
 
     const facturaproBaseUrl = process.env.FACTURAPRO_API_URL || 'https://facturapro.radiotecpro.com/api';
+    console.log("[SSO] Payload:", payload);
+    console.log("[SSO] Fetching from:", `${facturaproBaseUrl}/auth/sso`);
     
     // Server-to-Server API Call
     const res = await fetch(`${facturaproBaseUrl}/auth/sso`, {
@@ -102,17 +104,18 @@ export class FacturaproSettingsService {
        headers: { 'Content-Type': 'application/json' },
        body: JSON.stringify(payload)
     }).catch(e => {
-       console.error("Fetch to FacturaPro SSO failed at network level:", e);
+       console.error("[SSO] Fetch to FacturaPro SSO failed at network level:", e);
        throw new Error('Fallo al generar puente de inicio de sesión único con FacturaPro (Network)');
     });
 
     if (!res.ok) {
        const text = await res.text();
-       console.error(`FacturaPro SSO returned ${res.status}: ${text}`);
+       console.error(`[SSO] FacturaPro SSO returned ${res.status}: ${text}`);
        throw new Error(`Fallo al generar puente de inicio de sesión único con FacturaPro. Status: ${res.status}`);
     }
 
     const data = await res.json();
+    console.log("[SSO] Response from FacturaPro:", data);
     
     // Guardar el tenantId devuelto para unificar identidades permanentemente
     if (!user.facturaproTenantId && data.tenantId) {
